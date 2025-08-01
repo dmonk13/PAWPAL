@@ -136,3 +136,66 @@ export type MatchWithDogs = Match & {
   dog1: Dog;
   dog2: Dog;
 };
+
+// Veterinarian schema
+export const veterinarians = pgTable("veterinarians", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  clinicName: text("clinic_name").notNull(),
+  specialties: jsonb("specialties").$type<string[]>().default([]),
+  services: jsonb("services").$type<string[]>().default([]),
+  rating: decimal("rating", { precision: 3, scale: 2 }).default("0"),
+  reviewCount: integer("review_count").default(0),
+  phoneNumber: text("phone_number"),
+  email: text("email"),
+  website: text("website"),
+  address: text("address").notNull(),
+  latitude: decimal("latitude", { precision: 10, scale: 8 }).notNull(),
+  longitude: decimal("longitude", { precision: 11, scale: 8 }).notNull(),
+  workingHours: jsonb("working_hours").$type<{
+    [key: string]: { open: string; close: string; closed?: boolean };
+  }>().default({}),
+  emergencyServices: boolean("emergency_services").default(false),
+  onlineBooking: boolean("online_booking").default(false),
+  bookingUrl: text("booking_url"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Appointments schema
+export const appointments = pgTable("appointments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  dogId: varchar("dog_id").notNull().references(() => dogs.id),
+  veterinarianId: varchar("veterinarian_id").notNull().references(() => veterinarians.id),
+  appointmentDate: timestamp("appointment_date").notNull(),
+  serviceType: text("service_type").notNull(),
+  status: text("status").notNull().default("scheduled"),
+  notes: text("notes"),
+  isExternal: boolean("is_external").default(false),
+  externalBookingId: text("external_booking_id"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Additional insert schemas
+export const insertVeterinarianSchema = createInsertSchema(veterinarians).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAppointmentSchema = createInsertSchema(appointments).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Additional types
+export type Veterinarian = typeof veterinarians.$inferSelect;
+export type InsertVeterinarian = z.infer<typeof insertVeterinarianSchema>;
+
+export type Appointment = typeof appointments.$inferSelect;
+export type InsertAppointment = z.infer<typeof insertAppointmentSchema>;
+
+// Extended types for vet listings
+export type VeterinarianWithDistance = Veterinarian & {
+  distance?: number;
+};

@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertSwipeSchema, insertDogSchema, insertMedicalProfileSchema } from "@shared/schema";
+import { insertSwipeSchema, insertDogSchema, insertMedicalProfileSchema, insertAppointmentSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -233,6 +233,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(dogsWithMedical);
     } catch (error) {
       res.status(500).json({ message: "Failed to get user's dogs" });
+    }
+  });
+
+  // Veterinarian routes
+  
+  // Get veterinarians nearby
+  app.get("/api/veterinarians/nearby", async (req, res) => {
+    try {
+      const { latitude, longitude, maxDistance = 25 } = req.query;
+
+      if (!latitude || !longitude) {
+        return res.status(400).json({ 
+          message: "latitude and longitude are required" 
+        });
+      }
+
+      const veterinarians = await storage.getVeterinariansNearby(
+        parseFloat(latitude as string),
+        parseFloat(longitude as string),
+        parseFloat(maxDistance as string)
+      );
+
+      res.json(veterinarians);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get nearby veterinarians" });
+    }
+  });
+
+  // Get veterinarian details
+  app.get("/api/veterinarians/:vetId", async (req, res) => {
+    try {
+      const { vetId } = req.params;
+      const veterinarian = await storage.getVeterinarian(vetId);
+      
+      if (!veterinarian) {
+        return res.status(404).json({ message: "Veterinarian not found" });
+      }
+      
+      res.json(veterinarian);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get veterinarian details" });
+    }
+  });
+
+  // Create appointment
+  app.post("/api/appointments", async (req, res) => {
+    try {
+      const appointmentData = insertAppointmentSchema.parse(req.body);
+      const appointment = await storage.createAppointment(appointmentData);
+      res.status(201).json(appointment);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid appointment data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create appointment" });
+    }
+  });
+
+  // Get user appointments
+  app.get("/api/users/:userId/appointments", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const appointments = await storage.getAppointmentsByUser(userId);
+      res.json(appointments);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get user appointments" });
     }
   });
 

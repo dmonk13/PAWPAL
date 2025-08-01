@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Search, Heart, MessageCircle, User } from "lucide-react";
+import { Search, Heart, MessageCircle, User, Stethoscope } from "lucide-react";
 
 export default function BottomNav() {
   const [location] = useLocation();
@@ -8,6 +8,7 @@ export default function BottomNav() {
     { id: "discover", label: "Discover", icon: Search, path: "/" },
     { id: "matches", label: "Matches", icon: Heart, path: "/matches" },
     { id: "messages", label: "Messages", icon: MessageCircle, path: "/messages" },
+    { id: "vet-connect", label: "Vet Connect", icon: Stethoscope, path: "/vet-connect" },
     { id: "profile", label: "Profile", icon: User, path: "/profile" },
   ];
 
@@ -16,7 +17,7 @@ export default function BottomNav() {
       <div className="flex justify-around">
         {tabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = location === tab.path || (tab.path === "/" && location === "/discover");
+          const isActive = location === tab.path || (tab.path === "/" && location === "/discover") || (tab.path === "/vet-connect" && location.startsWith("/vet-"));
           
           return (
             <Link key={tab.id} href={tab.path}>

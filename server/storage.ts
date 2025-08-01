@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Dog, type InsertDog, type MedicalProfile, type InsertMedicalProfile, type Swipe, type InsertSwipe, type Match, type InsertMatch, type Message, type InsertMessage, type DogWithMedical } from "@shared/schema";
+import { type User, type InsertUser, type Dog, type InsertDog, type MedicalProfile, type InsertMedicalProfile, type Swipe, type InsertSwipe, type Match, type InsertMatch, type Message, type InsertMessage, type Veterinarian, type InsertVeterinarian, type Appointment, type InsertAppointment, type DogWithMedical, type VeterinarianWithDistance } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -30,6 +30,14 @@ export interface IStorage {
   // Message methods
   getMessagesByMatch(matchId: string): Promise<Message[]>;
   createMessage(message: InsertMessage): Promise<Message>;
+
+  // Veterinarian methods
+  getVeterinariansNearby(latitude: number, longitude: number, maxDistance: number): Promise<VeterinarianWithDistance[]>;
+  getVeterinarian(id: string): Promise<Veterinarian | undefined>;
+  
+  // Appointment methods
+  createAppointment(appointment: InsertAppointment): Promise<Appointment>;
+  getAppointmentsByUser(userId: string): Promise<Appointment[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -39,6 +47,8 @@ export class MemStorage implements IStorage {
   private swipes: Map<string, Swipe>;
   private matches: Map<string, Match>;
   private messages: Map<string, Message>;
+  private veterinarians: Map<string, Veterinarian>;
+  private appointments: Map<string, Appointment>;
 
   constructor() {
     this.users = new Map();
@@ -47,6 +57,8 @@ export class MemStorage implements IStorage {
     this.swipes = new Map();
     this.matches = new Map();
     this.messages = new Map();
+    this.veterinarians = new Map();
+    this.appointments = new Map();
     
     // Seed with initial data
     this.seedData();
@@ -195,6 +207,101 @@ export class MemStorage implements IStorage {
     this.medicalProfiles.set(medical1.dogId, medical1);
     this.medicalProfiles.set(medical2.dogId, medical2);
     this.medicalProfiles.set(medical3.dogId, medical3);
+
+    // Create sample veterinarians
+    const vet1: Veterinarian = {
+      id: "vet-1",
+      name: "Dr. Sarah Johnson",
+      clinicName: "Paws & Claws Veterinary Clinic",
+      specialties: ["General Practice", "Surgery", "Emergency Care"],
+      services: ["Vaccinations", "Health Checkups", "Surgery", "Dental Care", "Emergency Services"],
+      rating: "4.8",
+      reviewCount: 156,
+      phoneNumber: "(555) 123-4567",
+      email: "sarah@pawsandclaws.com",
+      website: "https://pawsandclaws.com",
+      address: "123 Main Street, New York, NY 10001",
+      latitude: "40.7589",
+      longitude: "-73.9851",
+      workingHours: {
+        Monday: { open: "8:00", close: "18:00" },
+        Tuesday: { open: "8:00", close: "18:00" },
+        Wednesday: { open: "8:00", close: "18:00" },
+        Thursday: { open: "8:00", close: "18:00" },
+        Friday: { open: "8:00", close: "18:00" },
+        Saturday: { open: "9:00", close: "15:00" },
+        Sunday: { closed: true }
+      },
+      emergencyServices: true,
+      onlineBooking: true,
+      bookingUrl: "https://pawsandclaws.com/book",
+      isActive: true,
+      createdAt: new Date(),
+    };
+
+    const vet2: Veterinarian = {
+      id: "vet-2",
+      name: "Dr. Michael Chen",
+      clinicName: "City Animal Hospital",
+      specialties: ["Internal Medicine", "Cardiology", "Oncology"],
+      services: ["Specialized Care", "Diagnostics", "Lab Tests", "X-rays", "Ultrasound"],
+      rating: "4.9",
+      reviewCount: 203,
+      phoneNumber: "(555) 987-6543",
+      email: "mchen@cityanimalhospital.com",
+      website: "https://cityanimalhospital.com",
+      address: "456 Oak Avenue, New York, NY 10002",
+      latitude: "40.7505",
+      longitude: "-73.9934",
+      workingHours: {
+        Monday: { open: "7:00", close: "19:00" },
+        Tuesday: { open: "7:00", close: "19:00" },
+        Wednesday: { open: "7:00", close: "19:00" },
+        Thursday: { open: "7:00", close: "19:00" },
+        Friday: { open: "7:00", close: "19:00" },
+        Saturday: { open: "8:00", close: "16:00" },
+        Sunday: { open: "10:00", close: "14:00" }
+      },
+      emergencyServices: true,
+      onlineBooking: false,
+      bookingUrl: null,
+      isActive: true,
+      createdAt: new Date(),
+    };
+
+    const vet3: Veterinarian = {
+      id: "vet-3",
+      name: "Dr. Emily Rodriguez",
+      clinicName: "Happy Tails Veterinary Care",
+      specialties: ["Preventive Care", "Behavioral Medicine", "Nutrition"],
+      services: ["Wellness Exams", "Behavioral Consultation", "Nutrition Planning", "Grooming"],
+      rating: "4.7",
+      reviewCount: 89,
+      phoneNumber: "(555) 456-7890",
+      email: "emily@happytailsvet.com",
+      website: "https://happytailsvet.com",
+      address: "789 Park Boulevard, New York, NY 10003",
+      latitude: "40.7614",
+      longitude: "-73.9776",
+      workingHours: {
+        Monday: { open: "9:00", close: "17:00" },
+        Tuesday: { open: "9:00", close: "17:00" },
+        Wednesday: { open: "9:00", close: "17:00" },
+        Thursday: { open: "9:00", close: "17:00" },
+        Friday: { open: "9:00", close: "17:00" },
+        Saturday: { closed: true },
+        Sunday: { closed: true }
+      },
+      emergencyServices: false,
+      onlineBooking: true,
+      bookingUrl: "https://happytailsvet.com/schedule",
+      isActive: true,
+      createdAt: new Date(),
+    };
+
+    this.veterinarians.set(vet1.id, vet1);
+    this.veterinarians.set(vet2.id, vet2);
+    this.veterinarians.set(vet3.id, vet3);
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -367,6 +474,43 @@ export class MemStorage implements IStorage {
     const message: Message = { ...insertMessage, id, createdAt: new Date() };
     this.messages.set(id, message);
     return message;
+  }
+
+  async getVeterinariansNearby(latitude: number, longitude: number, maxDistance: number): Promise<VeterinarianWithDistance[]> {
+    const vets = Array.from(this.veterinarians.values()).filter(vet => vet.isActive);
+    
+    const vetsWithDistance = vets.map(vet => {
+      const distance = this.calculateDistance(
+        latitude,
+        longitude,
+        parseFloat(vet.latitude),
+        parseFloat(vet.longitude)
+      );
+      
+      return {
+        ...vet,
+        distance: Math.round(distance * 10) / 10
+      };
+    }).filter(vet => vet.distance! <= maxDistance);
+
+    return vetsWithDistance.sort((a, b) => a.distance! - b.distance!);
+  }
+
+  async getVeterinarian(id: string): Promise<Veterinarian | undefined> {
+    return this.veterinarians.get(id);
+  }
+
+  async createAppointment(insertAppointment: InsertAppointment): Promise<Appointment> {
+    const id = randomUUID();
+    const appointment: Appointment = { ...insertAppointment, id, createdAt: new Date() };
+    this.appointments.set(id, appointment);
+    return appointment;
+  }
+
+  async getAppointmentsByUser(userId: string): Promise<Appointment[]> {
+    return Array.from(this.appointments.values())
+      .filter(appointment => appointment.userId === userId)
+      .sort((a, b) => new Date(a.appointmentDate).getTime() - new Date(b.appointmentDate).getTime());
   }
 }
 
