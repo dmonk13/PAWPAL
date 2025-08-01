@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, X, Star, Heart, Shield, Undo2, Infinity, Percent } from "lucide-react";
+import { Check, X, Star, Heart, Shield, Undo2, Infinity, Percent, Crown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Premium() {
@@ -49,15 +49,21 @@ export default function Premium() {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-2">Choose Your Plan</h1>
-        <p className="text-muted-foreground">
-          Find the perfect match for your furry friend with our premium features
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Crown className="h-8 w-8 text-purple-600" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Choose Your Plan
+            </h1>
+          </div>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Unlock premium features to find the perfect match for your furry friend and access professional veterinary care
+          </p>
+        </div>
 
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
         {/* Freemium Plan */}
         <Card className="relative">
           <CardHeader>
@@ -181,6 +187,7 @@ export default function Premium() {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

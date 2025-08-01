@@ -31,36 +31,36 @@ export default function SwipeCard({ dog, onMedicalClick, className = "", style }
         
         {/* Distance indicator */}
         {dog.distance && (
-          <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
+          <div className="absolute top-4 right-4 bg-black/70 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium">
             <MapPin className="w-3 h-3 inline mr-1" />
             <span>{dog.distance} mi</span>
           </div>
         )}
 
         {/* Medical badges */}
-        <div className="absolute top-4 left-4 flex flex-wrap gap-2">
-          {isVaccinated && (
-            <Badge className="medical-badge text-white text-xs">
+        <div className="absolute top-4 left-4 flex flex-wrap gap-2 max-w-48">
+          {medicalProfile?.vetClearance && (
+            <Badge className="bg-green-500/90 backdrop-blur-sm text-white text-xs font-medium px-2 py-1">
               <Heart className="w-3 h-3 mr-1" />
+              Vet Approved
+            </Badge>
+          )}
+          
+          {isVaccinated && (
+            <Badge className="bg-blue-500/90 backdrop-blur-sm text-white text-xs font-medium px-2 py-1">
               Vaccinated
             </Badge>
           )}
           
-          {medicalProfile?.isSpayedNeutered && (
-            <Badge className="medical-badge text-white text-xs">
-              Spayed/Neutered
+          {dog.matingPreference && (
+            <Badge className="bg-pink-500/90 backdrop-blur-sm text-white text-xs font-medium px-2 py-1">
+              Looking to Mate
             </Badge>
           )}
           
           {hasAllergies && (
-            <Badge className="bg-warm-yellow text-dark-gray text-xs">
-              Food Allergies
-            </Badge>
-          )}
-          
-          {!hasAllergies && medicalProfile && (
-            <Badge className="medical-badge text-white text-xs">
-              Allergy-Free
+            <Badge className="bg-orange-500/90 backdrop-blur-sm text-white text-xs font-medium px-2 py-1">
+              Has Allergies
             </Badge>
           )}
         </div>
@@ -74,14 +74,14 @@ export default function SwipeCard({ dog, onMedicalClick, className = "", style }
             </div>
             
             <div className="flex items-center space-x-4 medium-gray mb-3">
-              <span>{dog.breed}</span>
+              <span className="font-medium">{dog.breed}</span>
               <span>•</span>
               <span>{dog.size}</span>
               <span>•</span>
               <span>{dog.gender}</span>
             </div>
             
-            <p className="text-sm medium-gray line-clamp-2">
+            <p className="text-sm medium-gray line-clamp-2 leading-relaxed mb-4">
               {dog.bio || "No bio available"}
             </p>
           </div>
@@ -90,11 +90,32 @@ export default function SwipeCard({ dog, onMedicalClick, className = "", style }
           <Button
             onClick={onMedicalClick}
             variant="outline"
-            className="flex items-center justify-center space-x-2 bg-sky bg-opacity-10 text-sky border-sky mt-3"
+            className="flex items-center justify-center space-x-2 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 transition-colors"
           >
             <Plus className="w-4 h-4" />
-            <span>Medical Details</span>
+            <span>View Medical Profile</span>
           </Button>
+        </div>
+        
+        {/* Temperament section - positioned below the card */}
+        <div className="absolute -bottom-6 left-4 right-4 z-10">
+          {dog.temperament && dog.temperament.length > 0 && (
+            <div className="bg-white rounded-xl shadow-lg p-4 border border-gray-100">
+              <h4 className="text-sm font-semibold text-gray-700 mb-2">Personality Traits</h4>
+              <div className="flex flex-wrap gap-2">
+                {dog.temperament.slice(0, 4).map((trait: string, index: number) => (
+                  <Badge key={index} variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100 transition-colors">
+                    {trait}
+                  </Badge>
+                ))}
+                {dog.temperament.length > 4 && (
+                  <Badge variant="outline" className="text-xs bg-gray-50 text-gray-600 border-gray-200">
+                    +{dog.temperament.length - 4} more
+                  </Badge>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
