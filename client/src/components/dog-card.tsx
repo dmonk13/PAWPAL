@@ -1,4 +1,4 @@
-import { Heart, MapPin, Plus } from "lucide-react";
+import { Heart, MapPin, Plus, CheckCircle, Users } from "lucide-react";
 import { DogWithMedical } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,7 +33,7 @@ export default function DogCard({ dog, onMedicalClick, className = "" }: DogCard
           </div>
         )}
 
-        {/* Medical badges */}
+        {/* Status badges */}
         <div className="absolute top-4 left-4 flex flex-wrap gap-2">
           {isVaccinated && (
             <Badge className="medical-badge text-white text-xs">
@@ -42,15 +42,23 @@ export default function DogCard({ dog, onMedicalClick, className = "" }: DogCard
             </Badge>
           )}
           
-          {medicalProfile?.isSpayedNeutered && (
-            <Badge className="medical-badge text-white text-xs">
-              Spayed/Neutered
+          {medicalProfile?.vetClearance && (
+            <Badge className="bg-green-500 text-white text-xs">
+              <CheckCircle className="w-3 h-3 mr-1" />
+              Vet Approved
+            </Badge>
+          )}
+          
+          {dog.matingPreference && (
+            <Badge className="bg-purple-500 text-white text-xs">
+              <Users className="w-3 h-3 mr-1" />
+              Mating
             </Badge>
           )}
           
           {hasAllergies && (
             <Badge className="bg-warm-yellow text-dark-gray text-xs">
-              Food Allergies
+              Allergies
             </Badge>
           )}
         </div>
@@ -71,7 +79,23 @@ export default function DogCard({ dog, onMedicalClick, className = "" }: DogCard
               <span>{dog.gender}</span>
             </div>
             
-            <p className="text-sm medium-gray line-clamp-2">{dog.bio}</p>
+            <p className="text-sm medium-gray line-clamp-2 mb-3">{dog.bio}</p>
+            
+            {/* Temperament tags */}
+            {dog.temperament && dog.temperament.length > 0 && (
+              <div className="flex flex-wrap gap-1 mb-2">
+                {dog.temperament.slice(0, 3).map((trait: string, index: number) => (
+                  <Badge key={index} variant="outline" className="text-xs bg-coral bg-opacity-10 text-coral border-coral">
+                    {trait}
+                  </Badge>
+                ))}
+                {dog.temperament.length > 3 && (
+                  <Badge variant="outline" className="text-xs">
+                    +{dog.temperament.length - 3}
+                  </Badge>
+                )}
+              </div>
+            )}
           </div>
           
           {/* Medical info toggle */}

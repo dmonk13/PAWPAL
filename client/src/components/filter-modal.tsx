@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, CheckCircle, Users, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 
 interface FilterModalProps {
   onClose: () => void;
@@ -18,6 +19,22 @@ export default function FilterModal({ onClose, onApplyFilters }: FilterModalProp
   const [vaccinated, setVaccinated] = useState(true);
   const [spayedNeutered, setSpayedNeutered] = useState(false);
   const [noAllergies, setNoAllergies] = useState(false);
+  const [vetClearance, setVetClearance] = useState(false);
+  const [matingPreference, setMatingPreference] = useState(false);
+  const [selectedTemperaments, setSelectedTemperaments] = useState<string[]>([]);
+
+  const temperamentOptions = [
+    "Playful", "Energetic", "Calm", "Friendly", "Shy", 
+    "Intelligent", "Curious", "Loyal", "Social", "Gentle", "Active"
+  ];
+
+  const toggleTemperament = (temperament: string) => {
+    setSelectedTemperaments(prev => 
+      prev.includes(temperament)
+        ? prev.filter(t => t !== temperament)
+        : [...prev, temperament]
+    );
+  };
 
   const handleApply = () => {
     onApplyFilters({
@@ -27,6 +44,9 @@ export default function FilterModal({ onClose, onApplyFilters }: FilterModalProp
       vaccinated,
       spayedNeutered,
       noAllergies,
+      vetClearance,
+      matingPreference,
+      temperaments: selectedTemperaments,
     });
     onClose();
   };
@@ -38,6 +58,9 @@ export default function FilterModal({ onClose, onApplyFilters }: FilterModalProp
     setVaccinated(true);
     setSpayedNeutered(false);
     setNoAllergies(false);
+    setVetClearance(false);
+    setMatingPreference(false);
+    setSelectedTemperaments([]);
   };
 
   return (
@@ -113,28 +136,80 @@ export default function FilterModal({ onClose, onApplyFilters }: FilterModalProp
                 <Checkbox
                   id="vaccinated"
                   checked={vaccinated}
-                  onCheckedChange={setVaccinated}
+                  onCheckedChange={(checked) => setVaccinated(checked === true)}
                 />
-                <Label htmlFor="vaccinated" className="text-sm">Vaccinated</Label>
+                <Label htmlFor="vaccinated" className="text-sm flex items-center">
+                  <Heart className="w-4 h-4 mr-1 text-red-500" />
+                  Must be vaccinated
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-3">
+                <Checkbox
+                  id="vet-clearance"
+                  checked={vetClearance}
+                  onCheckedChange={(checked) => setVetClearance(checked === true)}
+                />
+                <Label htmlFor="vet-clearance" className="text-sm flex items-center">
+                  <CheckCircle className="w-4 h-4 mr-1 text-green-500" />
+                  Vet clearance required
+                </Label>
               </div>
               
               <div className="flex items-center space-x-3">
                 <Checkbox
                   id="spayedNeutered"
                   checked={spayedNeutered}
-                  onCheckedChange={setSpayedNeutered}
+                  onCheckedChange={(checked) => setSpayedNeutered(checked === true)}
                 />
-                <Label htmlFor="spayedNeutered" className="text-sm">Spayed/Neutered</Label>
+                <Label htmlFor="spayedNeutered" className="text-sm">Spayed/Neutered only</Label>
               </div>
               
               <div className="flex items-center space-x-3">
                 <Checkbox
                   id="noAllergies"
                   checked={noAllergies}
-                  onCheckedChange={setNoAllergies}
+                  onCheckedChange={(checked) => setNoAllergies(checked === true)}
                 />
-                <Label htmlFor="noAllergies" className="text-sm">No Allergies</Label>
+                <Label htmlFor="noAllergies" className="text-sm">No food allergies</Label>
               </div>
+            </div>
+          </div>
+
+          {/* Special Preferences */}
+          <div>
+            <Label className="block text-sm font-semibold dark-gray mb-3">Special Preferences</Label>
+            <div className="flex items-center space-x-3">
+              <Checkbox
+                id="mating"
+                checked={matingPreference}
+                onCheckedChange={(checked) => setMatingPreference(checked === true)}
+              />
+              <Label htmlFor="mating" className="text-sm flex items-center">
+                <Users className="w-4 h-4 mr-1 text-purple-500" />
+                Looking for mating partners only
+              </Label>
+            </div>
+          </div>
+
+          {/* Temperament Filter */}
+          <div>
+            <Label className="block text-sm font-semibold dark-gray mb-3">
+              Temperament (select traits you prefer)
+            </Label>
+            <div className="grid grid-cols-2 gap-2">
+              {temperamentOptions.map((temperament) => (
+                <Button
+                  key={temperament}
+                  type="button"
+                  variant={selectedTemperaments.includes(temperament) ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => toggleTemperament(temperament)}
+                  className={selectedTemperaments.includes(temperament) ? "bg-coral text-white" : ""}
+                >
+                  {temperament}
+                </Button>
+              ))}
             </div>
           </div>
           

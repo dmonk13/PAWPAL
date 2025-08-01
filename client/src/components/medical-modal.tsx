@@ -1,4 +1,4 @@
-import { X, Heart, Pill, AlertTriangle, Calendar } from "lucide-react";
+import { X, Heart, Pill, AlertTriangle, Calendar, CheckCircle, FileText } from "lucide-react";
 import { DogWithMedical } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -116,6 +116,28 @@ export default function MedicalModal({ dog, onClose }: MedicalModalProps) {
             </div>
           </div>
           
+          {/* Vet Clearance */}
+          {medicalProfile.vetClearance && (
+            <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+              <div className="flex items-center mb-2">
+                <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                <h4 className="font-semibold dark-gray">Veterinary Clearance</h4>
+              </div>
+              <p className="text-sm medium-gray mb-2">
+                Verified by veterinarian on {medicalProfile.vetClearanceDate 
+                  ? new Date(medicalProfile.vetClearanceDate).toLocaleDateString()
+                  : "Unknown date"
+                }
+              </p>
+              {medicalProfile.vetDocumentUrl && (
+                <Button variant="outline" size="sm" className="flex items-center">
+                  <FileText className="w-3 h-3 mr-1" />
+                  View Documents
+                </Button>
+              )}
+            </div>
+          )}
+
           {/* Last Vet Visit */}
           <div className="bg-purple-100 p-4 rounded-lg">
             <div className="flex items-center mb-2">

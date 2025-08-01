@@ -21,6 +21,9 @@ export const dogs = pgTable("dogs", {
   size: text("size").notNull(),
   bio: text("bio"),
   photos: jsonb("photos").$type<string[]>().default([]),
+  temperament: jsonb("temperament").$type<string[]>().default([]),
+  matingPreference: boolean("mating_preference").default(false),
+  distanceRadius: integer("distance_radius").default(10),
   latitude: decimal("latitude", { precision: 10, scale: 8 }),
   longitude: decimal("longitude", { precision: 11, scale: 8 }),
   isActive: boolean("is_active").default(true),
@@ -44,6 +47,9 @@ export const medicalProfiles = pgTable("medical_profiles", {
   conditions: jsonb("conditions").$type<string[]>().default([]),
   lastVetVisit: timestamp("last_vet_visit"),
   isSpayedNeutered: boolean("is_spayed_neutered").default(false),
+  vetClearance: boolean("vet_clearance").default(false),
+  vetClearanceDate: timestamp("vet_clearance_date"),
+  vetDocumentUrl: text("vet_document_url"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

@@ -84,6 +84,9 @@ export class MemStorage implements IStorage {
       size: "Large",
       bio: "Loves playing fetch and swimming. Great with kids and other dogs!",
       photos: ["https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
+      temperament: ["Playful", "Energetic", "Friendly"],
+      matingPreference: false,
+      distanceRadius: 15,
       latitude: "40.7128",
       longitude: "-74.0060",
       isActive: true,
@@ -100,6 +103,9 @@ export class MemStorage implements IStorage {
       size: "Medium",
       bio: "Energetic and playful! Loves short walks and belly rubs.",
       photos: ["https://images.unsplash.com/photo-1605568427561-40dd23c2acea?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
+      temperament: ["Energetic", "Playful", "Curious"],
+      matingPreference: true,
+      distanceRadius: 10,
       latitude: "40.7589",
       longitude: "-73.9851",
       isActive: true,
@@ -116,6 +122,9 @@ export class MemStorage implements IStorage {
       size: "Large",
       bio: "Highly intelligent and loves to learn new tricks. Perfect for active families!",
       photos: ["https://images.unsplash.com/photo-1551717743-49959800b1f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
+      temperament: ["Intelligent", "Active", "Focused"],
+      matingPreference: false,
+      distanceRadius: 20,
       latitude: "40.7282",
       longitude: "-74.0776",
       isActive: true,
@@ -140,6 +149,9 @@ export class MemStorage implements IStorage {
       conditions: [],
       lastVetVisit: new Date("2024-02-15"),
       isSpayedNeutered: true,
+      vetClearance: true,
+      vetClearanceDate: new Date("2024-02-15"),
+      vetDocumentUrl: null,
       createdAt: new Date(),
     };
 
@@ -155,6 +167,9 @@ export class MemStorage implements IStorage {
       conditions: [],
       lastVetVisit: new Date("2024-03-01"),
       isSpayedNeutered: false,
+      vetClearance: false,
+      vetClearanceDate: null,
+      vetDocumentUrl: null,
       createdAt: new Date(),
     };
 
@@ -171,6 +186,9 @@ export class MemStorage implements IStorage {
       conditions: [],
       lastVetVisit: new Date("2024-02-20"),
       isSpayedNeutered: true,
+      vetClearance: true,
+      vetClearanceDate: new Date("2024-02-20"),
+      vetDocumentUrl: null,
       createdAt: new Date(),
     };
 

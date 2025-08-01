@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Settings, Camera, Heart, Edit3, Plus } from "lucide-react";
+import { Settings, Camera, Heart, Edit3, Plus, MapPin, CheckCircle, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import BottomNav from "@/components/bottom-nav";
+import DogProfileForm from "@/components/dog-profile-form";
 
 const CURRENT_USER_ID = "user-1";
 
 export default function Profile() {
   const [selectedDog, setSelectedDog] = useState<string | null>(null);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [editingDog, setEditingDog] = useState<any>(null);
 
   const { data: dogs = [], isLoading } = useQuery({
     queryKey: ["/api/users", CURRENT_USER_ID, "dogs"],
@@ -72,7 +75,10 @@ export default function Profile() {
             <p className="medium-gray mb-6">
               Create a profile for your dog to start matching with other pups!
             </p>
-            <Button className="bg-coral text-white">
+            <Button 
+              className="bg-coral text-white"
+              onClick={() => setShowEditForm(true)}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Dog Profile
             </Button>
@@ -94,6 +100,24 @@ export default function Profile() {
                   </Button>
                 ))}
               </div>
+            )}
+
+            {/* Temperament section */}
+            {currentDog?.temperament && currentDog.temperament.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Temperament</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {currentDog.temperament.map((trait: string, index: number) => (
+                      <Badge key={index} className="bg-coral bg-opacity-10 text-coral border-coral">
+                        {trait}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             )}
 
             {/* Main profile card */}
@@ -118,14 +142,22 @@ export default function Profile() {
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
                         <h2 className="text-xl font-bold dark-gray">{currentDog.name}</h2>
-                        <Button variant="ghost" size="sm" className="p-1">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="p-1"
+                          onClick={() => {
+                            setEditingDog(currentDog);
+                            setShowEditForm(true);
+                          }}
+                        >
                           <Edit3 className="w-4 h-4" />
                         </Button>
                       </div>
                       <p className="medium-gray mb-2">
                         {currentDog.breed} • {currentDog.age} years • {currentDog.size}
                       </p>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 mb-2">
                         <Badge variant={currentDog.isActive ? "default" : "secondary"}>
                           {currentDog.isActive ? "Active" : "Inactive"}
                         </Badge>
@@ -135,6 +167,28 @@ export default function Profile() {
                             Vaccinated
                           </Badge>
                         )}
+                        {currentDog.medicalProfile?.vetClearance && (
+                          <Badge className="bg-green-100 text-green-800">
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Vet Approved
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      {/* Additional info row */}
+                      <div className="flex items-center space-x-4 text-sm medium-gray">
+                        {currentDog.distanceRadius && (
+                          <div className="flex items-center">
+                            <MapPin className="w-3 h-3 mr-1" />
+                            <span>{currentDog.distanceRadius}mi radius</span>
+                          </div>
+                        )}
+                        {currentDog.matingPreference && (
+                          <div className="flex items-center">
+                            <Users className="w-3 h-3 mr-1" />
+                            <span>Open to mating</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -143,7 +197,14 @@ export default function Profile() {
                     {currentDog.bio || "No bio yet. Add one to attract more matches!"}
                   </p>
                   
-                  <Button variant="outline" className="w-full">
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => {
+                      setEditingDog(currentDog);
+                      setShowEditForm(true);
+                    }}
+                  >
                     <Edit3 className="w-4 h-4 mr-2" />
                     Edit Profile
                   </Button>
@@ -204,7 +265,11 @@ export default function Profile() {
             )}
 
             {/* Add new dog button */}
-            <Button variant="outline" className="w-full">
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={() => setShowEditForm(true)}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Another Dog
             </Button>
@@ -213,6 +278,17 @@ export default function Profile() {
       </div>
       
       <BottomNav />
+
+      {/* Edit/Add Dog Form */}
+      {showEditForm && (
+        <DogProfileForm
+          dog={editingDog}
+          onClose={() => {
+            setShowEditForm(false);
+            setEditingDog(null);
+          }}
+        />
+      )}
     </>
   );
 }
