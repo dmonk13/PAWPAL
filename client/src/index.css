@@ -1,0 +1,164 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+  
+  /* PupMatch custom colors */
+  --coral: hsl(9, 100%, 69%);
+  --teal: hsl(175, 59%, 60%);
+  --sky: hsl(207, 90%, 54%);
+  --mint: hsl(145, 44%, 70%);
+  --warm-yellow: hsl(43, 89%, 78%);
+  --lavender: hsl(300, 47%, 75%);
+  --dark-gray: hsl(207, 26%, 19%);
+  --medium-gray: hsl(207, 13%, 44%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer utilities {
+  .coral {
+    color: var(--coral);
+  }
+  
+  .bg-coral {
+    background-color: var(--coral);
+  }
+  
+  .border-coral {
+    border-color: var(--coral);
+  }
+  
+  .teal {
+    color: var(--teal);
+  }
+  
+  .bg-teal {
+    background-color: var(--teal);
+  }
+  
+  .sky {
+    color: var(--sky);
+  }
+  
+  .bg-sky {
+    background-color: var(--sky);
+  }
+  
+  .mint {
+    color: var(--mint);
+  }
+  
+  .bg-mint {
+    background-color: var(--mint);
+  }
+  
+  .warm-yellow {
+    color: var(--warm-yellow);
+  }
+  
+  .bg-warm-yellow {
+    background-color: var(--warm-yellow);
+  }
+  
+  .dark-gray {
+    color: var(--dark-gray);
+  }
+  
+  .bg-dark-gray {
+    background-color: var(--dark-gray);
+  }
+  
+  .medium-gray {
+    color: var(--medium-gray);
+  }
+  
+  .bg-medium-gray {
+    background-color: var(--medium-gray);
+  }
+  
+  .gradient-bg {
+    background: linear-gradient(135deg, var(--coral) 0%, var(--teal) 100%);
+  }
+  
+  .medical-badge {
+    background: linear-gradient(45deg, var(--sky), var(--mint));
+  }
+  
+  .swipe-card {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  
+  .swipe-card.swiping-left {
+    transform: translateX(-100vw) rotate(-15deg);
+    opacity: 0;
+  }
+  
+  .swipe-card.swiping-right {
+    transform: translateX(100vw) rotate(15deg);
+    opacity: 0;
+  }
+  
+  .bounce-gentle {
+    animation: bounceGentle 0.5s ease;
+  }
+  
+  @keyframes bounceGentle {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-5px); }
+    60% { transform: translateY(-3px); }
+  }
+}
