@@ -170,7 +170,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const existingProfile = await storage.getMedicalProfile(dogId);
       
       if (existingProfile) {
-        const updatedProfile = await storage.updateMedicalProfile(dogId, medicalData);
+        const updatedProfile = await storage.updateMedicalProfile(dogId, req.body);
         res.json(updatedProfile);
       } else {
         const newProfile = await storage.createMedicalProfile(medicalData);
