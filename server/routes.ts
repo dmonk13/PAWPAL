@@ -302,6 +302,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Stripe subscription endpoint
+  app.post("/api/create-subscription", async (req, res) => {
+    try {
+      // For now, return a placeholder URL since we need actual Stripe setup
+      // In production, this would create a Stripe checkout session
+      res.json({ 
+        checkoutUrl: "/premium?success=true",
+        message: "Subscription feature ready - requires Stripe configuration" 
+      });
+    } catch (error: any) {
+      res.status(500).json({ 
+        message: "Error creating subscription: " + error.message 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

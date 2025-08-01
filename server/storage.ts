@@ -71,6 +71,10 @@ export class MemStorage implements IStorage {
       username: "sarah_golden",
       email: "sarah@example.com",
       password: "password123",
+      isPro: false,
+      proExpiresAt: null,
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
       createdAt: new Date(),
     };
     
@@ -79,6 +83,10 @@ export class MemStorage implements IStorage {
       username: "mike_corgi",
       email: "mike@example.com",
       password: "password123",
+      isPro: false,
+      proExpiresAt: null,
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
       createdAt: new Date(),
     };
 
@@ -87,6 +95,10 @@ export class MemStorage implements IStorage {
       username: "alex_husky",
       email: "alex@example.com", 
       password: "password123",
+      isPro: false,
+      proExpiresAt: null,
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
       createdAt: new Date(),
     };
 
@@ -95,6 +107,10 @@ export class MemStorage implements IStorage {
       username: "emma_beagle",
       email: "emma@example.com",
       password: "password123", 
+      isPro: false,
+      proExpiresAt: null,
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
       createdAt: new Date(),
     };
 
@@ -103,6 +119,10 @@ export class MemStorage implements IStorage {
       username: "carlos_poodle",
       email: "carlos@example.com",
       password: "password123",
+      isPro: false,
+      proExpiresAt: null,
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
       createdAt: new Date(),
     };
 
@@ -111,6 +131,10 @@ export class MemStorage implements IStorage {
       username: "lisa_lab",
       email: "lisa@example.com",
       password: "password123",
+      isPro: false,
+      proExpiresAt: null,
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
       createdAt: new Date(),
     };
 

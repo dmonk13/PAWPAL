@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Settings, Camera, Heart, Edit3, Plus, MapPin, CheckCircle, Users } from "lucide-react";
+import { Settings, Camera, Heart, Edit3, Plus, MapPin, CheckCircle, Users, Star, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import BottomNav from "@/components/bottom-nav";
 import DogProfileForm from "@/components/dog-profile-form";
+import { Link } from "wouter";
 
 const CURRENT_USER_ID = "user-1";
 
@@ -65,6 +66,34 @@ export default function Profile() {
             <Settings className="w-4 h-4" />
           </Button>
         </header>
+
+        {/* Premium Upgrade Card */}
+        <Card className="mb-6 bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                  <Crown className="w-5 h-5 text-purple-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Upgrade to Pro</h3>
+                  <p className="text-sm text-gray-600">Unlock premium features</p>
+                </div>
+              </div>
+              <Link href="/premium">
+                <Button size="sm" className="bg-purple-500 hover:bg-purple-600">
+                  <Star className="w-4 h-4 mr-1" />
+                  Upgrade
+                </Button>
+              </Link>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Badge variant="secondary" className="text-xs">Vet Connect</Badge>
+              <Badge variant="secondary" className="text-xs">Unlimited Swipes</Badge>
+              <Badge variant="secondary" className="text-xs">Priority Visibility</Badge>
+            </div>
+          </CardContent>
+        </Card>
 
         {dogs.length === 0 ? (
           <div className="text-center py-12">

@@ -10,6 +10,8 @@ import Messages from "@/pages/messages";
 import Profile from "@/pages/profile";
 import VetConnect from "@/pages/vet-connect";
 import VetProfile from "@/pages/vet-profile";
+import Premium from "@/pages/premium";
+import Checkout from "@/pages/checkout";
 
 function Router() {
   return (
@@ -21,6 +23,8 @@ function Router() {
       <Route path="/profile" component={Profile} />
       <Route path="/vet-connect" component={VetConnect} />
       <Route path="/vet-profile/:vetId" component={VetProfile} />
+      <Route path="/premium" component={Premium} />
+      <Route path="/checkout" component={Checkout} />
       <Route component={NotFound} />
     </Switch>
   );
