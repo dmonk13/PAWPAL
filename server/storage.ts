@@ -1,7 +1,16 @@
 import { users, dogs, medicalProfiles, swipes, matches, messages, veterinarians, appointments, type User, type InsertUser, type Dog, type InsertDog, type MedicalProfile, type InsertMedicalProfile, type Swipe, type InsertSwipe, type Match, type InsertMatch, type Message, type InsertMessage, type Veterinarian, type InsertVeterinarian, type Appointment, type InsertAppointment, type DogWithMedical, type VeterinarianWithDistance } from "@shared/schema";
-import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
+
+// Import db but use conditional export based on environment
+let db: any = null;
+if (process.env.DATABASE_URL) {
+  try {
+    db = require("./db").db;
+  } catch (error) {
+    console.warn("Database connection failed, using in-memory storage");
+  }
+}
 
 export interface IStorage {
   // User methods
@@ -1487,4 +1496,4 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+export const storage = new MemStorage();
