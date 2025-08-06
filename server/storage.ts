@@ -1,4 +1,6 @@
-import { type User, type InsertUser, type Dog, type InsertDog, type MedicalProfile, type InsertMedicalProfile, type Swipe, type InsertSwipe, type Match, type InsertMatch, type Message, type InsertMessage, type Veterinarian, type InsertVeterinarian, type Appointment, type InsertAppointment, type DogWithMedical, type VeterinarianWithDistance } from "@shared/schema";
+import { users, dogs, medicalProfiles, swipes, matches, messages, veterinarians, appointments, type User, type InsertUser, type Dog, type InsertDog, type MedicalProfile, type InsertMedicalProfile, type Swipe, type InsertSwipe, type Match, type InsertMatch, type Message, type InsertMessage, type Veterinarian, type InsertVeterinarian, type Appointment, type InsertAppointment, type DogWithMedical, type VeterinarianWithDistance } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -38,6 +40,223 @@ export interface IStorage {
   // Appointment methods
   createAppointment(appointment: InsertAppointment): Promise<Appointment>;
   getAppointmentsByUser(userId: string): Promise<Appointment[]>;
+}
+
+export class DatabaseStorage implements IStorage {
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async getDog(id: string): Promise<Dog | undefined> {
+    const [dog] = await db.select().from(dogs).where(eq(dogs.id, id));
+    return dog || undefined;
+  }
+
+  async getDogsByOwner(ownerId: string): Promise<Dog[]> {
+    return await db.select().from(dogs).where(eq(dogs.ownerId, ownerId));
+  }
+
+  async createDog(insertDog: InsertDog): Promise<Dog> {
+    const [dog] = await db
+      .insert(dogs)
+      .values(insertDog)
+      .returning();
+    return dog;
+  }
+
+  async updateDog(id: string, updates: Partial<Dog>): Promise<Dog | undefined> {
+    const [dog] = await db
+      .update(dogs)
+      .set(updates)
+      .where(eq(dogs.id, id))
+      .returning();
+    return dog || undefined;
+  }
+
+  async getMedicalProfile(dogId: string): Promise<MedicalProfile | undefined> {
+    const [profile] = await db.select().from(medicalProfiles).where(eq(medicalProfiles.dogId, dogId));
+    return profile || undefined;
+  }
+
+  async createMedicalProfile(insertProfile: InsertMedicalProfile): Promise<MedicalProfile> {
+    const [profile] = await db
+      .insert(medicalProfiles)
+      .values(insertProfile)
+      .returning();
+    return profile;
+  }
+
+  async updateMedicalProfile(dogId: string, updates: Partial<MedicalProfile>): Promise<MedicalProfile | undefined> {
+    const [profile] = await db
+      .update(medicalProfiles)
+      .set(updates)
+      .where(eq(medicalProfiles.dogId, dogId))
+      .returning();
+    return profile || undefined;
+  }
+
+  async getDogsForMatching(currentDogId: string, latitude: number, longitude: number, maxDistance: number, filters?: any): Promise<DogWithMedical[]> {
+    // Calculate distance using Haversine formula in SQL
+    const dogsWithDistance = await db
+      .select({
+        dog: dogs,
+        medicalProfile: medicalProfiles,
+        distance: sql<number>`
+          6371 * acos(
+            cos(radians(${latitude})) * 
+            cos(radians(${dogs.latitude})) * 
+            cos(radians(${dogs.longitude}) - radians(${longitude})) + 
+            sin(radians(${latitude})) * 
+            sin(radians(${dogs.latitude}))
+          )
+        `.as('distance')
+      })
+      .from(dogs)
+      .leftJoin(medicalProfiles, eq(dogs.id, medicalProfiles.dogId))
+      .where(
+        and(
+          eq(dogs.isActive, true),
+          sql`${dogs.id} != ${currentDogId}`,
+          sql`6371 * acos(
+            cos(radians(${latitude})) * 
+            cos(radians(${dogs.latitude})) * 
+            cos(radians(${dogs.longitude}) - radians(${longitude})) + 
+            sin(radians(${latitude})) * 
+            sin(radians(${dogs.latitude}))
+          ) <= ${maxDistance}`
+        )
+      );
+
+    return dogsWithDistance.map(row => ({
+      ...row.dog,
+      medicalProfile: row.medicalProfile || undefined,
+      distance: row.distance
+    }));
+  }
+
+  async createSwipe(insertSwipe: InsertSwipe): Promise<Swipe> {
+    const [swipe] = await db
+      .insert(swipes)
+      .values(insertSwipe)
+      .returning();
+    return swipe;
+  }
+
+  async getSwipe(swiperDogId: string, swipedDogId: string): Promise<Swipe | undefined> {
+    const [swipe] = await db
+      .select()
+      .from(swipes)
+      .where(
+        and(
+          eq(swipes.swiperDogId, swiperDogId),
+          eq(swipes.swipedDogId, swipedDogId)
+        )
+      );
+    return swipe || undefined;
+  }
+
+  async createMatch(insertMatch: InsertMatch): Promise<Match> {
+    const [match] = await db
+      .insert(matches)
+      .values(insertMatch)
+      .returning();
+    return match;
+  }
+
+  async getMatchesByDog(dogId: string): Promise<Match[]> {
+    return await db
+      .select()
+      .from(matches)
+      .where(
+        sql`${matches.dog1Id} = ${dogId} OR ${matches.dog2Id} = ${dogId}`
+      );
+  }
+
+  async getMessagesByMatch(matchId: string): Promise<Message[]> {
+    return await db
+      .select()
+      .from(messages)
+      .where(eq(messages.matchId, matchId))
+      .orderBy(sql`${messages.createdAt} ASC`);
+  }
+
+  async createMessage(insertMessage: InsertMessage): Promise<Message> {
+    const [message] = await db
+      .insert(messages)
+      .values(insertMessage)
+      .returning();
+    return message;
+  }
+
+  async getVeterinariansNearby(latitude: number, longitude: number, maxDistance: number): Promise<VeterinarianWithDistance[]> {
+    const vetsWithDistance = await db
+      .select({
+        vet: veterinarians,
+        distance: sql<number>`
+          6371 * acos(
+            cos(radians(${latitude})) * 
+            cos(radians(${veterinarians.latitude})) * 
+            cos(radians(${veterinarians.longitude}) - radians(${longitude})) + 
+            sin(radians(${latitude})) * 
+            sin(radians(${veterinarians.latitude}))
+          )
+        `.as('distance')
+      })
+      .from(veterinarians)
+      .where(
+        and(
+          eq(veterinarians.isActive, true),
+          sql`6371 * acos(
+            cos(radians(${latitude})) * 
+            cos(radians(${veterinarians.latitude})) * 
+            cos(radians(${veterinarians.longitude}) - radians(${longitude})) + 
+            sin(radians(${latitude})) * 
+            sin(radians(${veterinarians.latitude}))
+          ) <= ${maxDistance}`
+        )
+      )
+      .orderBy(sql`distance ASC`);
+
+    return vetsWithDistance.map(row => ({
+      ...row.vet,
+      distance: row.distance
+    }));
+  }
+
+  async getVeterinarian(id: string): Promise<Veterinarian | undefined> {
+    const [vet] = await db.select().from(veterinarians).where(eq(veterinarians.id, id));
+    return vet || undefined;
+  }
+
+  async createAppointment(insertAppointment: InsertAppointment): Promise<Appointment> {
+    const [appointment] = await db
+      .insert(appointments)
+      .values(insertAppointment)
+      .returning();
+    return appointment;
+  }
+
+  async getAppointmentsByUser(userId: string): Promise<Appointment[]> {
+    return await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.userId, userId))
+      .orderBy(sql`${appointments.appointmentDate} DESC`);
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -1256,4 +1475,4 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

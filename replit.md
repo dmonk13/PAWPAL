@@ -26,7 +26,7 @@ Preferred communication style: Simple, everyday language.
 - **Build System**: ESBuild for production bundling with dual client/server builds
 
 ### Data Storage Solutions
-- **Primary Database**: PostgreSQL hosted on Neon Database
+- **Primary Database**: PostgreSQL hosted on Neon Database (migrated from in-memory storage - August 6, 2025)
 - **ORM**: Drizzle ORM with code-first schema definition
 - **Schema Structure**: 
   - Users table for authentication
@@ -34,7 +34,10 @@ Preferred communication style: Simple, everyday language.
   - Medical profiles for health information
   - Swipes and matches for dating mechanics
   - Messages for communication
+  - Veterinarians table for vet connect feature
+  - Appointments table for scheduling
 - **Migrations**: Drizzle Kit for database schema management
+- **Sample Data**: Complete seed data with 6 users, 8 dogs, veterinarians, matches, and messages
 
 ### Authentication and Authorization
 - **Session Management**: Express sessions with PostgreSQL store (connect-pg-simple)
