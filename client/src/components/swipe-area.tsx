@@ -79,14 +79,17 @@ export default function SwipeArea() {
 
   if (locationError) {
     return (
-      <div className="h-[calc(100vh-8rem)] flex items-center justify-center p-8">
-        <div className="text-center">
-          <div className="text-4xl mb-4">📍</div>
-          <h3 className="text-xl font-bold mb-2 dark-gray">Location Required</h3>
-          <p className="medium-gray mb-4">
+      <div className="h-[calc(100vh-8rem)] flex items-center justify-center p-6">
+        <div className="bg-white rounded-2xl shadow-lg p-8 text-center border border-gray-100 max-w-sm mx-auto">
+          <div className="text-4xl mb-6">📍</div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-3">Location Required</h3>
+          <p className="text-gray-600 mb-6 leading-relaxed">
             PupMatch needs your location to find dogs nearby. Please enable location access in your browser settings.
           </p>
-          <Button onClick={() => window.location.reload()}>
+          <Button 
+            onClick={() => window.location.reload()}
+            className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-full font-medium shadow-lg"
+          >
             Try Again
           </Button>
         </div>
@@ -96,10 +99,10 @@ export default function SwipeArea() {
 
   if (isLoading) {
     return (
-      <div className="h-[calc(100vh-8rem)] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin text-4xl mb-4">🐕</div>
-          <p className="medium-gray">Finding dogs near you...</p>
+      <div className="h-[calc(100vh-8rem)] flex items-center justify-center p-6">
+        <div className="bg-white rounded-2xl shadow-lg p-8 text-center border border-gray-100">
+          <div className="animate-spin text-4xl mb-6">🐕</div>
+          <p className="text-gray-600 font-medium">Finding dogs near you...</p>
         </div>
       </div>
     );
@@ -110,12 +113,12 @@ export default function SwipeArea() {
 
   if (!currentDog) {
     return (
-      <div className="h-[calc(100vh-8rem)] flex items-center justify-center">
-        <div className="gradient-bg rounded-2xl mx-4 p-8 text-white text-center">
-          <div className="text-6xl mb-4 opacity-50">🐾</div>
-          <h3 className="text-2xl font-bold mb-2">That's all for now!</h3>
-          <p className="opacity-75 mb-4">Check back later for more potential matches</p>
-          <Button className="bg-white text-teal">
+      <div className="h-[calc(100vh-8rem)] flex items-center justify-center p-6">
+        <div className="bg-white rounded-2xl shadow-lg p-8 text-center border border-gray-100 max-w-sm mx-auto">
+          <div className="text-6xl mb-6">🐾</div>
+          <h3 className="text-2xl font-semibold text-gray-900 mb-3">That's all for now!</h3>
+          <p className="text-gray-600 mb-6 leading-relaxed">Check back later for more potential matches in your area</p>
+          <Button className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-full font-medium shadow-lg">
             Expand Search Radius
           </Button>
         </div>

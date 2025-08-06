@@ -49,12 +49,12 @@ export default function Premium() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
+    <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Crown className="h-8 w-8 text-purple-600" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <Crown className="h-8 w-8 text-primary" />
+            <h1 className="text-4xl font-bold text-gray-900">
               Choose Your Plan
             </h1>
           </div>
@@ -65,66 +65,66 @@ export default function Premium() {
 
         <div className="grid md:grid-cols-2 gap-6 mb-8">
         {/* Freemium Plan */}
-        <Card className="relative">
+        <Card className="relative border-2 border-gray-200">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Heart className="h-5 w-5 text-pink-500" />
+            <CardTitle className="flex items-center gap-2 text-gray-900">
+              <Heart className="h-5 w-5 text-gray-600" />
               Basic Plan
             </CardTitle>
-            <CardDescription>Perfect for casual matching</CardDescription>
-            <div className="text-3xl font-bold">Free</div>
+            <CardDescription className="text-gray-600">Perfect for casual matching</CardDescription>
+            <div className="text-3xl font-bold text-gray-900">Free</div>
           </CardHeader>
           <CardContent>
             <ul className="space-y-3">
               {freemiumFeatures.map((feature, index) => (
                 <li key={index} className="flex items-center gap-3">
                   {feature.included ? (
-                    <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                    <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
                   ) : (
                     <X className="h-4 w-4 text-gray-400 flex-shrink-0" />
                   )}
-                  <span className={feature.included ? "" : "text-gray-400"}>
+                  <span className={feature.included ? "text-gray-800 font-medium" : "text-gray-500"}>
                     {feature.text}
                   </span>
                 </li>
               ))}
             </ul>
-            <Button variant="outline" className="w-full mt-6" disabled>
+            <Button variant="outline" className="w-full mt-6 border-gray-300 text-gray-700 py-3 rounded-xl font-medium" disabled>
               Current Plan
             </Button>
           </CardContent>
         </Card>
 
         {/* Pro Plan */}
-        <Card className="relative border-2 border-purple-500">
+        <Card className="relative border-2 border-primary bg-gradient-to-br from-primary/5 to-primary/10">
           <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-            <Badge className="bg-purple-500 hover:bg-purple-600">
+            <Badge className="bg-primary text-white font-medium shadow-lg">
               <Star className="h-3 w-3 mr-1" />
               Most Popular
             </Badge>
           </div>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Star className="h-5 w-5 text-purple-500" />
+            <CardTitle className="flex items-center gap-2 text-gray-900">
+              <Star className="h-5 w-5 text-primary" />
               Pro Plan
             </CardTitle>
-            <CardDescription>Ultimate dog dating experience</CardDescription>
-            <div className="text-3xl font-bold">
+            <CardDescription className="text-gray-600">Ultimate dog dating experience</CardDescription>
+            <div className="text-3xl font-bold text-gray-900">
               $9.99
-              <span className="text-base font-normal text-muted-foreground">/month</span>
+              <span className="text-base font-normal text-gray-600">/month</span>
             </div>
           </CardHeader>
           <CardContent>
             <ul className="space-y-3">
               {proFeatures.map((feature, index) => (
                 <li key={index} className="flex items-center gap-3">
-                  <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                  <span>{feature.text}</span>
+                  <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
+                  <span className="text-gray-800 font-medium">{feature.text}</span>
                 </li>
               ))}
             </ul>
             <Button 
-              className="w-full mt-6 bg-purple-500 hover:bg-purple-600" 
+              className="w-full mt-6 bg-primary hover:bg-primary/90 text-white font-medium py-3 rounded-xl shadow-lg" 
               onClick={handleUpgrade}
               disabled={isUpgrading}
             >
