@@ -21,9 +21,9 @@ export default function SwipeArea() {
   
   const { latitude, longitude, error: locationError } = useGeolocation();
   
-  // Use fallback NYC coordinates if geolocation fails
-  const effectiveLatitude = latitude || 40.7128;
-  const effectiveLongitude = longitude || -74.0060;
+  // Use fallback Bangalore coordinates if geolocation fails
+  const effectiveLatitude = latitude || 12.9716;
+  const effectiveLongitude = longitude || 77.5946;
   const { toast } = useToast();
 
   // Get dogs for matching

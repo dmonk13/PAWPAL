@@ -61,9 +61,9 @@ export default function VetConnect() {
   const [searchRadius, setSearchRadius] = useState(25);
   const { latitude, longitude, error: locationError } = useGeolocation();
   
-  // Use fallback NYC coordinates if geolocation fails
-  const effectiveLatitude = latitude || 40.7128;
-  const effectiveLongitude = longitude || -74.0060;
+  // Use fallback Bangalore coordinates if geolocation fails
+  const effectiveLatitude = latitude || 12.9716;
+  const effectiveLongitude = longitude || 77.5946;
 
   const { data: veterinarians = [], isLoading } = useQuery({
     queryKey: ['/api/veterinarians/nearby', effectiveLatitude, effectiveLongitude, searchRadius],
