@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import BottomNav from "@/components/bottom-nav";
 
-const CURRENT_DOG_ID = "dog-1";
+const CURRENT_DOG_ID = "c7803a8b-9d6b-453a-b602-ec2a1d97e418"; // Buddy's ID from database
 
 export default function Matches() {
   const { data: matches = [], isLoading } = useQuery({

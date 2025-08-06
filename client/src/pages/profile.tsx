@@ -8,7 +8,7 @@ import BottomNav from "@/components/bottom-nav";
 import DogProfileForm from "@/components/dog-profile-form";
 import { Link } from "wouter";
 
-const CURRENT_USER_ID = "user-1";
+const CURRENT_USER_ID = "3c3044cf-bd16-46db-bbbf-1394cbdfa513"; // Sarah's ID from database
 
 export default function Profile() {
   const [selectedDog, setSelectedDog] = useState<string | null>(null);
