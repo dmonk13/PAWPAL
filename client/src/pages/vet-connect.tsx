@@ -60,14 +60,18 @@ interface VeterinarianWithDistance {
 export default function VetConnect() {
   const [searchRadius, setSearchRadius] = useState(25);
   const { latitude, longitude, error: locationError } = useGeolocation();
+  
+  // Use fallback NYC coordinates if geolocation fails
+  const effectiveLatitude = latitude || 40.7128;
+  const effectiveLongitude = longitude || -74.0060;
 
-  const { data: veterinarians, isLoading } = useQuery({
-    queryKey: ['/api/veterinarians/nearby', latitude, longitude, searchRadius],
-    enabled: !!latitude && !!longitude,
+  const { data: veterinarians = [], isLoading } = useQuery({
+    queryKey: ['/api/veterinarians/nearby', effectiveLatitude, effectiveLongitude, searchRadius],
+    enabled: true, // Always enabled with fallback coordinates
     queryFn: async () => {
       const params = new URLSearchParams({
-        latitude: latitude!.toString(),
-        longitude: longitude!.toString(),
+        latitude: effectiveLatitude.toString(),
+        longitude: effectiveLongitude.toString(),
         maxDistance: searchRadius.toString()
       });
       

@@ -20,17 +20,21 @@ export default function SwipeArea() {
   const [swipingDirection, setSwipingDirection] = useState<string | null>(null);
   
   const { latitude, longitude, error: locationError } = useGeolocation();
+  
+  // Use fallback NYC coordinates if geolocation fails
+  const effectiveLatitude = latitude || 40.7128;
+  const effectiveLongitude = longitude || -74.0060;
   const { toast } = useToast();
 
   // Get dogs for matching
   const { data: dogs = [], isLoading } = useQuery<DogWithMedical[]>({
-    queryKey: ["/api/dogs/discover", CURRENT_DOG_ID, latitude, longitude],
-    enabled: !!latitude && !!longitude,
+    queryKey: ["/api/dogs/discover", CURRENT_DOG_ID, effectiveLatitude, effectiveLongitude],
+    enabled: true, // Always enabled with fallback coordinates
     queryFn: async () => {
       const params = new URLSearchParams({
         dogId: CURRENT_DOG_ID,
-        latitude: latitude!.toString(),
-        longitude: longitude!.toString(),
+        latitude: effectiveLatitude.toString(),
+        longitude: effectiveLongitude.toString(),
         maxDistance: "25"
       });
       
