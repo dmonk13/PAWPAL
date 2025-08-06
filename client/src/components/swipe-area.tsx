@@ -11,7 +11,7 @@ import DogCard from "./dog-card";
 import MedicalModal from "./medical-modal";
 import MatchModal from "./match-modal";
 
-const CURRENT_DOG_ID = "975edab1-60b7-452c-962c-32fb2a622a7f"; // Buddy's ID from database
+const CURRENT_DOG_ID = "dog-1"; // Buddy's ID from sample data
 
 export default function SwipeArea() {
   const [currentIndex, setCurrentIndex] = useState(0);
