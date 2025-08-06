@@ -21,11 +21,11 @@ export default function BottomNav() {
           
           return (
             <Link key={tab.id} href={tab.path}>
-              <button className={`flex flex-col items-center py-2 ${
-                isActive ? "coral" : "medium-gray"
+              <button className={`flex flex-col items-center py-2 transition-colors ${
+                isActive ? "text-primary" : "text-gray-400 hover:text-gray-600"
               }`}>
                 <Icon className="w-5 h-5 mb-1" />
-                <span className="text-xs">{tab.label}</span>
+                <span className="text-xs font-medium">{tab.label}</span>
               </button>
             </Link>
           );

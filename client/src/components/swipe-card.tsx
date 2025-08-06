@@ -18,7 +18,7 @@ export default function SwipeCard({ dog, onMedicalClick, className = "", style }
   
   return (
     <div 
-      className={`swipe-card absolute inset-4 bg-white rounded-2xl shadow-xl overflow-hidden ${className}`}
+      className={`swipe-card absolute inset-4 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden ${className}`}
       style={style}
     >
       <div className="relative h-full">
@@ -26,92 +26,70 @@ export default function SwipeCard({ dog, onMedicalClick, className = "", style }
         <img 
           src={dog.photos?.[0] || "/placeholder-dog.jpg"}
           alt={`${dog.name} - ${dog.breed}`}
-          className="w-full h-2/3 object-cover"
+          className="w-full h-3/5 object-cover"
         />
         
-        {/* Distance indicator */}
+        {/* Distance indicator - Hinge style */}
         {dog.distance && (
-          <div className="absolute top-4 right-4 bg-black/70 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium">
-            <MapPin className="w-3 h-3 inline mr-1" />
-            <span>{dog.distance} mi</span>
+          <div className="absolute top-3 right-3 bg-white/95 backdrop-blur text-gray-800 px-2.5 py-1 rounded-full text-xs font-medium shadow-sm">
+            {dog.distance} mi away
           </div>
         )}
 
-        {/* Medical badges */}
-        <div className="absolute top-4 left-4 flex flex-wrap gap-2 max-w-48">
+        {/* Status badges - Hinge style */}
+        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           {medicalProfile?.vetClearance && (
-            <Badge className="bg-green-500/90 backdrop-blur-sm text-white text-xs font-medium px-2 py-1">
-              <Heart className="w-3 h-3 mr-1" />
-              Vet Approved
-            </Badge>
+            <div className="bg-white/95 backdrop-blur text-gray-800 text-xs font-medium px-2.5 py-1 rounded-full shadow-sm">
+              Vet ✓
+            </div>
           )}
           
           {isVaccinated && (
-            <Badge className="bg-blue-500/90 backdrop-blur-sm text-white text-xs font-medium px-2 py-1">
+            <div className="bg-white/95 backdrop-blur text-gray-800 text-xs font-medium px-2.5 py-1 rounded-full shadow-sm">
               Vaccinated
-            </Badge>
-          )}
-          
-          {dog.matingPreference && (
-            <Badge className="bg-pink-500/90 backdrop-blur-sm text-white text-xs font-medium px-2 py-1">
-              Looking to Mate
-            </Badge>
-          )}
-          
-          {hasAllergies && (
-            <Badge className="bg-orange-500/90 backdrop-blur-sm text-white text-xs font-medium px-2 py-1">
-              Has Allergies
-            </Badge>
+            </div>
           )}
         </div>
 
-        {/* Profile info */}
-        <div className="p-6 bg-white h-1/3 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-2xl font-bold dark-gray">{dog.name}</h2>
-              <span className="text-lg medium-gray">{dog.age} years</span>
+        {/* Profile info - Hinge style */}
+        <div className="p-5 bg-white h-2/5 flex flex-col">
+          <div className="flex-1">
+            <div className="flex items-baseline justify-between mb-1">
+              <h2 className="text-2xl font-semibold text-gray-900">{dog.name}</h2>
+              <span className="text-lg text-gray-600">{dog.age}</span>
             </div>
             
-            <div className="flex items-center space-x-4 medium-gray mb-3">
-              <span className="font-medium">{dog.breed}</span>
-              <span>•</span>
-              <span>{dog.size}</span>
-              <span>•</span>
-              <span>{dog.gender}</span>
-            </div>
+            <p className="text-gray-600 text-sm mb-3">{dog.breed} • {dog.size} • {dog.gender}</p>
             
-            <p className="text-sm medium-gray line-clamp-2 leading-relaxed mb-4">
+            <p className="text-gray-700 text-sm leading-relaxed line-clamp-3 mb-4">
               {dog.bio || "No bio available"}
             </p>
           </div>
           
-          {/* Medical info toggle */}
+          {/* Medical info toggle - Hinge style */}
           <Button
             onClick={onMedicalClick}
             variant="outline"
-            className="flex items-center justify-center space-x-2 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 transition-colors"
+            className="w-full text-gray-700 border-gray-200 hover:bg-gray-50 py-2.5 text-sm font-medium"
           >
-            <Plus className="w-4 h-4" />
-            <span>View Medical Profile</span>
+            View Health Profile
           </Button>
         </div>
         
-        {/* Temperament section - positioned below the card */}
-        <div className="absolute -bottom-6 left-4 right-4 z-10">
+        {/* Temperament section - Hinge style positioned below card */}
+        <div className="absolute -bottom-5 left-4 right-4 z-10">
           {dog.temperament && dog.temperament.length > 0 && (
-            <div className="bg-white rounded-xl shadow-lg p-4 border border-gray-100">
-              <h4 className="text-sm font-semibold text-gray-700 mb-2">Personality Traits</h4>
+            <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100">
               <div className="flex flex-wrap gap-2">
                 {dog.temperament.slice(0, 4).map((trait: string, index: number) => (
-                  <Badge key={index} variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100 transition-colors">
+                  <span key={index} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                     {trait}
-                  </Badge>
+                  </span>
                 ))}
                 {dog.temperament.length > 4 && (
-                  <Badge variant="outline" className="text-xs bg-gray-50 text-gray-600 border-gray-200">
-                    +{dog.temperament.length - 4} more
-                  </Badge>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                    +{dog.temperament.length - 4}
+                  </span>
                 )}
               </div>
             </div>

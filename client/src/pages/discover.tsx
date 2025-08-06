@@ -15,29 +15,31 @@ export default function Discover() {
 
   return (
     <>
-      {/* Header */}
-      <header className="gradient-bg text-white p-4 flex items-center justify-between sticky top-0 z-50">
+      {/* Header - Hinge style */}
+      <header className="bg-white border-b border-gray-100 p-4 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center space-x-2">
-          <PawPrint className="w-6 h-6" />
-          <h1 className="text-xl font-bold">PupMatch</h1>
+          <PawPrint className="w-6 h-6 text-primary" />
+          <h1 className="text-xl font-bold text-gray-900">PupMatch</h1>
         </div>
         <div className="flex items-center space-x-4">
           <Button
             variant="ghost"
             size="sm"
-            className="text-white hover:text-white hover:bg-white/20"
+            className="text-gray-600 hover:text-gray-900 hover:bg-gray-50"
             onClick={() => setShowFilters(true)}
           >
             <Sliders className="w-5 h-5" />
           </Button>
-          <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-            <User className="w-4 h-4 coral" />
+          <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+            <User className="w-4 h-4 text-gray-600" />
           </div>
         </div>
       </header>
 
-      {/* Main content */}
-      <SwipeArea />
+      {/* Main content - Hinge style background */}
+      <div className="flex-1 bg-gray-50">
+        <SwipeArea />
+      </div>
 
       {/* Bottom navigation */}
       <BottomNav />
