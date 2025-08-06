@@ -1,4 +1,4 @@
-import { Heart, MapPin, Plus, CheckCircle, Users } from "lucide-react";
+import { Heart, MapPin, Plus, CheckCircle, Users, X, Info } from "lucide-react";
 import { DogWithMedical } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
