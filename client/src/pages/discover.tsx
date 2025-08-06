@@ -15,23 +15,27 @@ export default function Discover() {
 
   return (
     <>
-      {/* Header - Hinge style */}
-      <header className="bg-white border-b border-gray-100 p-4 flex items-center justify-between sticky top-0 z-50">
-        <div className="flex items-center space-x-2">
-          <PawPrint className="w-6 h-6 text-primary" />
-          <h1 className="text-xl font-bold text-gray-900">PupMatch</h1>
+      {/* Enhanced Header */}
+      <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 p-4 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-red-500 rounded-full flex items-center justify-center">
+            <PawPrint className="w-5 h-5 text-white" />
+          </div>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-red-600 bg-clip-text text-transparent">
+            PupMatch
+          </h1>
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3">
           <Button
             variant="ghost"
             size="sm"
-            className="text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+            className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full p-2 transition-all duration-200"
             onClick={() => setShowFilters(true)}
           >
             <Sliders className="w-5 h-5" />
           </Button>
-          <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-            <User className="w-4 h-4 text-gray-600" />
+          <div className="w-9 h-9 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center border border-gray-200">
+            <User className="w-5 h-5 text-gray-600" />
           </div>
         </div>
       </header>

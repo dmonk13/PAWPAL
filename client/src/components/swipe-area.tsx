@@ -165,34 +165,37 @@ export default function SwipeArea() {
           }`}
         />
 
-        {/* Swipe buttons - Hinge style */}
-        <div className="absolute bottom-24 left-0 right-0 flex justify-center space-x-6 px-8">
+        {/* Dating app style action buttons */}
+        <div className="absolute bottom-20 left-0 right-0 flex justify-center items-center space-x-4 px-6">
+          {/* Reject Button */}
           <Button
             size="lg"
             variant="outline"
-            className="w-14 h-14 rounded-full border-2 border-gray-300 bg-white hover:bg-gray-50 shadow-lg"
+            className="w-16 h-16 rounded-full border-2 border-red-300 bg-white hover:bg-red-50 hover:border-red-400 shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95"
             onClick={() => handleSwipe("left")}
             disabled={swipeMutation.isPending}
           >
-            <X className="w-5 h-5 text-gray-600" />
+            <X className="w-6 h-6 text-red-500" />
           </Button>
           
-          <Button
-            size="lg"
-            className="w-16 h-16 bg-primary hover:bg-primary/90 rounded-full text-white shadow-lg"
-            onClick={() => setSelectedDog(currentDog)}
-          >
-            <Info className="w-5 h-5" />
-          </Button>
-          
+          {/* Info Button */}
           <Button
             size="lg"
             variant="outline"
-            className="w-14 h-14 rounded-full border-2 border-primary bg-white hover:bg-primary/5 shadow-lg"
+            className="w-12 h-12 rounded-full border-2 border-blue-300 bg-white hover:bg-blue-50 hover:border-blue-400 shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95"
+            onClick={() => setSelectedDog(currentDog)}
+          >
+            <Info className="w-4 h-4 text-blue-500" />
+          </Button>
+          
+          {/* Like Button */}
+          <Button
+            size="lg"
+            className="w-16 h-16 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 rounded-full text-white shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95"
             onClick={() => handleSwipe("right")}
             disabled={swipeMutation.isPending}
           >
-            <Heart className="w-5 h-5 text-primary" />
+            <Heart className="w-6 h-6 fill-current" />
           </Button>
         </div>
       </main>
