@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Sliders, PawPrint, User } from "lucide-react";
+import { Sliders, PawPrint } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SwipeArea from "@/components/swipe-area";
 import FilterModal from "@/components/filter-modal";
 import BottomNav from "@/components/bottom-nav";
+import { UserNav } from "@/components/user-nav";
 
 export default function Discover() {
   const [showFilters, setShowFilters] = useState(false);
@@ -34,9 +35,7 @@ export default function Discover() {
           >
             <Sliders className="w-5 h-5" />
           </Button>
-          <div className="w-9 h-9 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center border border-gray-200">
-            <User className="w-5 h-5 text-gray-600" />
-          </div>
+          <UserNav />
         </div>
       </header>
 

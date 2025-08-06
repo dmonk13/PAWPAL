@@ -3,6 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import AuthWrapper from "@/pages/auth-wrapper";
 import NotFound from "@/pages/not-found";
 import Discover from "@/pages/discover";
 import Matches from "@/pages/matches";
@@ -38,9 +39,11 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <div className={`${isVetPage ? 'max-w-full' : 'max-w-sm mx-auto'} bg-white min-h-screen relative overflow-hidden`}>
-          <Router />
-        </div>
+        <AuthWrapper>
+          <div className={`${isVetPage ? 'max-w-full' : 'max-w-sm mx-auto'} bg-white min-h-screen relative overflow-hidden`}>
+            <Router />
+          </div>
+        </AuthWrapper>
       </TooltipProvider>
     </QueryClientProvider>
   );

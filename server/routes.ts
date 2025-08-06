@@ -1,10 +1,139 @@
-import type { Express } from "express";
+import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
+import session from "express-session";
 import { storage } from "./storage";
-import { insertSwipeSchema, insertDogSchema, insertMedicalProfileSchema, insertAppointmentSchema } from "@shared/schema";
+import { insertSwipeSchema, insertDogSchema, insertMedicalProfileSchema, insertAppointmentSchema, insertUserSchema } from "@shared/schema";
 import { z } from "zod";
 
+// Define session type extension
+declare module 'express-session' {
+  interface SessionData {
+    userId?: string;
+  }
+}
+
+// Middleware to check authentication
+const requireAuth = (req: Request, res: Response, next: any) => {
+  if (req.session?.userId) {
+    next();
+  } else {
+    res.status(401).json({ message: 'Unauthorized' });
+  }
+};
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  
+  // Configure session
+  app.use(session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false, // Set to true in production with HTTPS
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+  }));
+
+  // Authentication Routes
+  app.post("/api/auth/login", async (req: Request, res: Response) => {
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ message: "Username and password are required" });
+      }
+
+      const user = await storage.authenticateUser(username, password);
+      if (!user) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      // Set session
+      req.session.userId = user.id;
+      
+      // Don't send password back
+      const { password: _, ...userWithoutPassword } = user;
+      res.json({ user: userWithoutPassword });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  app.post("/api/auth/register", async (req: Request, res: Response) => {
+    try {
+      const { user: userData, dog: dogData } = req.body;
+      
+      // Validate user data
+      const validatedUser = insertUserSchema.parse(userData);
+      
+      // Check if username already exists
+      const existingUser = await storage.getUserByUsername(validatedUser.username);
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+
+      // Create user
+      const newUser = await storage.createUser(validatedUser);
+      
+      // Create dog profile
+      const dogProfileData = insertDogSchema.parse({
+        ...dogData,
+        ownerId: newUser.id,
+        photos: [],
+        latitude: "12.9716", // Default Bangalore coordinates
+        longitude: "77.5946",
+        isActive: true
+      });
+      
+      const newDog = await storage.createDog(dogProfileData);
+
+      // Set session
+      req.session.userId = newUser.id;
+      
+      // Don't send password back
+      const { password: _, ...userWithoutPassword } = newUser;
+      res.json({ 
+        user: userWithoutPassword, 
+        dog: newDog 
+      });
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ message: "Invalid data provided", errors: error.errors });
+      }
+      res.status(500).json({ message: "Registration failed" });
+    }
+  });
+
+  app.get("/api/auth/user", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUser(req.session.userId!);
+      if (!user) {
+        req.session.destroy((err) => {});
+        return res.status(401).json({ message: "User not found" });
+      }
+      
+      // Don't send password back
+      const { password: _, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("Get user error:", error);
+      res.status(500).json({ message: "Failed to get user" });
+    }
+  });
+
+  app.post("/api/auth/logout", (req: Request, res: Response) => {
+    req.session.destroy((err) => {
+      if (err) {
+        console.error("Logout error:", err);
+        return res.status(500).json({ message: "Logout failed" });
+      }
+      res.json({ message: "Logged out successfully" });
+    });
+  });
+
   
   // Get dogs for matching based on location and filters
   app.get("/api/dogs/discover", async (req, res) => {
