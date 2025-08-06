@@ -17,7 +17,7 @@ export default function DogCard({ dog, onMedicalClick, className = "" }: DogCard
   
   return (
     <div className={`absolute inset-4 bg-white rounded-2xl shadow-xl overflow-hidden ${className}`}>
-      <div className="relative h-full">
+      <div className="relative h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
         {/* Main photo */}
         <img 
           src={dog.photos?.[0] || "/placeholder-dog.jpg"}
@@ -27,51 +27,51 @@ export default function DogCard({ dog, onMedicalClick, className = "" }: DogCard
         
         {/* Distance indicator */}
         {dog.distance && (
-          <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm text-white px-3 py-2 rounded-full text-sm font-medium shadow-lg">
-            <MapPin className="w-3.5 h-3.5 inline mr-1.5" />
-            <span>{Math.round(dog.distance)} mi away</span>
+          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-gray-700 px-3 py-1.5 rounded-lg text-sm font-medium shadow-sm border border-gray-200">
+            <MapPin className="w-3.5 h-3.5 inline mr-1" />
+            <span>{Math.round(dog.distance)} mi</span>
           </div>
         )}
 
-        {/* Enhanced Status badges */}
+        {/* Cohesive Status badges */}
         <div className="absolute top-4 left-4 flex flex-wrap gap-2 max-w-[60%]">
           {isVaccinated && (
-            <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm">
-              <Heart className="w-3 h-3 mr-1.5" />
+            <Badge className="bg-white/90 backdrop-blur-sm text-green-700 text-xs font-medium px-2.5 py-1 rounded-lg shadow-sm border border-green-200">
+              <Heart className="w-3 h-3 mr-1 text-green-600" />
               Vaccinated
             </Badge>
           )}
           
           {medicalProfile?.vetClearance && (
-            <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm">
-              <CheckCircle className="w-3 h-3 mr-1.5" />
+            <Badge className="bg-white/90 backdrop-blur-sm text-blue-700 text-xs font-medium px-2.5 py-1 rounded-lg shadow-sm border border-blue-200">
+              <CheckCircle className="w-3 h-3 mr-1 text-blue-600" />
               Vet Cleared
             </Badge>
           )}
           
           {dog.matingPreference && (
-            <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm">
-              <Users className="w-3 h-3 mr-1.5" />
+            <Badge className="bg-white/90 backdrop-blur-sm text-purple-700 text-xs font-medium px-2.5 py-1 rounded-lg shadow-sm border border-purple-200">
+              <Users className="w-3 h-3 mr-1 text-purple-600" />
               Breeding
             </Badge>
           )}
           
           {medicalProfile?.isSpayedNeutered && (
-            <Badge className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm">
-              <Plus className="w-3 h-3 mr-1.5" />
+            <Badge className="bg-white/90 backdrop-blur-sm text-indigo-700 text-xs font-medium px-2.5 py-1 rounded-lg shadow-sm border border-indigo-200">
+              <Plus className="w-3 h-3 mr-1 text-indigo-600" />
               Fixed
             </Badge>
           )}
           
           {hasAllergies && (
-            <Badge className="bg-gradient-to-r from-orange-400 to-yellow-400 text-black text-xs font-medium px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm">
+            <Badge className="bg-white/90 backdrop-blur-sm text-orange-700 text-xs font-medium px-2.5 py-1 rounded-lg shadow-sm border border-orange-200">
               ⚠️ Allergies
             </Badge>
           )}
         </div>
 
         {/* Enhanced Profile info */}
-        <div className="p-6 bg-gradient-to-t from-white to-gray-50 h-1/3 flex flex-col justify-between">
+        <div className="p-6 bg-white min-h-[40%] flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-3xl font-bold text-gray-900">{dog.name}</h2>
