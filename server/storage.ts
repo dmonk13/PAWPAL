@@ -622,6 +622,7 @@ export class MemStorage implements IStorage {
         vetClearance: true,
         vetClearanceDate: new Date("2024-02-15"),
         vetDocumentUrl: null,
+        insurance: null,
         createdAt: new Date(),
       },
       {
@@ -639,6 +640,7 @@ export class MemStorage implements IStorage {
         vetClearance: false,
         vetClearanceDate: null,
         vetDocumentUrl: null,
+        insurance: null,
         createdAt: new Date(),
       },
       {
@@ -659,6 +661,7 @@ export class MemStorage implements IStorage {
         vetClearance: true,
         vetClearanceDate: new Date("2024-02-20"),
         vetDocumentUrl: null,
+        insurance: null,
         createdAt: new Date(),
       },
       {
@@ -676,6 +679,7 @@ export class MemStorage implements IStorage {
         vetClearance: true,
         vetClearanceDate: new Date("2024-06-15"),
         vetDocumentUrl: null,
+        insurance: null,
         createdAt: new Date(),
       },
       {
@@ -696,6 +700,7 @@ export class MemStorage implements IStorage {
         vetClearance: true,
         vetClearanceDate: new Date("2024-01-20"),
         vetDocumentUrl: null,
+        insurance: null,
         createdAt: new Date(),
       },
       {
@@ -714,6 +719,7 @@ export class MemStorage implements IStorage {
         vetClearance: true,
         vetClearanceDate: new Date("2024-04-10"),
         vetDocumentUrl: null,
+        insurance: null,
         createdAt: new Date(),
       },
       {
@@ -732,6 +738,7 @@ export class MemStorage implements IStorage {
         vetClearance: true,
         vetClearanceDate: new Date("2024-05-05"),
         vetDocumentUrl: null,
+        insurance: null,
         createdAt: new Date(),
       },
       {
@@ -751,6 +758,7 @@ export class MemStorage implements IStorage {
         vetClearance: true,
         vetClearanceDate: new Date("2024-07-01"),
         vetDocumentUrl: null,
+        insurance: null,
         createdAt: new Date(),
       },
       {
@@ -772,6 +780,7 @@ export class MemStorage implements IStorage {
         vetClearance: true,
         vetClearanceDate: new Date("2024-04-20"),
         vetDocumentUrl: null,
+        insurance: null,
         createdAt: new Date(),
       },
       {
@@ -791,6 +800,7 @@ export class MemStorage implements IStorage {
         vetClearance: true,
         vetClearanceDate: new Date("2024-06-10"),
         vetDocumentUrl: null,
+        insurance: null,
         createdAt: new Date(),
       },
       {
@@ -809,6 +819,7 @@ export class MemStorage implements IStorage {
         vetClearance: true,
         vetClearanceDate: new Date("2024-08-15"),
         vetDocumentUrl: null,
+        insurance: null,
         createdAt: new Date(),
       },
       {
@@ -850,6 +861,7 @@ export class MemStorage implements IStorage {
         vetClearance: true,
         vetClearanceDate: new Date("2024-05-30"),
         vetDocumentUrl: null,
+        insurance: null,
         createdAt: new Date(),
       }
     ];
