@@ -5,11 +5,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import BottomNav from "@/components/bottom-nav";
 
-const CURRENT_DOG_ID = "c7803a8b-9d6b-453a-b602-ec2a1d97e418"; // Buddy's ID from database
+const CURRENT_DOG_ID = "975edab1-60b7-452c-962c-32fb2a622a7f"; // Buddy's ID from database
 
 export default function Matches() {
   const { data: matches = [], isLoading } = useQuery({
     queryKey: ["/api/dogs", CURRENT_DOG_ID, "matches"],
+    queryFn: async () => {
+      const response = await fetch(`/api/dogs/${CURRENT_DOG_ID}/matches`);
+      if (!response.ok) throw new Error('Failed to fetch matches');
+      return response.json();
+    },
   });
 
   if (isLoading) {

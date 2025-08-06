@@ -8,7 +8,7 @@ import BottomNav from "@/components/bottom-nav";
 import DogProfileForm from "@/components/dog-profile-form";
 import { Link } from "wouter";
 
-const CURRENT_USER_ID = "3c3044cf-bd16-46db-bbbf-1394cbdfa513"; // Sarah's ID from database
+const CURRENT_USER_ID = "52ae6e15-c749-4151-b75b-bd4a6403b81f"; // Sarah's ID from database
 
 export default function Profile() {
   const [selectedDog, setSelectedDog] = useState<string | null>(null);
@@ -17,6 +17,11 @@ export default function Profile() {
 
   const { data: dogs = [], isLoading } = useQuery({
     queryKey: ["/api/users", CURRENT_USER_ID, "dogs"],
+    queryFn: async () => {
+      const response = await fetch(`/api/users/${CURRENT_USER_ID}/dogs`);
+      if (!response.ok) throw new Error('Failed to fetch user dogs');
+      return response.json();
+    },
   });
 
   if (isLoading) {
