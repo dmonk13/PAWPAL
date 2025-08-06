@@ -23,9 +23,21 @@ export default function SwipeArea() {
   const { toast } = useToast();
 
   // Get dogs for matching
-  const { data: dogs = [], isLoading } = useQuery({
+  const { data: dogs = [], isLoading } = useQuery<DogWithMedical[]>({
     queryKey: ["/api/dogs/discover", CURRENT_DOG_ID, latitude, longitude],
     enabled: !!latitude && !!longitude,
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        dogId: CURRENT_DOG_ID,
+        latitude: latitude!.toString(),
+        longitude: longitude!.toString(),
+        maxDistance: "25"
+      });
+      
+      const response = await fetch(`/api/dogs/discover?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch dogs');
+      return response.json();
+    },
   });
 
   // Swipe mutation
@@ -40,7 +52,7 @@ export default function SwipeArea() {
     },
     onSuccess: (data, variables) => {
       if (data.match && variables.isLike) {
-        const swipedDog = dogs.find(dog => dog.id === variables.dogId);
+        const swipedDog = dogs.find((dog: DogWithMedical) => dog.id === variables.dogId);
         if (swipedDog) {
           setMatchedDog(swipedDog);
         }
@@ -107,6 +119,8 @@ export default function SwipeArea() {
       </div>
     );
   }
+
+
 
   const currentDog = dogs[currentIndex];
   const nextDog = dogs[currentIndex + 1];
