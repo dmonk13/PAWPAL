@@ -37,7 +37,7 @@ Preferred communication style: Simple, everyday language.
   - Veterinarians table for vet connect feature
   - Appointments table for scheduling
 - **Migrations**: Drizzle Kit for database schema management
-- **Sample Data**: Complete seed data with 6 users, 8 dogs, 8 veterinarians (3 in NY, 5 in Bangalore), 4 medical profiles, matches, messages, and 8 appointments across different statuses
+- **Sample Data**: Complete seed data with 6 users, 14 dogs (8 in NY, 6 in Bangalore), 8 veterinarians (3 in NY, 5 in Bangalore), 10 medical profiles, matches, messages, and 8 appointments across different statuses
 
 ### Authentication and Authorization
 - **Session Management**: Express sessions with PostgreSQL store (connect-pg-simple)
