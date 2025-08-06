@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button";
 interface DogCardProps {
   dog: DogWithMedical;
   onMedicalClick: () => void;
+  onSwipe?: (direction: 'left' | 'right') => void;
   className?: string;
 }
 
-export default function DogCard({ dog, onMedicalClick, className = "" }: DogCardProps) {
+export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }: DogCardProps) {
   const { medicalProfile } = dog;
   
   const isVaccinated = medicalProfile?.vaccinations?.some(v => v.type === "Rabies");
@@ -120,6 +121,42 @@ export default function DogCard({ dog, onMedicalClick, className = "" }: DogCard
             <Plus className="w-4 h-4" />
             <span className="font-medium">View Medical Info</span>
           </Button>
+        </div>
+        
+        {/* Integrated Action Buttons */}
+        <div className="p-4 bg-gray-50 border-t border-gray-100">
+          <div className="flex justify-center items-center space-x-4">
+            {/* Pass (Reject) Button */}
+            <Button
+              size="lg"
+              variant="outline"
+              className="flex-1 h-12 bg-white border-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-xl font-medium transition-all duration-200"
+              onClick={() => onSwipe?.('left')}
+            >
+              <X className="w-5 h-5 mr-2" />
+              Pass
+            </Button>
+            
+            {/* Info Button */}
+            <Button
+              size="lg"
+              variant="outline"
+              className="w-12 h-12 bg-white border-2 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 rounded-xl transition-all duration-200"
+              onClick={onMedicalClick}
+            >
+              <Info className="w-5 h-5" />
+            </Button>
+            
+            {/* Like Button */}
+            <Button
+              size="lg"
+              className="flex-1 h-12 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white rounded-xl font-medium shadow-md transition-all duration-200"
+              onClick={() => onSwipe?.('right')}
+            >
+              <Heart className="w-5 h-5 mr-2 fill-current" />
+              Like
+            </Button>
+          </div>
         </div>
       </div>
     </div>

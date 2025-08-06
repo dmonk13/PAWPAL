@@ -159,48 +159,14 @@ export default function SwipeArea() {
         <DogCard
           dog={currentDog}
           onMedicalClick={() => setSelectedDog(currentDog)}
+          onSwipe={handleSwipe}
           className={`z-10 swipe-card ${
             swipingDirection === "left" ? "swiping-left" : 
             swipingDirection === "right" ? "swiping-right" : ""
           }`}
         />
 
-        {/* Cohesive action buttons */}
-        <div className="absolute bottom-24 left-0 right-0 flex justify-center items-center space-x-4 px-8 z-20">
-          {/* Subtle backdrop */}
-          <div className="absolute inset-0 bg-gradient-to-t from-white/40 to-transparent pointer-events-none" />
-          
-          {/* Reject Button */}
-          <Button
-            size="lg"
-            variant="outline"
-            className="relative w-14 h-14 rounded-2xl bg-white/95 backdrop-blur-sm border border-gray-200 hover:bg-white hover:border-red-300 shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95"
-            onClick={() => handleSwipe("left")}
-            disabled={swipeMutation.isPending}
-          >
-            <X className="w-6 h-6 text-gray-600 hover:text-red-500 transition-colors" />
-          </Button>
-          
-          {/* Info Button */}
-          <Button
-            size="lg"
-            variant="outline"
-            className="relative w-12 h-12 rounded-2xl bg-white/95 backdrop-blur-sm border border-gray-200 hover:bg-white hover:border-blue-300 shadow-md transition-all duration-200 transform hover:scale-105 active:scale-95"
-            onClick={() => setSelectedDog(currentDog)}
-          >
-            <Info className="w-4 h-4 text-gray-600 hover:text-blue-500 transition-colors" />
-          </Button>
-          
-          {/* Like Button */}
-          <Button
-            size="lg"
-            className="relative w-14 h-14 rounded-2xl bg-white/95 backdrop-blur-sm border border-gray-200 hover:bg-pink-50 hover:border-pink-300 shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95"
-            onClick={() => handleSwipe("right")}
-            disabled={swipeMutation.isPending}
-          >
-            <Heart className="w-6 h-6 text-gray-600 hover:text-pink-500 transition-colors fill-none hover:fill-current" />
-          </Button>
-        </div>
+
       </main>
 
       {/* Medical Modal */}
