@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { X, Upload, CheckCircle, Heart, AlertTriangle } from "lucide-react";
+import { X, Upload, CheckCircle, Heart, AlertTriangle, Shield } from "lucide-react";
 import { insertDogSchema, insertMedicalProfileSchema, type Dog, type MedicalProfile } from "@shared/schema";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -55,6 +55,16 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
   const [newAllergy, setNewAllergy] = useState("");
   const [newCondition, setNewCondition] = useState("");
   const [distanceRadius, setDistanceRadius] = useState([dog?.distanceRadius || 10]);
+  const [insurance, setInsurance] = useState({
+    provider: dog?.medicalProfile?.insurance?.provider || "",
+    policyNumber: dog?.medicalProfile?.insurance?.policyNumber || "",
+    coverageType: dog?.medicalProfile?.insurance?.coverageType || "",
+    coverageLimit: dog?.medicalProfile?.insurance?.coverageLimit || "",
+    deductible: dog?.medicalProfile?.insurance?.deductible || "",
+    expirationDate: dog?.medicalProfile?.insurance?.expirationDate || "",
+    contactNumber: dog?.medicalProfile?.insurance?.contactNumber || "",
+  });
+  const [hasInsurance, setHasInsurance] = useState(!!dog?.medicalProfile?.insurance?.provider);
 
   const { toast } = useToast();
 
@@ -141,8 +151,36 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
     setConditions(conditions.filter(c => c !== condition));
   };
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    saveDogMutation.mutate(data);
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    try {
+      // Save dog profile first
+      await saveDogMutation.mutateAsync(data);
+      
+      // Then save medical profile if it has data
+      if (dog?.id && (allergies.length > 0 || conditions.length > 0 || hasInsurance)) {
+        const medicalData = {
+          dogId: dog.id,
+          allergies,
+          conditions,
+          vetClearance: dog.medicalProfile?.vetClearance || false,
+          insurance: hasInsurance ? insurance : null,
+        };
+
+        if (dog.medicalProfile?.id) {
+          await apiRequest("PATCH", `/api/medical-profiles/${dog.medicalProfile.id}`, medicalData);
+        } else {
+          await apiRequest("POST", "/api/medical-profiles", medicalData);
+        }
+        
+        queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save profile. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -409,6 +447,102 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
                         </Badge>
                       ))}
                     </div>
+                  </div>
+
+                  {/* Pet Insurance Section */}
+                  <div className="bg-blue-50 p-4 rounded-lg space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <Shield className="w-4 h-4 mr-2 text-blue-600" />
+                        <Label className="text-sm font-medium">Pet Insurance</Label>
+                      </div>
+                      <Switch
+                        checked={hasInsurance}
+                        onCheckedChange={setHasInsurance}
+                      />
+                    </div>
+                    
+                    {hasInsurance && (
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Label className="text-xs text-gray-600">Insurance Provider</Label>
+                            <Input
+                              placeholder="e.g., Trupanion, Healthy Paws"
+                              value={insurance.provider}
+                              onChange={(e) => setInsurance({...insurance, provider: e.target.value})}
+                              className="text-sm"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs text-gray-600">Policy Number</Label>
+                            <Input
+                              placeholder="Policy number"
+                              value={insurance.policyNumber}
+                              onChange={(e) => setInsurance({...insurance, policyNumber: e.target.value})}
+                              className="text-sm"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Label className="text-xs text-gray-600">Coverage Type</Label>
+                            <Select value={insurance.coverageType} onValueChange={(value) => setInsurance({...insurance, coverageType: value})}>
+                              <SelectTrigger className="text-sm">
+                                <SelectValue placeholder="Select coverage" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="accident-only">Accident Only</SelectItem>
+                                <SelectItem value="accident-illness">Accident & Illness</SelectItem>
+                                <SelectItem value="comprehensive">Comprehensive</SelectItem>
+                                <SelectItem value="wellness">Wellness</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="text-xs text-gray-600">Coverage Limit</Label>
+                            <Input
+                              placeholder="e.g., $10,000/year"
+                              value={insurance.coverageLimit}
+                              onChange={(e) => setInsurance({...insurance, coverageLimit: e.target.value})}
+                              className="text-sm"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Label className="text-xs text-gray-600">Deductible</Label>
+                            <Input
+                              placeholder="e.g., $250"
+                              value={insurance.deductible}
+                              onChange={(e) => setInsurance({...insurance, deductible: e.target.value})}
+                              className="text-sm"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs text-gray-600">Expiration Date</Label>
+                            <Input
+                              type="date"
+                              value={insurance.expirationDate}
+                              onChange={(e) => setInsurance({...insurance, expirationDate: e.target.value})}
+                              className="text-sm"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <Label className="text-xs text-gray-600">Contact Number</Label>
+                          <Input
+                            placeholder="Insurance contact number"
+                            value={insurance.contactNumber}
+                            onChange={(e) => setInsurance({...insurance, contactNumber: e.target.value})}
+                            className="text-sm"
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="bg-mint bg-opacity-10 p-4 rounded-lg">

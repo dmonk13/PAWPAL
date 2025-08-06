@@ -1,4 +1,4 @@
-import { X, Heart, Pill, AlertTriangle, Calendar, CheckCircle, FileText } from "lucide-react";
+import { X, Heart, Pill, AlertTriangle, Calendar, CheckCircle, FileText, Shield } from "lucide-react";
 import { DogWithMedical } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -135,6 +135,51 @@ export default function MedicalModal({ dog, onClose }: MedicalModalProps) {
                   View Documents
                 </Button>
               )}
+            </div>
+          )}
+
+          {/* Pet Insurance */}
+          {medicalProfile.insurance && (
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <div className="flex items-center mb-2">
+                <Shield className="w-4 h-4 text-blue-600 mr-2" />
+                <h4 className="font-semibold dark-gray">Pet Insurance</h4>
+              </div>
+              <div className="space-y-2 text-sm medium-gray">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="font-medium">Provider:</span> {medicalProfile.insurance.provider}
+                  </div>
+                  <div>
+                    <span className="font-medium">Coverage:</span> {medicalProfile.insurance.coverageType}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="font-medium">Policy:</span> {medicalProfile.insurance.policyNumber}
+                  </div>
+                  {medicalProfile.insurance.coverageLimit && (
+                    <div>
+                      <span className="font-medium">Limit:</span> {medicalProfile.insurance.coverageLimit}
+                    </div>
+                  )}
+                </div>
+                {medicalProfile.insurance.deductible && (
+                  <div>
+                    <span className="font-medium">Deductible:</span> {medicalProfile.insurance.deductible}
+                  </div>
+                )}
+                {medicalProfile.insurance.expirationDate && (
+                  <div>
+                    <span className="font-medium">Expires:</span> {new Date(medicalProfile.insurance.expirationDate).toLocaleDateString()}
+                  </div>
+                )}
+                {medicalProfile.insurance.contactNumber && (
+                  <div>
+                    <span className="font-medium">Contact:</span> {medicalProfile.insurance.contactNumber}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

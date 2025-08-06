@@ -54,6 +54,15 @@ export const medicalProfiles = pgTable("medical_profiles", {
   vetClearance: boolean("vet_clearance").default(false),
   vetClearanceDate: timestamp("vet_clearance_date"),
   vetDocumentUrl: text("vet_document_url"),
+  insurance: jsonb("insurance").$type<{
+    provider: string;
+    policyNumber: string;
+    coverageType: string;
+    coverageLimit?: string;
+    deductible?: string;
+    expirationDate?: string;
+    contactNumber?: string;
+  } | null>(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

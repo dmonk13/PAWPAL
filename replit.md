@@ -56,5 +56,6 @@ Preferred communication style: Simple, everyday language.
 - **Matching Algorithm**: Location-based filtering with customizable distance radius and preference filters
 - **Swipe Mechanics**: Touch gesture handling with visual feedback and match detection
 - **Real-time Updates**: React Query for optimistic updates and cache invalidation
-- **Medical Information**: Structured medical profiles with vaccination records, allergies, and health conditions
+- **Medical Information**: Structured medical profiles with vaccination records, allergies, health conditions, and pet insurance integration
+- **Pet Insurance System**: Complete third-party insurance management with provider details, policy numbers, coverage types, and expiration tracking
 - **Responsive Design**: Mobile-optimized interface with bottom navigation pattern

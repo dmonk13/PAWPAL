@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Settings, Camera, Heart, Edit3, Plus, MapPin, CheckCircle, Users, Star, Crown } from "lucide-react";
+import { Settings, Camera, Heart, Edit3, Plus, MapPin, CheckCircle, Users, Star, Crown, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -287,6 +287,22 @@ export default function Profile() {
                       <p className="text-sm medium-gray">
                         {new Date(currentDog.medicalProfile.lastVetVisit).toLocaleDateString()}
                       </p>
+                    </div>
+                  )}
+
+                  {currentDog.medicalProfile.insurance && (
+                    <div>
+                      <h4 className="font-semibold mb-2 flex items-center">
+                        <Shield className="w-4 h-4 mr-2 text-blue-600" />
+                        Pet Insurance
+                      </h4>
+                      <div className="space-y-1 text-sm medium-gray">
+                        <p><span className="font-medium">Provider:</span> {currentDog.medicalProfile.insurance.provider}</p>
+                        <p><span className="font-medium">Coverage:</span> {currentDog.medicalProfile.insurance.coverageType}</p>
+                        {currentDog.medicalProfile.insurance.expirationDate && (
+                          <p><span className="font-medium">Expires:</span> {new Date(currentDog.medicalProfile.insurance.expirationDate).toLocaleDateString()}</p>
+                        )}
+                      </div>
                     </div>
                   )}
                 </CardContent>
