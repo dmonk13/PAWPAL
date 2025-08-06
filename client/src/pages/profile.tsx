@@ -7,21 +7,28 @@ import { Badge } from "@/components/ui/badge";
 import BottomNav from "@/components/bottom-nav";
 import DogProfileForm from "@/components/dog-profile-form";
 import { Link } from "wouter";
-
-const CURRENT_USER_ID = "52ae6e15-c749-4151-b75b-bd4a6403b81f"; // Sarah's ID from database
+import { type User } from "@shared/schema";
 
 export default function Profile() {
   const [selectedDog, setSelectedDog] = useState<string | null>(null);
   const [showEditForm, setShowEditForm] = useState(false);
   const [editingDog, setEditingDog] = useState<any>(null);
 
+  // Get current user
+  const { data: user } = useQuery<User>({
+    queryKey: ["/api/auth/user"],
+  });
+
+  // Get user's dogs
   const { data: dogs = [], isLoading } = useQuery({
-    queryKey: ["/api/users", CURRENT_USER_ID, "dogs"],
+    queryKey: ["/api/users", user?.id, "dogs"],
     queryFn: async () => {
-      const response = await fetch(`/api/users/${CURRENT_USER_ID}/dogs`);
+      if (!user?.id) throw new Error('No user ID available');
+      const response = await fetch(`/api/users/${user.id}/dogs`);
       if (!response.ok) throw new Error('Failed to fetch user dogs');
       return response.json();
     },
+    enabled: !!user?.id,
   });
 
   if (isLoading) {

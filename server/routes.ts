@@ -271,6 +271,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user's dogs
+  app.get("/api/users/:userId/dogs", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const dogs = await storage.getDogsByOwner(userId);
+      
+      // Get medical profiles for each dog
+      const dogsWithMedical = await Promise.all(
+        dogs.map(async (dog) => {
+          const medicalProfile = await storage.getMedicalProfile(dog.id);
+          return {
+            ...dog,
+            medicalProfile
+          };
+        })
+      );
+      
+      res.json(dogsWithMedical);
+    } catch (error) {
+      console.error("Failed to get user dogs:", error);
+      res.status(500).json({ message: "Failed to get user dogs" });
+    }
+  });
+
   // Get dog medical profile
   app.get("/api/dogs/:dogId/medical", async (req, res) => {
     try {
