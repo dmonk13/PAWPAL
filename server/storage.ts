@@ -732,6 +732,134 @@ export class MemStorage implements IStorage {
     this.veterinarians.set(vet2.id, vet2);
     this.veterinarians.set(vet3.id, vet3);
 
+    // Add comprehensive veterinarian profiles with professional experience
+    const vetProfiles = [
+      {
+        id: "vet-4",
+        name: "Dr. Sarah Mitchell",
+        title: "DVM, DACVIM",
+        clinicName: "Manhattan Veterinary Specialists",
+        profilePhoto: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400",
+        bio: "Dr. Mitchell is a board-certified internal medicine specialist with over 12 years of experience treating complex medical cases in dogs and cats. She specializes in endocrinology, gastroenterology, and emergency critical care.",
+        yearsExperience: 12,
+        education: [
+          {
+            degree: "Doctor of Veterinary Medicine (DVM)",
+            institution: "Cornell University College of Veterinary Medicine",
+            year: 2012
+          },
+          {
+            degree: "Bachelor of Science in Animal Science", 
+            institution: "University of California, Davis",
+            year: 2008
+          }
+        ],
+        certifications: [
+          {
+            name: "Diplomate, American College of Veterinary Internal Medicine",
+            issuingBody: "ACVIM",
+            year: 2016
+          },
+          {
+            name: "Emergency and Critical Care Certification",
+            issuingBody: "VECCS",
+            year: 2018
+          }
+        ],
+        specialties: ["Internal Medicine", "Endocrinology", "Emergency Care", "Gastroenterology"],
+        services: ["Comprehensive Health Exams", "Diagnostic Imaging", "Laboratory Testing", "Emergency Treatment", "Surgical Consultations"],
+        languages: ["English", "Spanish"],
+        rating: "4.9",
+        reviewCount: 127,
+        phoneNumber: "+1 (212) 555-0123",
+        email: "dr.mitchell@manhattanvet.com",
+        website: "https://manhattanvet.com",
+        address: "425 E 58th St, New York, NY 10022",
+        latitude: "40.7614",
+        longitude: "-73.9776",
+        workingHours: {
+          Monday: { open: "08:00", close: "18:00" },
+          Tuesday: { open: "08:00", close: "18:00" },
+          Wednesday: { open: "08:00", close: "18:00" },
+          Thursday: { open: "08:00", close: "18:00" },
+          Friday: { open: "08:00", close: "17:00" },
+          Saturday: { open: "09:00", close: "15:00" },
+          Sunday: { closed: true }
+        },
+        emergencyServices: true,
+        onlineBooking: true,
+        bookingUrl: "https://manhattanvet.com/book",
+        consultationFee: "175.00",
+        acceptsInsurance: true,
+        acceptedInsurances: ["Trupanion", "Nationwide", "Embrace", "ASPCA"],
+        isActive: true,
+        createdAt: new Date()
+      },
+      {
+        id: "vet-5",
+        name: "Dr. Lisa Thompson", 
+        title: "DVM",
+        clinicName: "Compassionate Care Veterinary Clinic",
+        profilePhoto: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400",
+        bio: "Dr. Thompson is a dedicated general practice veterinarian with 18 years of experience providing comprehensive care for dogs and cats. She has a special interest in geriatric medicine and preventive care, and is known for her gentle approach with anxious pets.",
+        yearsExperience: 18,
+        education: [
+          {
+            degree: "Doctor of Veterinary Medicine (DVM)",
+            institution: "Auburn University College of Veterinary Medicine",
+            year: 2006
+          },
+          {
+            degree: "Bachelor of Science in Biology",
+            institution: "University of Georgia", 
+            year: 2002
+          }
+        ],
+        certifications: [
+          {
+            name: "Fear Free Certified Professional",
+            issuingBody: "Fear Free",
+            year: 2019
+          },
+          {
+            name: "Geriatric Medicine Certification",
+            issuingBody: "AAHA",
+            year: 2020
+          }
+        ],
+        specialties: ["General Practice", "Geriatric Medicine", "Preventive Care", "Behavioral Consultation"],
+        services: ["Wellness Exams", "Vaccinations", "Dental Care", "Senior Pet Care", "Behavioral Counseling"],
+        languages: ["English"],
+        rating: "4.8",
+        reviewCount: 156,
+        phoneNumber: "+1 (212) 555-0654",
+        email: "dr.thompson@compassionatecare.com",
+        website: "https://compassionatecarenyc.com",
+        address: "789 2nd Ave, New York, NY 10017",
+        latitude: "40.7505",
+        longitude: "-73.9749",
+        workingHours: {
+          Monday: { open: "08:00", close: "18:00" },
+          Tuesday: { open: "08:00", close: "18:00" },
+          Wednesday: { open: "08:00", close: "18:00" },
+          Thursday: { open: "08:00", close: "20:00" },
+          Friday: { open: "08:00", close: "18:00" },
+          Saturday: { open: "09:00", close: "17:00" },
+          Sunday: { open: "10:00", close: "16:00" }
+        },
+        emergencyServices: false,
+        onlineBooking: true,
+        bookingUrl: "https://compassionatecarenyc.com/schedule",
+        consultationFee: "125.00",
+        acceptsInsurance: true,
+        acceptedInsurances: ["Trupanion", "Nationwide", "Pets Best", "ASPCA", "Embrace"],
+        isActive: true,
+        createdAt: new Date()
+      }
+    ];
+
+    vetProfiles.forEach(vet => this.veterinarians.set(vet.id, vet));
+
     // Create sample swipes to show swiping interactions
     const swipes: Swipe[] = [
       {

@@ -145,9 +145,25 @@ export type MatchWithDogs = Match & {
 export const veterinarians = pgTable("veterinarians", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
+  title: text("title"), // e.g., "DVM", "VMD", "Doctor of Veterinary Medicine"
   clinicName: text("clinic_name").notNull(),
+  profilePhoto: text("profile_photo"),
+  bio: text("bio"),
+  yearsExperience: integer("years_experience"),
+  education: jsonb("education").$type<{
+    degree: string;
+    institution: string;
+    year: number;
+  }[]>().default([]),
+  certifications: jsonb("certifications").$type<{
+    name: string;
+    issuingBody: string;
+    year: number;
+    expiryDate?: string;
+  }[]>().default([]),
   specialties: jsonb("specialties").$type<string[]>().default([]),
   services: jsonb("services").$type<string[]>().default([]),
+  languages: jsonb("languages").$type<string[]>().default(["English"]),
   rating: decimal("rating", { precision: 3, scale: 2 }).default("0"),
   reviewCount: integer("review_count").default(0),
   phoneNumber: text("phone_number"),
@@ -162,6 +178,9 @@ export const veterinarians = pgTable("veterinarians", {
   emergencyServices: boolean("emergency_services").default(false),
   onlineBooking: boolean("online_booking").default(false),
   bookingUrl: text("booking_url"),
+  consultationFee: decimal("consultation_fee", { precision: 8, scale: 2 }),
+  acceptsInsurance: boolean("accepts_insurance").default(false),
+  acceptedInsurances: jsonb("accepted_insurances").$type<string[]>().default([]),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });
