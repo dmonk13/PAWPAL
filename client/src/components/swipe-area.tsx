@@ -165,37 +165,39 @@ export default function SwipeArea() {
           }`}
         />
 
-        {/* Dating app style action buttons */}
-        <div className="absolute bottom-20 left-0 right-0 flex justify-center items-center space-x-4 px-6">
+        {/* Dating app style action buttons - Fixed positioning above bottom nav */}
+        <div className="absolute bottom-24 left-0 right-0 flex justify-center items-center space-x-6 px-8 z-20">
+          {/* Backdrop for visibility */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none rounded-t-3xl" />
           {/* Reject Button */}
           <Button
             size="lg"
             variant="outline"
-            className="w-16 h-16 rounded-full border-2 border-red-300 bg-white hover:bg-red-50 hover:border-red-400 shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95"
+            className="w-16 h-16 rounded-full border-2 border-red-400 bg-white hover:bg-red-50 hover:border-red-500 shadow-2xl transition-all duration-200 transform hover:scale-110 active:scale-95"
             onClick={() => handleSwipe("left")}
             disabled={swipeMutation.isPending}
           >
-            <X className="w-6 h-6 text-red-500" />
+            <X className="w-7 h-7 text-red-500 stroke-2" />
           </Button>
           
           {/* Info Button */}
           <Button
             size="lg"
             variant="outline"
-            className="w-12 h-12 rounded-full border-2 border-blue-300 bg-white hover:bg-blue-50 hover:border-blue-400 shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95"
+            className="w-12 h-12 rounded-full border-2 border-blue-400 bg-white hover:bg-blue-50 hover:border-blue-500 shadow-xl transition-all duration-200 transform hover:scale-110 active:scale-95"
             onClick={() => setSelectedDog(currentDog)}
           >
-            <Info className="w-4 h-4 text-blue-500" />
+            <Info className="w-5 h-5 text-blue-500" />
           </Button>
           
           {/* Like Button */}
           <Button
             size="lg"
-            className="w-16 h-16 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 rounded-full text-white shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95"
+            className="w-16 h-16 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 rounded-full text-white shadow-2xl transition-all duration-200 transform hover:scale-110 active:scale-95 border-0"
             onClick={() => handleSwipe("right")}
             disabled={swipeMutation.isPending}
           >
-            <Heart className="w-6 h-6 fill-current" />
+            <Heart className="w-7 h-7 fill-current stroke-0" />
           </Button>
         </div>
       </main>
