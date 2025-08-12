@@ -39,7 +39,7 @@ export default function BottomNavigation() {
   };
 
   return (
-    <nav className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2">
+    <nav className="absolute bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-2">
       <div className="flex justify-around">
         {navigationTabs.map((tab) => {
           const Icon = tab.icon;
@@ -49,7 +49,7 @@ export default function BottomNavigation() {
             <Link key={tab.id} href={tab.path}>
               <button 
                 className={`flex flex-col items-center py-2 transition-colors ${
-                  isActive ? "coral" : "medium-gray hover:dark-gray"
+                  isActive ? "text-primary-rose" : "text-secondary-gray hover:text-primary-dark"
                 }`}
               >
                 <Icon className="w-5 h-5 mb-1" />

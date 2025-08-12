@@ -17,7 +17,7 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
   const hasAllergies = medicalProfile?.allergies && medicalProfile.allergies.length > 0;
   
   return (
-    <div className={`absolute inset-4 bg-white rounded-2xl shadow-xl overflow-hidden ${className}`}>
+    <div className={`absolute inset-4 bg-card-light rounded-2xl shadow-xl overflow-hidden ${className}`}>
       <div className="relative h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
         {/* Main photo */}
         <img 
@@ -28,44 +28,44 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
         
         {/* Distance indicator */}
         {dog.distance && (
-          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-gray-700 px-3 py-1.5 rounded-lg text-sm font-medium shadow-sm border border-gray-200">
+          <div className="absolute top-4 right-4 bg-card-light/95 backdrop-blur-sm text-secondary-gray px-3 py-1.5 rounded-lg text-sm font-medium shadow-sm border border-divider">
             <MapPin className="w-3.5 h-3.5 inline mr-1" />
             <span>{Math.round(dog.distance)} mi</span>
           </div>
         )}
 
-        {/* Cohesive Status badges */}
+        {/* Status badges with new color scheme */}
         <div className="absolute top-4 left-4 flex flex-wrap gap-2 max-w-[60%]">
           {isVaccinated && (
-            <Badge className="bg-white/90 backdrop-blur-sm text-green-700 text-xs font-medium px-2.5 py-1 rounded-lg shadow-sm border border-green-200">
-              <Heart className="w-3 h-3 mr-1 text-green-600" />
+            <Badge className="bg-card-light/95 backdrop-blur-sm text-success text-xs font-medium px-2.5 py-1 rounded-lg shadow-sm border border-success/20">
+              <Heart className="w-3 h-3 mr-1 text-success" />
               Vaccinated
             </Badge>
           )}
           
           {medicalProfile?.vetClearance && (
-            <Badge className="bg-white/90 backdrop-blur-sm text-blue-700 text-xs font-medium px-2.5 py-1 rounded-lg shadow-sm border border-blue-200">
-              <CheckCircle className="w-3 h-3 mr-1 text-blue-600" />
+            <Badge className="bg-card-light/95 backdrop-blur-sm text-primary-rose text-xs font-medium px-2.5 py-1 rounded-lg shadow-sm border border-primary-rose/20">
+              <CheckCircle className="w-3 h-3 mr-1 text-primary-rose" />
               Vet Cleared
             </Badge>
           )}
           
           {dog.matingPreference && (
-            <Badge className="bg-white/90 backdrop-blur-sm text-purple-700 text-xs font-medium px-2.5 py-1 rounded-lg shadow-sm border border-purple-200">
-              <Users className="w-3 h-3 mr-1 text-purple-600" />
+            <Badge className="bg-card-light/95 backdrop-blur-sm text-purple-accent text-xs font-medium px-2.5 py-1 rounded-lg shadow-sm border border-purple-accent/20">
+              <Users className="w-3 h-3 mr-1 text-purple-accent" />
               Breeding
             </Badge>
           )}
           
           {medicalProfile?.isSpayedNeutered && (
-            <Badge className="bg-white/90 backdrop-blur-sm text-indigo-700 text-xs font-medium px-2.5 py-1 rounded-lg shadow-sm border border-indigo-200">
-              <Plus className="w-3 h-3 mr-1 text-indigo-600" />
+            <Badge className="bg-card-light/95 backdrop-blur-sm text-coral text-xs font-medium px-2.5 py-1 rounded-lg shadow-sm border border-coral/20">
+              <Plus className="w-3 h-3 mr-1 text-coral" />
               Fixed
             </Badge>
           )}
           
           {hasAllergies && (
-            <Badge className="bg-white/90 backdrop-blur-sm text-orange-700 text-xs font-medium px-2.5 py-1 rounded-lg shadow-sm border border-orange-200">
+            <Badge className="bg-card-light/95 backdrop-blur-sm text-error text-xs font-medium px-2.5 py-1 rounded-lg shadow-sm border border-error/20">
               ⚠️ Allergies
             </Badge>
           )}
@@ -106,7 +106,7 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
                   {dog.temperament.slice(0, 3).map((trait: string, index: number) => (
                     <Badge 
                       key={index} 
-                      className="text-xs bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-700 border-orange-200 px-3 py-1.5 font-semibold shadow-sm hover:shadow-md transition-all duration-200"
+                      className="text-xs bg-profile-card text-primary-dark border-primary-rose/20 px-3 py-1.5 font-semibold shadow-sm hover:shadow-md transition-all duration-200"
                     >
                       {trait}
                     </Badge>
@@ -124,7 +124,7 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
           {/* Enhanced Medical info toggle */}
           <Button
             onClick={onMedicalClick}
-            className="flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
+            className="flex items-center justify-center space-x-2 bg-coral hover:bg-coral/90 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
           >
             <Info className="w-5 h-5" />
             <span>View Medical Profile</span>
@@ -132,12 +132,12 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
         </div>
         
         {/* Integrated Action Buttons */}
-        <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 border-t border-gray-200">
+        <div className="p-4 bg-divider border-t border-border">
           <div className="flex justify-center items-center space-x-4">
             {/* Pass (Reject) Button */}
             <Button
               size="lg"
-              className="flex-1 h-14 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
+              className="flex-1 h-14 bg-secondary text-secondary-foreground hover:bg-secondary/90 font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
               onClick={() => onSwipe?.('left')}
             >
               <X className="w-6 h-6 mr-2" />
@@ -147,7 +147,7 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
             {/* Info Button */}
             <Button
               size="lg"
-              className="w-14 h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
+              className="w-14 h-14 bg-coral hover:bg-coral/90 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
               onClick={onMedicalClick}
             >
               <Info className="w-5 h-5" />
@@ -156,7 +156,7 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
             {/* Like Button */}
             <Button
               size="lg"
-              className="flex-1 h-14 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
+              className="flex-1 h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
               onClick={() => onSwipe?.('right')}
             >
               <Heart className="w-6 h-6 mr-2 fill-current" />

@@ -34,7 +34,7 @@ export default function Profile() {
   if (isLoading) {
     return (
       <div className="flex flex-col h-full">
-        <header className="bg-gradient-to-r from-pink-500 to-red-500 text-white p-6 sticky top-0 z-40 shadow-lg">
+        <header className="bg-primary text-primary-foreground p-6 sticky top-0 z-40 shadow-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -42,11 +42,11 @@ export default function Profile() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold">My Profile</h1>
-                <p className="text-pink-100 text-sm">Manage your dogs and preferences</p>
+                <p className="text-primary-foreground/80 text-sm">Manage your dogs and preferences</p>
               </div>
             </div>
             <Link href="/settings">
-              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 border-white/30">
+              <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-foreground/20 border-primary-foreground/30">
                 <Settings className="w-4 h-4" />
               </Button>
             </Link>

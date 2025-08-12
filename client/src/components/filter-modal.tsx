@@ -65,10 +65,10 @@ export default function FilterModal({ onClose, onApplyFilters }: FilterModalProp
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex flex-col">
-      <div className="bg-white rounded-t-3xl mt-16 flex-1 flex flex-col max-h-[calc(100vh-4rem)]">
+      <div className="bg-card rounded-t-3xl mt-16 flex-1 flex flex-col max-h-[calc(100vh-4rem)]">
         {/* Fixed Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100 flex-shrink-0">
-          <h3 className="text-xl font-bold dark-gray">Filters</h3>
+        <div className="flex items-center justify-between p-6 border-b border-border flex-shrink-0">
+          <h3 className="text-xl font-bold text-primary-dark">Filters</h3>
           <Button variant="ghost" size="sm" onClick={onClose} className="touch-manipulation min-h-[44px] min-w-[44px]">
             <X className="w-5 h-5" />
           </Button>
@@ -79,7 +79,7 @@ export default function FilterModal({ onClose, onApplyFilters }: FilterModalProp
           <div className="space-y-6 py-2">
           {/* Distance */}
           <div>
-            <Label className="block text-sm font-semibold dark-gray mb-4">
+            <Label className="block text-sm font-semibold text-primary-dark mb-4">
               Distance ({distance[0]} miles)
             </Label>
             <div className="px-2 py-4">
@@ -91,7 +91,7 @@ export default function FilterModal({ onClose, onApplyFilters }: FilterModalProp
                 step={1}
                 className="w-full touch-manipulation"
               />
-              <div className="flex justify-between text-xs medium-gray mt-2 px-1">
+              <div className="flex justify-between text-xs text-secondary-gray mt-2 px-1">
                 <span>1 mi</span>
                 <span>25 mi</span>
                 <span>50 mi</span>
@@ -101,7 +101,7 @@ export default function FilterModal({ onClose, onApplyFilters }: FilterModalProp
           
           {/* Age Range */}
           <div>
-            <Label className="block text-sm font-semibold dark-gray mb-4">Age Range</Label>
+            <Label className="block text-sm font-semibold text-primary-dark mb-4">Age Range</Label>
             <Select value={ageRange} onValueChange={setAgeRange}>
               <SelectTrigger className="touch-manipulation min-h-[48px] text-left">
                 <SelectValue placeholder="Select age range" />
@@ -129,7 +129,7 @@ export default function FilterModal({ onClose, onApplyFilters }: FilterModalProp
           
           {/* Size */}
           <div>
-            <Label className="block text-sm font-semibold dark-gray mb-4">Size</Label>
+            <Label className="block text-sm font-semibold text-primary-dark mb-4">Size</Label>
             <div className="grid grid-cols-3 gap-3">
               {["Small", "Medium", "Large"].map((sizeOption) => (
                 <Button
@@ -137,7 +137,7 @@ export default function FilterModal({ onClose, onApplyFilters }: FilterModalProp
                   variant={size === sizeOption ? "default" : "outline"}
                   onClick={() => setSize(size === sizeOption ? "" : sizeOption)}
                   className={`touch-manipulation min-h-[48px] text-sm font-medium ${
-                    size === sizeOption ? "bg-coral text-white border-coral" : "border-2"
+                    size === sizeOption ? "bg-primary-rose text-white border-primary-rose" : "border-2 hover:border-primary-rose hover:text-primary-rose"
                   }`}
                 >
                   {sizeOption}
