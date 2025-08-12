@@ -37,6 +37,27 @@
   background: rgb(156 163 175);
 }
 
+/* Touch and scroll behavior improvements */
+.touch-pan-y {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+[data-scrollable="true"] {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior-y: contain;
+}
+
+/* Prevent default touch behaviors on swipe areas while preserving scroll */
+.swipe-card {
+  touch-action: manipulation;
+}
+
+.swipe-card [data-scrollable="true"] {
+  touch-action: pan-y;
+}
+
 :root {
   /* Backgrounds */
   --background: hsl(0, 0%, 100%); /* #FFFFFF - Pure white */
