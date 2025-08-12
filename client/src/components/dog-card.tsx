@@ -1,7 +1,17 @@
-import { Heart, MapPin, Plus, CheckCircle, Users, X, Info } from "lucide-react";
+import { 
+  Heart, MapPin, Plus, CheckCircle, Users, X, Info, Share2, Bookmark, Flag,
+  Activity, Shield, Eye, MoreHorizontal, Timer, Zap, Star
+} from "lucide-react";
 import { DogWithMedical } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { useState } from "react";
 
 interface DogCardProps {
   dog: DogWithMedical;
@@ -11,110 +21,182 @@ interface DogCardProps {
 }
 
 export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }: DogCardProps) {
+  const [showFullBio, setShowFullBio] = useState(false);
   const { medicalProfile } = dog;
   
   const isVaccinated = medicalProfile?.vaccinations?.some(v => v.type === "Rabies");
   const hasAllergies = medicalProfile?.allergies && medicalProfile.allergies.length > 0;
+
+  // Personality trait icons mapping
+  const personalityIcons: Record<string, any> = {
+    'Athletic': Activity,
+    'Independent': Shield,
+    'Alert': Eye,
+    'Energetic': Zap,
+    'Calm': Timer,
+    'Friendly': Heart,
+    'Playful': Star
+  };
   
   return (
-    <div className={`absolute inset-4 bg-card-light rounded-2xl shadow-xl overflow-hidden ${className}`}>
+    <div 
+      className={`absolute inset-4 bg-[hsl(var(--surface-white))] rounded-2xl shadow-xl overflow-hidden ${className}`}
+      role="region"
+      aria-labelledby={`dog-${dog.id}-name`}
+      aria-describedby={`dog-${dog.id}-details`}
+    >
       <div className="relative h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
-        {/* Main photo */}
+        {/* Hero Photo */}
         <img 
           src={dog.photos?.[0] || "/placeholder-dog.jpg"}
-          alt={`${dog.name} - ${dog.breed}`}
+          alt={`${dog.name}, ${dog.breed} dog`}
           className="w-full h-2/3 object-cover"
         />
         
-        {/* Distance indicator */}
+        {/* Distance Badge - Top Right */}
         {dog.distance && (
-          <div className="absolute top-4 right-4 bg-card-light/95 backdrop-blur-sm text-secondary-gray px-3 py-1.5 rounded-lg text-sm font-medium shadow-sm border border-divider">
-            <MapPin className="w-3.5 h-3.5 inline mr-1" />
+          <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm text-[hsl(var(--text-secondary))] px-3 py-1.5 rounded-full text-sm font-semibold shadow-lg border border-[hsl(var(--borders-light))]">
+            <MapPin className="w-3.5 h-3.5 inline mr-1.5" />
             <span>{Math.round(dog.distance)} mi</span>
           </div>
         )}
 
-        {/* Status badges with new color scheme */}
+        {/* Status Badges - Top Left */}
         <div className="absolute top-4 left-4 flex flex-wrap gap-2 max-w-[60%]">
           {isVaccinated && (
-            <Badge className="bg-card-light/95 backdrop-blur-sm text-success text-xs font-medium px-2.5 py-1 rounded-lg shadow-sm border border-success/20">
-              <Heart className="w-3 h-3 mr-1 text-success" />
+            <Badge 
+              className="bg-white/95 backdrop-blur-sm text-[hsl(var(--success-green))] text-xs font-bold px-2.5 py-1.5 rounded-full shadow-lg border-2 border-[hsl(var(--success-green))]/30"
+              data-tone="success"
+              role="status"
+              aria-label="Vaccinated dog"
+            >
+              <CheckCircle className="w-3 h-3 mr-1" />
               Vaccinated
             </Badge>
           )}
           
           {medicalProfile?.vetClearance && (
-            <Badge className="bg-card-light/95 backdrop-blur-sm text-primary-rose text-xs font-medium px-2.5 py-1 rounded-lg shadow-sm border border-primary-rose/20">
-              <CheckCircle className="w-3 h-3 mr-1 text-primary-rose" />
+            <Badge 
+              className="bg-white/95 backdrop-blur-sm text-[hsl(var(--primary-rose))] text-xs font-bold px-2.5 py-1.5 rounded-full shadow-lg border-2 border-[hsl(var(--primary-rose))]/30"
+              data-tone="primary"
+              role="status"  
+              aria-label="Veterinary clearance confirmed"
+            >
+              <Shield className="w-3 h-3 mr-1" />
               Vet Cleared
             </Badge>
           )}
           
-          {dog.matingPreference && (
-            <Badge className="bg-card-light/95 backdrop-blur-sm text-purple-accent text-xs font-medium px-2.5 py-1 rounded-lg shadow-sm border border-purple-accent/20">
-              <Users className="w-3 h-3 mr-1 text-purple-accent" />
-              Breeding
-            </Badge>
-          )}
-          
-          {medicalProfile?.isSpayedNeutered && (
-            <Badge className="bg-card-light/95 backdrop-blur-sm text-coral text-xs font-medium px-2.5 py-1 rounded-lg shadow-sm border border-coral/20">
-              <Plus className="w-3 h-3 mr-1 text-coral" />
-              Fixed
-            </Badge>
-          )}
-          
           {hasAllergies && (
-            <Badge className="bg-card-light/95 backdrop-blur-sm text-error text-xs font-medium px-2.5 py-1 rounded-lg shadow-sm border border-error/20">
+            <Badge 
+              className="bg-white/95 backdrop-blur-sm text-[hsl(var(--warning-amber))] text-xs font-bold px-2.5 py-1.5 rounded-full shadow-lg border-2 border-[hsl(var(--warning-amber))]/30"
+              data-tone="warning"
+              role="status"
+              aria-label="Has known allergies"
+            >
               ⚠️ Allergies
             </Badge>
           )}
         </div>
 
-        {/* Enhanced Profile info with new color scheme */}
-        <div className="p-6 bg-card min-h-[40%] flex flex-col justify-between">
+        {/* Premium Profile Content */}
+        <div className="p-4 bg-[hsl(var(--surface-white))] min-h-[40%] flex flex-col justify-between pb-safe">
+          {/* Header Section */}
           <div>
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <h2 className="text-3xl font-bold text-primary-dark mb-2">{dog.name}</h2>
-                <div className="flex items-center flex-wrap gap-2 mb-3">
-                  <Badge className="bg-primary-rose/10 text-primary-rose border-primary-rose/20 px-3 py-1.5 font-semibold text-sm">
-                    {dog.breed}
-                  </Badge>
-                  <Badge className="bg-coral/10 text-coral border-coral/20 px-3 py-1.5 font-semibold text-sm">
-                    {dog.size}
-                  </Badge>
-                  <Badge className="bg-success/10 text-success border-success/20 px-3 py-1.5 font-semibold text-sm">
-                    {dog.gender}
-                  </Badge>
-                </div>
+            {/* Name & Age Row */}
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1 min-w-0">
+                <h2 
+                  id={`dog-${dog.id}-name`}
+                  className="text-2xl font-bold text-[hsl(var(--text-primary))] truncate"
+                >
+                  {dog.name}
+                </h2>
               </div>
-              <div className="bg-primary-rose text-white px-4 py-2 rounded-full shadow-lg ml-4">
-                <span className="text-lg font-bold">{dog.age}</span>
+              <div className="bg-[hsl(var(--primary-rose))] text-white px-3 py-1.5 rounded-full shadow-sm ml-3 flex-shrink-0">
+                <span className="text-base font-bold">{dog.age}</span>
                 <span className="text-sm ml-1">yrs</span>
               </div>
             </div>
-            
-            <div className="bg-divider rounded-lg p-3 mb-4 border border-border">
-              <p className="text-sm text-primary-dark line-clamp-3 leading-relaxed font-medium">{dog.bio}</p>
+
+            {/* Meta Badges Row - Gender, Size, Breed */}
+            <div className="flex items-center flex-wrap gap-1.5 mb-4">
+              <Badge 
+                className="bg-[hsl(var(--info-blue))]/10 text-[hsl(var(--info-blue))] border-[hsl(var(--info-blue))]/30 px-2.5 py-1 font-bold text-xs rounded-full"
+                data-tone="info"
+                aria-label={`Gender: ${dog.gender}`}
+              >
+                {dog.gender}
+              </Badge>
+              <Badge 
+                className="bg-[hsl(var(--warning-amber))]/10 text-[hsl(var(--warning-amber))] border-[hsl(var(--warning-amber))]/30 px-2.5 py-1 font-bold text-xs rounded-full"
+                data-tone="warning"
+                aria-label={`Size: ${dog.size}`}
+              >
+                {dog.size}
+              </Badge>
+              <Badge 
+                className="bg-[hsl(var(--primary-rose))]/10 text-[hsl(var(--primary-rose))] border-[hsl(var(--primary-rose))]/30 px-2.5 py-1 font-bold text-xs rounded-full"
+                data-tone="primary"
+                aria-label={`Breed: ${dog.breed}`}
+              >
+                {dog.breed}
+              </Badge>
             </div>
             
-            {/* Enhanced Temperament tags */}
+            {/* Bio Section with Truncation */}
+            <div 
+              className="bg-[hsl(var(--surface-gray))] rounded-xl p-3 mb-4 border border-[hsl(var(--borders-light))]"
+              id={`dog-${dog.id}-details`}
+            >
+              <p 
+                className={`text-sm text-[hsl(var(--text-secondary))] leading-relaxed font-medium ${
+                  !showFullBio ? 'line-clamp-2' : ''
+                }`}
+              >
+                {dog.bio}
+              </p>
+              {dog.bio && dog.bio.length > 100 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowFullBio(!showFullBio)}
+                  className="mt-2 p-0 h-auto text-[hsl(var(--primary-rose))] hover:text-[hsl(var(--primary-rose))]/80 font-semibold"
+                  aria-expanded={showFullBio}
+                  aria-controls={`dog-${dog.id}-details`}
+                >
+                  {showFullBio ? 'Less' : 'More'}
+                </Button>
+              )}
+            </div>
+            
+            {/* Compact High-Contrast Personality Pills */}
             {dog.temperament && dog.temperament.length > 0 && (
               <div className="mb-4">
-                <h4 className="text-sm font-bold text-primary-dark mb-2">Personality</h4>
+                <h4 className="text-sm font-bold text-[hsl(var(--text-primary))] mb-3">Personality</h4>
                 <div className="flex flex-wrap gap-2">
-                  {dog.temperament.slice(0, 3).map((trait: string, index: number) => (
-                    <Badge 
-                      key={index} 
-                      className="text-xs bg-profile-card text-primary-dark border-primary-rose/20 px-3 py-1.5 font-semibold shadow-sm hover:shadow-md transition-all duration-200"
-                    >
-                      {trait}
-                    </Badge>
-                  ))}
+                  {dog.temperament.slice(0, 3).map((trait: string, index: number) => {
+                    const IconComponent = personalityIcons[trait] || Star;
+                    return (
+                      <Badge 
+                        key={index} 
+                        className="bg-[hsl(var(--text-primary))] text-white border-0 px-3 py-2 font-bold text-xs rounded-full shadow-md hover:shadow-lg transition-all duration-200 min-h-[44px] flex items-center touch-manipulation"
+                        data-tone="primary"
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`Personality trait: ${trait}`}
+                      >
+                        <IconComponent className="w-3 h-3 mr-1.5" />
+                        {trait}
+                      </Badge>
+                    );
+                  })}
                   {dog.temperament.length > 3 && (
-                    <Badge className="text-xs bg-gray-100 text-gray-600 border-gray-200 px-3 py-1.5 font-medium">
-                      +{dog.temperament.length - 3} more
+                    <Badge 
+                      className="bg-[hsl(var(--borders-light))] text-[hsl(var(--text-secondary))] border-0 px-3 py-2 font-medium text-xs rounded-full min-h-[44px] flex items-center"
+                      aria-label={`${dog.temperament.length - 3} more personality traits`}
+                    >
+                      +{dog.temperament.length - 3}
                     </Badge>
                   )}
                 </div>
@@ -122,47 +204,85 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
             )}
           </div>
           
-          {/* Enhanced Medical info toggle */}
-          <Button
-            onClick={onMedicalClick}
-            className="flex items-center justify-center space-x-2 bg-coral hover:bg-coral/90 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
-          >
-            <Info className="w-5 h-5" />
-            <span>View Medical Profile</span>
-          </Button>
-        </div>
-        
-        {/* Integrated Action Buttons */}
-        <div className="p-4 bg-divider border-t border-border">
-          <div className="flex justify-center items-center space-x-4">
-            {/* Pass (Reject) Button */}
+          {/* Primary Action Row */}
+          <div className="space-y-3">
+            {/* Medical Profile - Prominent Action */}
             <Button
-              size="lg"
-              className="flex-1 h-14 bg-secondary text-secondary-foreground hover:bg-secondary/90 font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
-              onClick={() => onSwipe?.('left')}
-            >
-              <X className="w-6 h-6 mr-2" />
-              Pass
-            </Button>
-            
-            {/* Info Button */}
-            <Button
-              size="lg"
-              className="w-14 h-14 bg-coral hover:bg-coral/90 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
               onClick={onMedicalClick}
+              className="w-full flex items-center justify-center space-x-3 bg-[hsl(var(--primary-rose))] hover:bg-[hsl(var(--primary-rose))]/90 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 min-h-[48px] touch-manipulation"
+              data-tone="primary"
+              aria-label={`View medical profile for ${dog.name}`}
             >
               <Info className="w-5 h-5" />
+              <span className="text-base">View Medical Profile</span>
             </Button>
-            
-            {/* Like Button */}
-            <Button
-              size="lg"
-              className="flex-1 h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
-              onClick={() => onSwipe?.('right')}
-            >
-              <Heart className="w-6 h-6 mr-2 fill-current" />
-              Like
-            </Button>
+
+            {/* Action Row: Like, Pass, Overflow Menu */}
+            <div className="flex items-center space-x-3">
+              {/* Pass Button */}
+              <Button
+                size="lg"
+                className="flex-1 h-12 bg-[hsl(var(--surface-gray))] text-[hsl(var(--text-secondary))] hover:bg-[hsl(var(--borders-light))] font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 min-h-[44px] touch-manipulation"
+                onClick={() => onSwipe?.('left')}
+                data-tone="default"
+                aria-label={`Pass on ${dog.name}`}
+              >
+                <X className="w-5 h-5 mr-2" />
+                Pass
+              </Button>
+              
+              {/* Like Button */}
+              <Button
+                size="lg"
+                className="flex-1 h-12 bg-[hsl(var(--success-green))] hover:bg-[hsl(var(--success-green))]/90 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 min-h-[44px] touch-manipulation"
+                onClick={() => onSwipe?.('right')}
+                data-tone="success"
+                aria-label={`Like ${dog.name}`}
+              >
+                <Heart className="w-5 h-5 mr-2 fill-current" />
+                Like
+              </Button>
+
+              {/* Overflow Menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-12 h-12 p-0 rounded-xl border-2 border-[hsl(var(--borders-light))] hover:bg-[hsl(var(--surface-gray))] shadow-md hover:shadow-lg transition-all duration-200 min-h-[44px] min-w-[44px] touch-manipulation"
+                    aria-label={`More options for ${dog.name}`}
+                  >
+                    <MoreHorizontal className="w-5 h-5 text-[hsl(var(--text-secondary))]" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent 
+                  align="end" 
+                  className="w-48 bg-white border-[hsl(var(--borders-light))] shadow-xl rounded-xl"
+                >
+                  <DropdownMenuItem 
+                    className="flex items-center space-x-2 px-4 py-3 text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--surface-gray))] rounded-lg cursor-pointer"
+                    aria-label={`Share ${dog.name}'s profile`}
+                  >
+                    <Share2 className="w-4 h-4" />
+                    <span>Share</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    className="flex items-center space-x-2 px-4 py-3 text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--surface-gray))] rounded-lg cursor-pointer"
+                    aria-label={`Save ${dog.name} for later`}
+                  >
+                    <Bookmark className="w-4 h-4" />
+                    <span>Save</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    className="flex items-center space-x-2 px-4 py-3 text-[hsl(var(--danger-red))] hover:bg-red-50 rounded-lg cursor-pointer"
+                    aria-label={`Report ${dog.name}'s profile`}
+                  >
+                    <Flag className="w-4 h-4" />
+                    <span>Report</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
       </div>
