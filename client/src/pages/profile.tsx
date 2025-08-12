@@ -53,7 +53,7 @@ export default function Profile() {
           </div>
         </header>
         
-        <div className="flex-1 overflow-auto p-4 bg-gradient-to-b from-gray-50 to-white">
+        <div className="flex-1 overflow-auto p-4 bg-background">
           <div className="animate-pulse space-y-4">
             <Card>
               <CardContent className="p-6">
@@ -77,7 +77,7 @@ export default function Profile() {
 
   return (
     <div className="flex flex-col h-full">
-      <header className="bg-gradient-to-r from-pink-500 to-red-500 text-white p-6 sticky top-0 z-40 shadow-lg">
+      <header className="bg-primary text-primary-foreground p-6 sticky top-0 z-40 shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -85,59 +85,59 @@ export default function Profile() {
             </div>
             <div>
               <h1 className="text-2xl font-bold">My Profile</h1>
-              <p className="text-pink-100 text-sm">Manage your dogs and preferences</p>
+              <p className="text-primary-foreground/80 text-sm">Manage your dogs and preferences</p>
             </div>
           </div>
           <Link href="/settings">
-            <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 border-white/30">
+            <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-foreground/20 border-primary-foreground/30">
               <Settings className="w-4 h-4" />
             </Button>
           </Link>
         </div>
       </header>
       
-      <div className="flex-1 overflow-auto p-4 bg-gradient-to-b from-gray-50 to-white">
+      <div className="flex-1 overflow-auto p-4 bg-background">
 
         {/* Premium Upgrade Card */}
-        <Card className="mb-6 bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+        <Card className="mb-6 bg-card border border-border">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                  <Crown className="w-5 h-5 text-purple-600" />
+                <div className="w-10 h-10 bg-purple-accent/10 rounded-full flex items-center justify-center">
+                  <Crown className="w-5 h-5 text-purple-accent" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Upgrade to Pro</h3>
-                  <p className="text-sm text-gray-600">Unlock premium features</p>
+                  <h3 className="font-semibold text-primary-dark">Upgrade to Pro</h3>
+                  <p className="text-sm text-secondary-gray">Unlock premium features</p>
                 </div>
               </div>
               <Link href="/premium">
-                <Button size="sm" className="bg-purple-500 hover:bg-purple-600">
+                <Button size="sm" className="bg-purple-accent hover:bg-purple-accent/90 text-white">
                   <Star className="w-4 h-4 mr-1" />
                   Upgrade
                 </Button>
               </Link>
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
-              <Badge variant="secondary" className="text-xs">Vet Connect</Badge>
-              <Badge variant="secondary" className="text-xs">Unlimited Swipes</Badge>
-              <Badge variant="secondary" className="text-xs">Priority Visibility</Badge>
+              <Badge className="bg-divider text-secondary-gray text-xs">Vet Connect</Badge>
+              <Badge className="bg-divider text-secondary-gray text-xs">Unlimited Swipes</Badge>
+              <Badge className="bg-divider text-secondary-gray text-xs">Priority Visibility</Badge>
             </div>
           </CardContent>
         </Card>
 
         {dogs.length === 0 ? (
           <div className="text-center py-16">
-            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-pink-100 to-red-100 rounded-full flex items-center justify-center shadow-lg">
-              <Plus className="w-12 h-12 text-pink-600" />
+            <div className="w-24 h-24 mx-auto mb-6 bg-primary-rose/10 rounded-full flex items-center justify-center shadow-sm">
+              <Plus className="w-12 h-12 text-primary-rose" />
             </div>
-            <h3 className="text-2xl font-bold mb-3 text-gray-900">Add Your First Dog</h3>
-            <p className="text-gray-600 mb-8 max-w-sm mx-auto leading-relaxed">
+            <h3 className="text-2xl font-bold mb-3 text-primary-dark">Add Your First Dog</h3>
+            <p className="text-secondary-gray mb-8 max-w-sm mx-auto leading-relaxed">
               Create a profile for your furry friend to start connecting with other dogs in your area!
             </p>
             <Button 
               size="lg"
-              className="bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+              className="bg-primary-rose hover:bg-primary-rose/90 text-white px-8 py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
               onClick={() => setShowEditForm(true)}
             >
               <Plus className="w-5 h-5 mr-2" />
@@ -148,9 +148,9 @@ export default function Profile() {
           <div className="space-y-6">
             {/* Dog selector if multiple dogs */}
             {dogs.length > 1 && (
-              <Card className="bg-white shadow-md border-0">
+              <Card className="bg-card border border-border shadow-sm">
                 <CardContent className="p-4">
-                  <h4 className="font-bold text-gray-900 mb-3">Select Your Dog</h4>
+                  <h4 className="font-bold text-primary-dark mb-3">Select Your Dog</h4>
                   <div className="flex space-x-3 overflow-x-auto pb-2">
                     {dogs.map((dog: any) => (
                       <Button
@@ -160,8 +160,8 @@ export default function Profile() {
                         onClick={() => setSelectedDog(dog.id)}
                         className={`whitespace-nowrap transition-all duration-200 ${
                           selectedDog === dog.id 
-                            ? "bg-gradient-to-r from-pink-500 to-red-500 text-white shadow-md" 
-                            : "hover:border-pink-300 hover:text-pink-600"
+                            ? "bg-primary-rose text-white shadow-sm" 
+                            : "hover:border-primary-rose/30 hover:text-primary-rose"
                         }`}
                       >
                         {dog.name}
@@ -174,17 +174,17 @@ export default function Profile() {
 
             {/* Temperament section */}
             {currentDog?.temperament && currentDog.temperament.length > 0 && (
-              <Card className="bg-white shadow-md border-0">
+              <Card className="bg-card border border-border shadow-sm">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg font-bold text-gray-900 flex items-center">
-                    <Star className="w-5 h-5 mr-2 text-yellow-500" />
+                  <CardTitle className="text-lg font-bold text-primary-dark flex items-center">
+                    <Star className="w-5 h-5 mr-2 text-coral" />
                     Personality Traits
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
                     {currentDog.temperament.map((trait: string, index: number) => (
-                      <Badge key={index} className="bg-gradient-to-r from-pink-100 to-red-100 text-pink-700 border-pink-200 px-3 py-1 text-sm font-medium">
+                      <Badge key={index} className="bg-primary-rose/10 text-primary-rose border-primary-rose/20 px-3 py-1 text-sm font-medium">
                         {trait}
                       </Badge>
                     ))}
@@ -195,8 +195,8 @@ export default function Profile() {
 
             {/* Main profile card */}
             {currentDog && (
-              <Card className="bg-white shadow-lg border-0 overflow-hidden">
-                <div className="bg-gradient-to-r from-pink-500 to-red-500 p-4">
+              <Card className="bg-card border border-border shadow-sm overflow-hidden">
+                <div className="bg-primary-rose p-4">
                   <div className="flex items-center space-x-4">
                     <div className="relative">
                       <img
@@ -206,7 +206,7 @@ export default function Profile() {
                       />
                       <Button
                         size="sm"
-                        className="absolute -bottom-1 -right-1 w-10 h-10 rounded-full bg-white text-pink-600 p-0 shadow-lg hover:bg-gray-50"
+                        className="absolute -bottom-1 -right-1 w-10 h-10 rounded-full bg-white text-primary-rose p-0 shadow-md hover:bg-card"
                       >
                         <Camera className="w-5 h-5" />
                       </Button>
@@ -227,7 +227,7 @@ export default function Profile() {
                           <Edit3 className="w-5 h-5" />
                         </Button>
                       </div>
-                      <p className="text-pink-100 mb-3 text-lg">
+                      <p className="text-white/80 mb-3 text-lg">
                         {currentDog.breed} • {currentDog.age} years • {currentDog.size}
                       </p>
                       <div className="flex items-center space-x-2 mb-3">
@@ -241,7 +241,7 @@ export default function Profile() {
                           </Badge>
                         )}
                         {currentDog.medicalProfile?.vetClearance && (
-                          <Badge className="bg-green-500 text-white border-green-400">
+                          <Badge className="bg-success text-white border-success">
                             <CheckCircle className="w-3 h-3 mr-1" />
                             Vet Approved
                           </Badge>
@@ -249,7 +249,7 @@ export default function Profile() {
                       </div>
                       
                       {/* Additional info row */}
-                      <div className="flex items-center space-x-4 text-sm text-pink-100">
+                      <div className="flex items-center space-x-4 text-sm text-white/70">
                         {currentDog.distanceRadius && (
                           <div className="flex items-center">
                             <MapPin className="w-4 h-4 mr-1" />
@@ -269,14 +269,14 @@ export default function Profile() {
                 
                 <CardContent className="p-6">
                   <div className="mb-4">
-                    <h4 className="font-bold text-gray-900 mb-2">About {currentDog.name}</h4>
-                    <p className="text-gray-600 leading-relaxed">
+                    <h4 className="font-bold text-primary-dark mb-2">About {currentDog.name}</h4>
+                    <p className="text-secondary-gray leading-relaxed bg-divider p-4 rounded-lg border border-border">
                       {currentDog.bio || "No bio yet. Add one to attract more matches!"}
                     </p>
                   </div>
                   
                   <Button 
-                    className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white font-medium py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+                    className="w-full bg-primary-rose hover:bg-primary-rose/90 text-white font-medium py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
                     onClick={() => {
                       setEditingDog(currentDog);
                       setShowEditForm(true);
@@ -291,44 +291,44 @@ export default function Profile() {
 
             {/* Medical profile section */}
             {currentDog?.medicalProfile && (
-              <Card className="bg-white shadow-md border-0">
+              <Card className="bg-card border border-border shadow-sm">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center justify-between text-lg font-bold text-gray-900">
+                  <CardTitle className="flex items-center justify-between text-lg font-bold text-primary-dark">
                     <div className="flex items-center">
-                      <Shield className="w-5 h-5 mr-2 text-blue-600" />
+                      <Shield className="w-5 h-5 mr-2 text-coral" />
                       Medical Profile
                     </div>
-                    <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-700">
+                    <Button variant="ghost" size="sm" className="text-secondary-gray hover:text-primary-dark">
                       <Edit3 className="w-4 h-4" />
                     </Button>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div>
-                    <h4 className="font-bold text-gray-900 mb-3 flex items-center">
-                      <Heart className="w-4 h-4 mr-2 text-red-500" />
+                    <h4 className="font-bold text-primary-dark mb-3 flex items-center">
+                      <Heart className="w-4 h-4 mr-2 text-success" />
                       Vaccinations
                     </h4>
                     {currentDog.medicalProfile.vaccinations?.length > 0 ? (
                       <div className="space-y-2">
                         {currentDog.medicalProfile.vaccinations.map((vax: any, index: number) => (
-                          <div key={index} className="bg-green-50 border border-green-200 rounded-lg p-3">
-                            <div className="font-medium text-green-800">{vax.type}</div>
-                            <div className="text-sm text-green-600">{new Date(vax.date).toLocaleDateString()}</div>
+                          <div key={index} className="bg-success/5 border border-success/20 rounded-lg p-3">
+                            <div className="font-medium text-success">{vax.type}</div>
+                            <div className="text-sm text-success/80">{new Date(vax.date).toLocaleDateString()}</div>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-gray-500 bg-gray-50 p-3 rounded-lg">No vaccination records</p>
+                      <p className="text-secondary-gray bg-divider p-3 rounded-lg border border-border">No vaccination records</p>
                     )}
                   </div>
                   
                   {currentDog.medicalProfile.allergies?.length > 0 && (
                     <div>
-                      <h4 className="font-semibold mb-2">Allergies</h4>
+                      <h4 className="font-semibold mb-2 text-primary-dark">Allergies</h4>
                       <div className="flex flex-wrap gap-1">
                         {currentDog.medicalProfile.allergies.map((allergy: string, index: number) => (
-                          <Badge key={index} variant="secondary">
+                          <Badge key={index} className="bg-error/10 text-error border-error/20">
                             {allergy}
                           </Badge>
                         ))}
@@ -338,8 +338,8 @@ export default function Profile() {
                   
                   {currentDog.medicalProfile.lastVetVisit && (
                     <div>
-                      <h4 className="font-semibold mb-2">Last Vet Visit</h4>
-                      <p className="text-sm medium-gray">
+                      <h4 className="font-semibold mb-2 text-primary-dark">Last Vet Visit</h4>
+                      <p className="text-sm text-secondary-gray">
                         {new Date(currentDog.medicalProfile.lastVetVisit).toLocaleDateString()}
                       </p>
                     </div>
@@ -347,11 +347,11 @@ export default function Profile() {
 
                   {currentDog.medicalProfile.insurance && (
                     <div>
-                      <h4 className="font-semibold mb-2 flex items-center">
-                        <Shield className="w-4 h-4 mr-2 text-blue-600" />
+                      <h4 className="font-semibold mb-2 flex items-center text-primary-dark">
+                        <Shield className="w-4 h-4 mr-2 text-coral" />
                         Pet Insurance
                       </h4>
-                      <div className="space-y-1 text-sm medium-gray">
+                      <div className="space-y-1 text-sm text-secondary-gray">
                         <p><span className="font-medium">Provider:</span> {currentDog.medicalProfile.insurance.provider}</p>
                         <p><span className="font-medium">Coverage:</span> {currentDog.medicalProfile.insurance.coverageType}</p>
                         {currentDog.medicalProfile.insurance.expirationDate && (
@@ -366,7 +366,7 @@ export default function Profile() {
 
             {/* Add new dog button */}
             <Button 
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium py-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+              className="w-full bg-purple-accent hover:bg-purple-accent/90 text-white font-medium py-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
               onClick={() => setShowEditForm(true)}
             >
               <Plus className="w-5 h-5 mr-2" />
