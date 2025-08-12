@@ -1,0 +1,143 @@
+{
+  "badgeSystem": {
+    "description": "Premium badge system with gradient design, AA contrast compliance, and mobile-first accessibility",
+    "tokens": {
+      "premiumGradient": {
+        "start": "#6B21A8",
+        "end": "#F59E0B", 
+        "border": "#D4AF37",
+        "shadow": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)"
+      },
+      "spacing": {
+        "base": "4px",
+        "medium": "8px", 
+        "large": "16px"
+      },
+      "minHeight": {
+        "small": "32px",
+        "default": "40px",
+        "large": "48px"
+      }
+    },
+    "variants": {
+      "premium": {
+        "background": "linear-gradient(to right, #6B21A8, #F59E0B)",
+        "border": "2px solid #D4AF37",
+        "color": "white",
+        "fontWeight": "bold",
+        "textTransform": "uppercase",
+        "letterSpacing": "0.05em",
+        "padding": "12px 16px",
+        "borderRadius": "9999px",
+        "shadow": "0 8px 16px rgba(0, 0, 0, 0.15)",
+        "states": {
+          "hover": {
+            "transform": "scale(1.05)",
+            "shadow": "0 12px 24px rgba(0, 0, 0, 0.2)"
+          },
+          "active": {
+            "transform": "scale(0.95)"
+          },
+          "focus": {
+            "outline": "2px solid #D4AF37",
+            "outlineOffset": "2px"
+          }
+        }
+      },
+      "status": {
+        "background": "rgba(255, 255, 255, 0.95)",
+        "backdropFilter": "blur(8px)",
+        "border": "2px solid",
+        "fontWeight": "bold",
+        "textTransform": "uppercase",
+        "letterSpacing": "0.05em",
+        "padding": "8px 12px",
+        "borderRadius": "9999px",
+        "shadow": "0 8px 16px rgba(0, 0, 0, 0.15)"
+      },
+      "personality": {
+        "background": "linear-gradient(to right, #6B21A8, #F59E0B)",
+        "border": "1px solid rgba(212, 175, 55, 0.3)",
+        "color": "white",
+        "fontWeight": "bold",
+        "textTransform": "uppercase",
+        "letterSpacing": "0.05em",
+        "padding": "8px 12px",
+        "borderRadius": "9999px",
+        "shadow": "0 4px 8px rgba(0, 0, 0, 0.1)",
+        "states": {
+          "hover": {
+            "transform": "scale(1.05)",
+            "shadow": "0 8px 16px rgba(0, 0, 0, 0.15)"
+          },
+          "active": {
+            "transform": "scale(0.95)"
+          }
+        }
+      }
+    },
+    "accessibility": {
+      "minTapTarget": "44px",
+      "contrastRatio": "AAA (7:1)",
+      "ariaLabels": "Required for all interactive badges",
+      "touchOptimization": "Touch-safe spacing between elements",
+      "focusIndicators": "Visible focus rings with high contrast"
+    }
+  },
+  "dogCardLayout": {
+    "description": "Single-column mobile-first layout with 4/8/16px spacing grid",
+    "structure": {
+      "heroSection": {
+        "height": "60% of card",
+        "content": ["photo", "distance", "status badges"]
+      },
+      "contentSection": {
+        "height": "40% of card",
+        "spacing": "4px base grid",
+        "sections": [
+          {
+            "name": "Name & Age",
+            "spacing": "8px between elements"
+          },
+          {
+            "name": "Premium Badges",
+            "layout": "single column",
+            "spacing": "8px between badges",
+            "badges": ["gender", "size", "breed"]
+          },
+          {
+            "name": "Bio",
+            "spacing": "16px from badges"
+          },
+          {
+            "name": "Personality",
+            "layout": "single column",
+            "spacing": "8px between traits"
+          }
+        ]
+      }
+    },
+    "visualPolish": {
+      "cardBackground": "hsl(0, 0%, 100%)",
+      "borderRadius": "16px",
+      "shadow": "0 24px 48px rgba(0, 0, 0, 0.15)",
+      "statusBadgeStacking": "vertical, no overlap with titles",
+      "properWrapping": "all text content respects container bounds",
+      "minHeights": "defined for each section to prevent layout shift"
+    }
+  },
+  "testIds": {
+    "badges": {
+      "gender": "badge-gender",
+      "size": "badge-size", 
+      "breed": "badge-breed",
+      "personality": "personality-{trait-lowercase}"
+    },
+    "interactive": {
+      "medicalProfile": "button-medical-profile",
+      "like": "button-like",
+      "pass": "button-pass",
+      "moreOptions": "button-more-options"
+    }
+  }
+}

@@ -86,6 +86,13 @@
   --borders-light: hsl(220, 13%, 91%); /* #E5E7EB - Borders */
   --profile-card: hsl(339, 100%, 97%); /* #FFF0F3 - Profile card background */
   --placeholder: hsl(220, 3%, 80%); /* #C7C7CC - Placeholder text */
+  --surface-white: hsl(0, 0%, 100%); /* #FFFFFF - Card backgrounds */
+  --surface-gray: hsl(220, 13%, 96%); /* #F8FAFC - Light surface */
+  
+  /* Premium Badge Colors */
+  --premium-gradient-start: hsl(274, 83%, 39%); /* #6B21A8 - Purple */
+  --premium-gradient-end: hsl(38, 92%, 50%); /* #F59E0B - Amber */
+  --premium-border: hsl(45, 85%, 56%); /* #D4AF37 - Gold */
   
   --radius: 0.75rem;
 }
