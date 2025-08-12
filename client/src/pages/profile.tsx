@@ -1,16 +1,27 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
   Settings, Camera, Heart, Edit3, Plus, MapPin, CheckCircle, Users, Star, Crown, Shield, PawPrint,
-  HelpCircle, MoreVertical, Calendar, FileText, AlertCircle, Clock, Activity
+  HelpCircle, MoreVertical, Calendar, FileText, AlertCircle, Clock, Activity, LogOut
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle, 
+  AlertDialogTrigger 
+} from "@/components/ui/alert-dialog";
 import BottomNav from "@/components/bottom-nav";
 import DogProfileForm from "@/components/dog-profile-form";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { type User } from "@shared/schema";
 
 // Helper function to calculate vaccination status
@@ -31,6 +42,9 @@ export default function Profile() {
   const [showEditForm, setShowEditForm] = useState(false);
   const [editingDog, setEditingDog] = useState<any>(null);
   const [aboutExpanded, setAboutExpanded] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
 
   // Get current user
   const { data: user } = useQuery<User>({
@@ -48,6 +62,24 @@ export default function Profile() {
     },
     enabled: !!user?.id,
   });
+
+  // Logout mutation
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/auth/logout', { method: 'POST' });
+      if (!response.ok) throw new Error('Logout failed');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.clear();
+      setLocation('/signin');
+    },
+  });
+
+  const handleLogout = () => {
+    setShowLogoutDialog(false);
+    logoutMutation.mutate();
+  };
 
   if (isLoading) {
     return (
@@ -139,7 +171,7 @@ export default function Profile() {
         </div>
       </header>
       
-      <div className="flex-1 overflow-auto p-4 bg-gray-50">
+      <div className="flex-1 overflow-auto p-4 bg-gray-50 pb-20">
         <div className="max-w-md mx-auto space-y-4">
 
           {/* Premium Upgrade Banner */}
@@ -580,17 +612,54 @@ export default function Profile() {
                 </Card>
               )}
 
-              {/* Add Another Dog CTA */}
-              <Button 
-                className="w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
-                onClick={() => setShowEditForm(true)}
-                data-testid="button-add-another-dog"
-              >
-                <Plus className="w-5 h-5 mr-2" />
-                Add Another Dog
-              </Button>
+
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Persistent Logout Button */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-4 py-3 safe-area-pb">
+        <div className="max-w-md mx-auto">
+          <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+            <AlertDialogTrigger asChild>
+              <Button 
+                variant="outline"
+                className="w-full h-11 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition-all duration-200"
+                data-testid="button-logout"
+                aria-label="Log out"
+              >
+                <LogOut className="w-5 h-5 mr-2" />
+                Log Out
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-gray-900 dark:text-white">
+                  Are you sure you want to log out?
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-gray-600 dark:text-gray-300">
+                  You'll need to sign in again to access your account and continue using PupMatch.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="gap-2">
+                <AlertDialogCancel 
+                  className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 border-gray-300 dark:border-gray-600"
+                  data-testid="button-cancel-logout"
+                >
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={handleLogout}
+                  className="bg-red-600 hover:bg-red-700 text-white border-0"
+                  data-testid="button-confirm-logout"
+                  disabled={logoutMutation.isPending}
+                >
+                  {logoutMutation.isPending ? 'Logging out...' : 'Log Out'}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
       
