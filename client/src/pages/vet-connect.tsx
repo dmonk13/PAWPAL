@@ -135,9 +135,9 @@ export default function VetConnect() {
         <p className="text-gray-600">Find trusted veterinarians near you</p>
       </header>
       
-      <div className="flex-1 overflow-auto p-4">
-        <div className="text-center mb-6">
-          <div className="flex items-center justify-center space-x-2 mt-4">
+      <div className="flex-1 overflow-auto p-4 bg-gray-50">
+        <div className="mb-6">
+          <div className="flex items-center justify-center space-x-2 mb-4">
             <Badge variant="secondary" className="bg-primary/10 text-primary font-medium">
               Premium Feature
             </Badge>
@@ -148,24 +148,27 @@ export default function VetConnect() {
         </div>
 
         {/* Search Controls */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="flex flex-col sm:flex-row gap-4 items-center">
-            <div className="flex-1">
-              <label htmlFor="radius" className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium dark-gray mb-2 block">
                 Search Radius: {searchRadius} miles
               </label>
               <Input
-                id="radius"
                 type="range"
-                min="5"
+                min="1"
                 max="50"
                 value={searchRadius}
                 onChange={(e) => setSearchRadius(parseInt(e.target.value))}
                 className="w-full"
               />
+              <div className="flex justify-between text-xs medium-gray mt-1">
+                <span>1 mile</span>
+                <span>50 miles</span>
+              </div>
             </div>
             <div className="text-center">
-              <p className="text-sm text-gray-600 font-medium">
+              <p className="text-sm medium-gray font-medium">
                 {veterinarians?.length || 0} veterinarians found
               </p>
             </div>
@@ -174,17 +177,17 @@ export default function VetConnect() {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[...Array(6)].map((_, i) => (
+          <div className="space-y-4">
+            {[...Array(4)].map((_, i) => (
               <Card key={i} className="animate-pulse">
-                <CardHeader>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
+                    <div className="flex-1">
+                      <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-32 mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-20"></div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -194,168 +197,83 @@ export default function VetConnect() {
 
         {/* Veterinarians List */}
         {veterinarians && veterinarians.length > 0 && (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="space-y-4">
             {veterinarians.map((vet: VeterinarianWithDistance) => (
-              <Card key={vet.id} className="bg-white border border-gray-200 hover:shadow-lg transition-all duration-200 overflow-hidden">
-                <CardHeader className="pb-4">
-                  <div className="flex items-start space-x-4">
-                    {vet.profilePhoto && (
+              <Card key={vet.id} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-4">
+                    {vet.profilePhoto ? (
                       <img 
                         src={vet.profilePhoto} 
                         alt={vet.name}
-                        className="w-16 h-16 rounded-full object-cover border-2 border-gray-100"
+                        className="w-16 h-16 rounded-full object-cover"
                       />
+                    ) : (
+                      <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
+                        <span className="text-gray-500 text-sm">👨‍⚕️</span>
+                      </div>
                     )}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <CardTitle className="text-lg font-semibold text-gray-900 mb-1">
-                            {vet.name}
-                            {vet.title && <span className="text-sm font-normal text-gray-600 ml-2">{vet.title}</span>}
-                          </CardTitle>
-                          <CardDescription className="text-primary font-medium">
-                            {vet.clinicName}
-                          </CardDescription>
-                          {vet.yearsExperience && (
-                            <p className="text-sm text-gray-600 mt-1">
-                              {vet.yearsExperience} years experience
-                            </p>
-                          )}
-                        </div>
+                    
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <h3 className="font-bold dark-gray">{vet.name}</h3>
                         <div className="flex items-center space-x-1 text-sm">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="font-medium text-gray-900">{vet.rating}</span>
-                          <span className="text-gray-500">({vet.reviewCount})</span>
+                          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                          <span className="font-medium">{vet.rating}</span>
                         </div>
                       </div>
+                      
+                      <p className="text-sm medium-gray mb-2">
+                        {vet.clinicName} • {vet.distance} miles
+                      </p>
+                      
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {vet.specialties.slice(0, 2).map((specialty: string, idx: number) => (
+                          <Badge key={idx} variant="secondary" className="text-xs">
+                            {specialty}
+                          </Badge>
+                        ))}
+                        {vet.emergencyServices && (
+                          <Badge variant="destructive" className="text-xs bg-red-50 text-red-700">
+                            24/7
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col space-y-2">
+                      <Link href={`/vet-profile/${vet.id}`}>
+                        <Button size="sm" className="bg-coral text-white text-xs">
+                          View Profile
+                        </Button>
+                      </Link>
+                      {vet.onlineBooking && vet.bookingUrl ? (
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => window.open(vet.bookingUrl!, '_blank')}
+                          className="text-xs"
+                        >
+                          <Calendar className="w-3 h-3 mr-1" />
+                          Book
+                        </Button>
+                      ) : (
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => window.open(`tel:${vet.phoneNumber}`, '_self')}
+                          className="text-xs"
+                        >
+                          <Phone className="w-3 h-3 mr-1" />
+                          Call
+                        </Button>
+                      )}
                     </div>
                   </div>
                   
-                  {/* Professional Bio */}
-                  {vet.bio && (
-                    <p className="text-sm text-gray-600 leading-relaxed mt-3 line-clamp-3">
-                      {vet.bio}
-                    </p>
-                  )}
-                </CardHeader>
-                
-                <CardContent className="space-y-4 pt-2">
-                  {/* Education & Certifications */}
-                  {(vet.education?.length || vet.certifications?.length) && (
-                    <div>
-                      <p className="text-sm font-medium text-gray-800 mb-2">Education & Certifications:</p>
-                      <div className="space-y-1">
-                        {vet.education?.slice(0, 1).map((edu, idx) => (
-                          <p key={idx} className="text-xs text-gray-600">
-                            {edu.degree} - {edu.institution} ({edu.year})
-                          </p>
-                        ))}
-                        {vet.certifications?.slice(0, 1).map((cert, idx) => (
-                          <p key={idx} className="text-xs text-primary font-medium">
-                            {cert.name} ({cert.year})
-                          </p>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Distance, Status, and Fee */}
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center space-x-3">
-                      <div className="flex items-center space-x-1 text-sm text-gray-600">
-                        <MapPin className="h-4 w-4" />
-                        <span>{vet.distance} miles</span>
-                      </div>
-                      {vet.consultationFee && (
-                        <div className="text-sm font-medium text-gray-900">
-                          ${vet.consultationFee}
-                        </div>
-                      )}
-                    </div>
-                    <Badge 
-                      variant={isOpenNow(vet.workingHours) ? "default" : "secondary"}
-                      className={isOpenNow(vet.workingHours) 
-                        ? "bg-green-100 text-green-800 border-green-200" 
-                        : "bg-gray-100 text-gray-600 border-gray-200"
-                      }
-                    >
-                      {isOpenNow(vet.workingHours) ? "Open Now" : "Closed"}
-                    </Badge>
-                  </div>
-
-                  {/* Today's Hours */}
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <Clock className="h-4 w-4" />
-                    <span>Today: {getTodayHours(vet.workingHours)}</span>
-                  </div>
-
-                  {/* Specialties */}
-                  <div>
-                    <p className="text-sm font-medium text-gray-800 mb-2">Specialties:</p>
-                    <div className="flex flex-wrap gap-1">
-                      {vet.specialties.slice(0, 3).map((specialty: string, idx: number) => (
-                        <Badge key={idx} variant="outline" className="text-xs border-primary/30 text-primary">
-                          {specialty}
-                        </Badge>
-                      ))}
-                      {vet.specialties.length > 3 && (
-                        <Badge variant="outline" className="text-xs text-gray-500 border-gray-300">
-                          +{vet.specialties.length - 3} more
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Languages & Insurance */}
-                  <div className="flex justify-between items-center text-xs text-gray-600">
-                    {vet.languages && vet.languages.length > 1 && (
-                      <span>Languages: {vet.languages.join(', ')}</span>
-                    )}
-                    {vet.acceptsInsurance && (
-                      <Badge variant="outline" className="text-xs text-green-700 border-green-200">
-                        Accepts Insurance
-                      </Badge>
-                    )}
-                  </div>
-
-                  {/* Emergency Services */}
-                  {vet.emergencyServices && (
-                    <Badge variant="destructive" className="bg-red-50 text-red-700 border-red-200 w-full justify-center">
-                      24/7 Emergency Services Available
-                    </Badge>
-                  )}
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-2 pt-2">
-                    <Link href={`/vet-profile/${vet.id}`} className="flex-1">
-                      <Button className="w-full bg-primary hover:bg-primary/90 text-white font-medium" size="sm">
-                        View Full Profile
-                      </Button>
-                    </Link>
-                    
-                    {vet.onlineBooking && vet.bookingUrl ? (
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => window.open(vet.bookingUrl!, '_blank')}
-                        className="flex items-center space-x-1 border-gray-300"
-                      >
-                        <Calendar className="h-4 w-4" />
-                        <span>Book</span>
-                        <ExternalLink className="h-3 w-3" />
-                      </Button>
-                    ) : (
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => window.open(`tel:${vet.phoneNumber}`, '_self')}
-                        className="flex items-center space-x-1 border-gray-300"
-                      >
-                        <Phone className="h-4 w-4" />
-                        <span>Call</span>
-                      </Button>
-                    )}
-                  </div>
+                  <p className="text-xs medium-gray mt-3">
+                    {getTodayHours(vet.workingHours)} • {vet.consultationFee && `$${vet.consultationFee} consultation`}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -377,6 +295,8 @@ export default function VetConnect() {
           </div>
         )}
       </div>
+      
+      <BottomNav />
     </div>
   );
 }
