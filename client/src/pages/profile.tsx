@@ -143,54 +143,74 @@ export default function Profile() {
         <div className="max-w-md mx-auto space-y-4">
 
           {/* Premium Upgrade Banner */}
-          <Card className="bg-gradient-to-r from-pink-50 to-rose-50 border-pink-200 shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
-                    <Crown className="w-5 h-5 text-pink-600" />
+          <Card className="bg-[#FFF8F2] dark:bg-[#0B1020] border-0 shadow-lg overflow-hidden">
+            <div className="bg-gradient-to-r from-[#6B21A8] to-[#F59E0B] p-[1px]">
+              <div className="bg-[#FFF8F2] dark:bg-[#0B1020] rounded-lg">
+                <CardContent className="px-4 py-6">
+                  {/* Header with Crown and Title */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 bg-gradient-to-r from-[#6B21A8] to-[#F59E0B] rounded-full flex items-center justify-center shadow-md">
+                        <Crown className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
+                          Upgrade to Pro
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                          Unlock premium features for your pup
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Upgrade to Pro</h3>
-                    <p className="text-sm text-gray-600">Unlock premium features for your pup</p>
+
+                  {/* Premium Feature Chips */}
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    <Badge className="bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700 px-3 py-1.5 text-xs font-medium">
+                      <Shield className="w-3 h-3 mr-1.5 text-[#D4AF37]" />
+                      Vet Connect
+                    </Badge>
+                    <Badge className="bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-700 px-3 py-1.5 text-xs font-medium">
+                      <Heart className="w-3 h-3 mr-1.5 text-[#D4AF37]" />
+                      Unlimited Swipes
+                    </Badge>
+                    <Badge className="bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-700 px-3 py-1.5 text-xs font-medium">
+                      <Star className="w-3 h-3 mr-1.5 text-[#D4AF37]" />
+                      Priority Visibility
+                    </Badge>
                   </div>
-                </div>
-                <div className="flex space-x-2">
-                  <Link href="/premium">
-                    <Button 
-                      size="sm" 
-                      className="bg-pink-600 hover:bg-pink-700 text-white shadow-sm"
-                      data-testid="button-upgrade"
-                    >
-                      <Star className="w-4 h-4 mr-1" />
-                      Upgrade
-                    </Button>
-                  </Link>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="border-pink-300 text-pink-700 hover:bg-pink-50"
-                    data-testid="button-compare-plans"
-                  >
-                    Compare Plans
-                  </Button>
-                </div>
+
+                  {/* Call-to-Action Buttons */}
+                  <div className="space-y-3">
+                    <Link href="/premium" className="block">
+                      <Button 
+                        className="w-full h-11 bg-gradient-to-r from-[#6B21A8] to-[#F59E0B] hover:from-[#5B1A8B] hover:to-[#E8890B] text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-200 border-0"
+                        data-testid="button-upgrade-pro"
+                        aria-label="Upgrade to Pro plan"
+                      >
+                        <Star className="w-5 h-5 mr-2" />
+                        Upgrade Now
+                      </Button>
+                    </Link>
+                    
+                    <div className="flex items-center justify-between">
+                      <Button 
+                        variant="ghost" 
+                        className="text-[#E94B6E] hover:text-[#D73E5E] hover:bg-pink-50 dark:hover:bg-pink-900/10 font-medium h-auto p-0"
+                        data-testid="button-compare-plans"
+                        aria-label="Compare all available plans"
+                      >
+                        Compare Plans
+                      </Button>
+                      
+                      <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                        Cancel anytime
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
               </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Badge className="bg-pink-100 text-pink-800 text-xs border-pink-200">
-                  <Shield className="w-3 h-3 mr-1" />
-                  Vet Connect
-                </Badge>
-                <Badge className="bg-pink-100 text-pink-800 text-xs border-pink-200">
-                  <Heart className="w-3 h-3 mr-1" />
-                  Unlimited Swipes
-                </Badge>
-                <Badge className="bg-pink-100 text-pink-800 text-xs border-pink-200">
-                  <Star className="w-3 h-3 mr-1" />
-                  Priority Visibility
-                </Badge>
-              </div>
-            </CardContent>
+            </div>
           </Card>
 
           {dogs.length === 0 ? (
