@@ -117,7 +117,7 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
       {/* Scrollable Content Section */}
       <div className="flex-1 flex flex-col bg-[hsl(var(--surface-white))] overflow-hidden">
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
+        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 pb-safe">
           <div className="p-4">
             {/* Name & Age Row */}
             <div className="flex items-start justify-between mb-3">
@@ -222,88 +222,90 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
                 </div>
               </div>
             )}
-          </div>
-        </div>
 
-        {/* Fixed Action Bar - Outside Scroll Area */}
-        <div className="flex-shrink-0 p-4 bg-[hsl(var(--surface-white))] border-t border-[hsl(var(--borders-light))] pb-safe">
-          <div className="space-y-3">
-            {/* Medical Profile - Prominent Action */}
-            <Button
-              onClick={onMedicalClick}
-              className="w-full flex items-center justify-center space-x-3 bg-[hsl(var(--primary-rose))] hover:bg-[hsl(var(--primary-rose))]/90 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 min-h-[48px] touch-manipulation"
-              data-tone="primary"
-              aria-label={`View medical profile for ${dog.name}`}
-            >
-              <Info className="w-5 h-5" />
-              <span className="text-base">View Medical Profile</span>
-            </Button>
-
-            {/* Action Row: Like, Pass, Overflow Menu */}
-            <div className="flex items-center space-x-3">
-              {/* Pass Button */}
+            {/* Action Section - Inside Scroll Area */}
+            <div className="pt-4 border-t border-[hsl(var(--borders-light))] space-y-3">
+              {/* Medical Profile - Prominent Action */}
               <Button
-                size="lg"
-                className="flex-1 h-12 bg-[hsl(var(--surface-gray))] text-[hsl(var(--text-secondary))] hover:bg-[hsl(var(--borders-light))] font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 min-h-[44px] touch-manipulation"
-                onClick={() => onSwipe?.('left')}
-                data-tone="default"
-                aria-label={`Pass on ${dog.name}`}
+                onClick={onMedicalClick}
+                className="w-full flex items-center justify-center space-x-3 bg-[hsl(var(--primary-rose))] hover:bg-[hsl(var(--primary-rose))]/90 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 min-h-[48px] touch-manipulation"
+                data-tone="primary"
+                data-testid="button-medical-profile"
+                aria-label={`View medical profile for ${dog.name}`}
               >
-                <X className="w-5 h-5 mr-2" />
-                Pass
-              </Button>
-              
-              {/* Like Button */}
-              <Button
-                size="lg"
-                className="flex-1 h-12 bg-[hsl(var(--success-green))] hover:bg-[hsl(var(--success-green))]/90 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 min-h-[44px] touch-manipulation"
-                onClick={() => onSwipe?.('right')}
-                data-tone="success"
-                aria-label={`Like ${dog.name}`}
-              >
-                <Heart className="w-5 h-5 mr-2 fill-current" />
-                Like
+                <Info className="w-5 h-5" />
+                <span className="text-base">View Medical Profile</span>
               </Button>
 
-              {/* Overflow Menu */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="w-12 h-12 p-0 rounded-xl border-2 border-[hsl(var(--borders-light))] hover:bg-[hsl(var(--surface-gray))] shadow-md hover:shadow-lg transition-all duration-200 min-h-[44px] min-w-[44px] touch-manipulation"
-                    aria-label={`More options for ${dog.name}`}
-                  >
-                    <MoreHorizontal className="w-5 h-5 text-[hsl(var(--text-secondary))]" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent 
-                  align="end" 
-                  className="w-48 bg-white border-[hsl(var(--borders-light))] shadow-xl rounded-xl"
+              {/* Action Row: Like, Pass, Overflow Menu */}
+              <div className="flex items-center space-x-3">
+                {/* Pass Button */}
+                <Button
+                  size="lg"
+                  className="flex-1 h-12 bg-[hsl(var(--surface-gray))] text-[hsl(var(--text-secondary))] hover:bg-[hsl(var(--borders-light))] font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 min-h-[44px] touch-manipulation"
+                  onClick={() => onSwipe?.('left')}
+                  data-tone="default"
+                  data-testid="button-pass"
+                  aria-label={`Pass on ${dog.name}`}
                 >
-                  <DropdownMenuItem 
-                    className="flex items-center space-x-2 px-4 py-3 text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--surface-gray))] rounded-lg cursor-pointer"
-                    aria-label={`Share ${dog.name}'s profile`}
+                  <X className="w-5 h-5 mr-2" />
+                  Pass
+                </Button>
+                
+                {/* Like Button */}
+                <Button
+                  size="lg"
+                  className="flex-1 h-12 bg-[hsl(var(--success-green))] hover:bg-[hsl(var(--success-green))]/90 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 min-h-[44px] touch-manipulation"
+                  onClick={() => onSwipe?.('right')}
+                  data-tone="success"
+                  data-testid="button-like"
+                  aria-label={`Like ${dog.name}`}
+                >
+                  <Heart className="w-5 h-5 mr-2 fill-current" />
+                  Like
+                </Button>
+
+                {/* Overflow Menu */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="w-12 h-12 p-0 rounded-xl border-2 border-[hsl(var(--borders-light))] hover:bg-[hsl(var(--surface-gray))] shadow-md hover:shadow-lg transition-all duration-200 min-h-[44px] min-w-[44px] touch-manipulation"
+                      data-testid="button-more-options"
+                      aria-label={`More options for ${dog.name}`}
+                    >
+                      <MoreHorizontal className="w-5 h-5 text-[hsl(var(--text-secondary))]" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent 
+                    align="end" 
+                    className="w-48 bg-white border-[hsl(var(--borders-light))] shadow-xl rounded-xl"
                   >
-                    <Share2 className="w-4 h-4" />
-                    <span>Share</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    className="flex items-center space-x-2 px-4 py-3 text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--surface-gray))] rounded-lg cursor-pointer"
-                    aria-label={`Save ${dog.name} for later`}
-                  >
-                    <Bookmark className="w-4 h-4" />
-                    <span>Save</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    className="flex items-center space-x-2 px-4 py-3 text-[hsl(var(--danger-red))] hover:bg-red-50 rounded-lg cursor-pointer"
-                    aria-label={`Report ${dog.name}'s profile`}
-                  >
-                    <Flag className="w-4 h-4" />
-                    <span>Report</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    <DropdownMenuItem 
+                      className="flex items-center space-x-2 px-4 py-3 text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--surface-gray))] rounded-lg cursor-pointer"
+                      aria-label={`Share ${dog.name}'s profile`}
+                    >
+                      <Share2 className="w-4 h-4" />
+                      <span>Share</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      className="flex items-center space-x-2 px-4 py-3 text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--surface-gray))] rounded-lg cursor-pointer"
+                      aria-label={`Save ${dog.name} for later`}
+                    >
+                      <Bookmark className="w-4 h-4" />
+                      <span>Save</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      className="flex items-center space-x-2 px-4 py-3 text-[hsl(var(--danger-red))] hover:bg-red-50 rounded-lg cursor-pointer"
+                      aria-label={`Report ${dog.name}'s profile`}
+                    >
+                      <Flag className="w-4 h-4" />
+                      <span>Report</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           </div>
         </div>
