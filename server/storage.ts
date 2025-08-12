@@ -859,6 +859,7 @@ export class MemStorage implements IStorage {
         vetClearance: true,
         vetClearanceDate: new Date("2024-03-25"),
         vetDocumentUrl: null,
+        insurance: null,
         createdAt: new Date(),
       },
       {
@@ -890,9 +891,18 @@ export class MemStorage implements IStorage {
     const vet1: Veterinarian = {
       id: "vet-1",
       name: "Dr. Priya Sharma",
+      title: "DVM",
       clinicName: "Paws & Claws Veterinary Clinic",
+      profilePhoto: null,
+      bio: "Experienced veterinarian specializing in general practice and emergency care.",
+      yearsExperience: 8,
+      education: [
+        { degree: "Doctor of Veterinary Medicine", institution: "Bangalore Veterinary College", year: 2016 }
+      ],
+      certifications: [],
       specialties: ["General Practice", "Surgery", "Emergency Care"],
       services: ["Vaccinations", "Health Checkups", "Surgery", "Dental Care", "Emergency Services"],
+      languages: ["English", "Hindi", "Kannada"],
       rating: "4.8",
       reviewCount: 156,
       phoneNumber: "+91-80-2345-6789",
@@ -908,11 +918,14 @@ export class MemStorage implements IStorage {
         Thursday: { open: "8:00", close: "18:00" },
         Friday: { open: "8:00", close: "18:00" },
         Saturday: { open: "9:00", close: "15:00" },
-        Sunday: { open: "", close: "", closed: true }
+        Sunday: { open: "10:00", close: "14:00", closed: true }
       },
       emergencyServices: true,
       onlineBooking: true,
       bookingUrl: "https://pawsandclaws.com/book",
+      consultationFee: null,
+      acceptsInsurance: false,
+      acceptedInsurances: [],
       isActive: true,
       createdAt: new Date(),
     };
@@ -920,9 +933,21 @@ export class MemStorage implements IStorage {
     const vet2: Veterinarian = {
       id: "vet-2",
       name: "Dr. Rajesh Kumar",
+      title: "DVM, PhD",
       clinicName: "Bangalore Animal Hospital",
+      profilePhoto: null,
+      bio: "Specialist in internal medicine with expertise in cardiology and oncology.",
+      yearsExperience: 12,
+      education: [
+        { degree: "Doctor of Veterinary Medicine", institution: "Tamil Nadu Veterinary University", year: 2012 },
+        { degree: "PhD in Veterinary Medicine", institution: "Indian Veterinary Research Institute", year: 2015 }
+      ],
+      certifications: [
+        { name: "Board Certified Internal Medicine", issuingBody: "Indian Board of Veterinary Medicine", year: 2018 }
+      ],
       specialties: ["Internal Medicine", "Cardiology", "Oncology"],
       services: ["Specialized Care", "Diagnostics", "Lab Tests", "X-rays", "Ultrasound"],
+      languages: ["English", "Hindi", "Tamil"],
       rating: "4.9",
       reviewCount: 203,
       phoneNumber: "+91-80-3456-7890",
@@ -938,11 +963,14 @@ export class MemStorage implements IStorage {
         Thursday: { open: "7:00", close: "19:00" },
         Friday: { open: "7:00", close: "19:00" },
         Saturday: { open: "8:00", close: "16:00" },
-        Sunday: { open: "10:00", close: "14:00" }
+        Sunday: { open: "10:00", close: "14:00", closed: true }
       },
       emergencyServices: true,
       onlineBooking: false,
       bookingUrl: null,
+      consultationFee: null,
+      acceptsInsurance: false,
+      acceptedInsurances: [],
       isActive: true,
       createdAt: new Date(),
     };
@@ -950,9 +978,18 @@ export class MemStorage implements IStorage {
     const vet3: Veterinarian = {
       id: "vet-3",
       name: "Dr. Anjali Reddy",
+      title: "DVM",
       clinicName: "Happy Tails Veterinary Care",
+      profilePhoto: null,
+      bio: "Passionate about preventive care and animal behavior.",
+      yearsExperience: 6,
+      education: [
+        { degree: "Doctor of Veterinary Medicine", institution: "Karnataka Veterinary College", year: 2018 }
+      ],
+      certifications: [],
       specialties: ["Preventive Care", "Behavioral Medicine", "Nutrition"],
       services: ["Wellness Exams", "Behavioral Consultation", "Nutrition Planning", "Grooming"],
+      languages: ["English", "Hindi", "Telugu"],
       rating: "4.7",
       reviewCount: 89,
       phoneNumber: "+91-80-4567-8901",
@@ -967,12 +1004,15 @@ export class MemStorage implements IStorage {
         Wednesday: { open: "9:00", close: "17:00" },
         Thursday: { open: "9:00", close: "17:00" },
         Friday: { open: "9:00", close: "17:00" },
-        Saturday: { open: "", close: "", closed: true },
-        Sunday: { open: "", close: "", closed: true }
+        Saturday: { open: "10:00", close: "14:00", closed: true },
+        Sunday: { open: "10:00", close: "14:00", closed: true }
       },
       emergencyServices: false,
       onlineBooking: true,
       bookingUrl: "https://happytailsvet.com/schedule",
+      consultationFee: null,
+      acceptsInsurance: false,
+      acceptedInsurances: [],
       isActive: true,
       createdAt: new Date(),
     };
@@ -1033,7 +1073,7 @@ export class MemStorage implements IStorage {
           Thursday: { open: "08:00", close: "18:00" },
           Friday: { open: "08:00", close: "17:00" },
           Saturday: { open: "09:00", close: "15:00" },
-          Sunday: { closed: true }
+          Sunday: { open: "10:00", close: "14:00", closed: true }
         },
         emergencyServices: true,
         onlineBooking: true,
@@ -1305,7 +1345,15 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
-    const user: User = { ...insertUser, id, createdAt: new Date() };
+    const user: User = { 
+      ...insertUser, 
+      id, 
+      createdAt: new Date(),
+      isPro: insertUser.isPro ?? false,
+      proExpiresAt: insertUser.proExpiresAt ?? null,
+      stripeCustomerId: insertUser.stripeCustomerId ?? null,
+      stripeSubscriptionId: insertUser.stripeSubscriptionId ?? null
+    };
     this.users.set(id, user);
     return user;
   }
@@ -1328,7 +1376,17 @@ export class MemStorage implements IStorage {
 
   async createDog(insertDog: InsertDog): Promise<Dog> {
     const id = randomUUID();
-    const dog: Dog = { ...insertDog, id, createdAt: new Date() };
+    const dog: Dog = { 
+      ...insertDog, 
+      id, 
+      createdAt: new Date(),
+      bio: insertDog.bio ?? null,
+      photos: insertDog.photos ?? null,
+      temperament: insertDog.temperament ?? null,
+      matingPreference: insertDog.matingPreference ?? false,
+      distanceRadius: insertDog.distanceRadius ?? 10,
+      isActive: insertDog.isActive ?? true
+    };
     this.dogs.set(id, dog);
     return dog;
   }
@@ -1348,7 +1406,20 @@ export class MemStorage implements IStorage {
 
   async createMedicalProfile(insertProfile: InsertMedicalProfile): Promise<MedicalProfile> {
     const id = randomUUID();
-    const profile: MedicalProfile = { ...insertProfile, id, createdAt: new Date() };
+    const profile: MedicalProfile = { 
+      ...insertProfile, 
+      id, 
+      createdAt: new Date(),
+      vaccinations: insertProfile.vaccinations ?? null,
+      medications: insertProfile.medications ?? null,
+      allergies: insertProfile.allergies ?? null,
+      conditions: insertProfile.conditions ?? null,
+      isSpayedNeutered: insertProfile.isSpayedNeutered ?? false,
+      vetClearance: insertProfile.vetClearance ?? false,
+      vetClearanceDate: insertProfile.vetClearanceDate ?? null,
+      vetDocumentUrl: insertProfile.vetDocumentUrl ?? null,
+      insurance: insertProfile.insurance ?? null
+    };
     this.medicalProfiles.set(insertProfile.dogId, profile);
     return profile;
   }
@@ -1501,7 +1572,15 @@ export class MemStorage implements IStorage {
 
   async createAppointment(insertAppointment: InsertAppointment): Promise<Appointment> {
     const id = randomUUID();
-    const appointment: Appointment = { ...insertAppointment, id, createdAt: new Date() };
+    const appointment: Appointment = { 
+      ...insertAppointment, 
+      id, 
+      createdAt: new Date(),
+      status: insertAppointment.status ?? "scheduled",
+      notes: insertAppointment.notes ?? null,
+      isExternal: insertAppointment.isExternal ?? false,
+      externalBookingId: insertAppointment.externalBookingId ?? null
+    };
     this.appointments.set(id, appointment);
     return appointment;
   }
