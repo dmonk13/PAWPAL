@@ -29,7 +29,7 @@ export default function SwipeCard({ dog, onMedicalClick, className = "", style }
   const isVaccinated = medicalProfile?.vaccinations?.some(v => v.type === "Rabies");
   const hasAllergies = medicalProfile?.allergies && medicalProfile.allergies.length > 0;
   const isSpayedNeutered = medicalProfile?.isSpayedNeutered;
-  const hasMicrochip = medicalProfile?.microchip;
+  // Note: microchip field not available in current schema
 
   // Generate priority-based tags according to the document
   const generateTags = (): TagInfo[] => {
@@ -223,49 +223,32 @@ export default function SwipeCard({ dog, onMedicalClick, className = "", style }
         </div>
 
         {/* Enhanced Profile info with better content strategy */}
-        <div className="p-5 bg-white h-2/5 flex flex-col">
-          <div className="flex-1">
-            <div className="flex items-baseline justify-between mb-2">
-              <h2 className="text-2xl font-bold text-gray-900">{dog.name}</h2>
-              <div className="text-right">
-                <span className="text-lg font-semibold text-gray-700">{dog.age}</span>
-                <span className="text-sm text-gray-500 ml-1">years old</span>
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-transparent p-6">
+          <div className="mb-3">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-red-600 bg-clip-text text-transparent">{dog.name}</h2>
+              <div className="bg-gradient-to-r from-pink-500 to-red-500 text-white px-3 py-1.5 rounded-full shadow-md">
+                <span className="text-lg font-bold">{dog.age}</span>
+                <span className="text-sm ml-1">yrs</span>
               </div>
             </div>
             
-            <div className="flex items-center space-x-2 text-gray-600 mb-3">
-              <span className="font-medium text-gray-800">{dog.breed}</span>
-              <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-              <span className="capitalize">{dog.size.toLowerCase()}</span>
-              <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-              <span>{dog.gender}</span>
+            <div className="flex items-center space-x-2 mb-3">
+              <Badge className="bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border-blue-200 px-2.5 py-1 font-semibold text-sm">
+                {dog.breed}
+              </Badge>
+              <Badge className="bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 border-purple-200 px-2.5 py-1 font-semibold text-sm">
+                {dog.size}
+              </Badge>
+              <Badge className="bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-green-200 px-2.5 py-1 font-semibold text-sm">
+                {dog.gender}
+              </Badge>
             </div>
             
-            <p className="text-gray-700 text-sm leading-relaxed line-clamp-3 mb-4">
-              {dog.bio || "No bio available"}
-            </p>
-
-            {/* Insurance information if available */}
-            {medicalProfile?.insurance?.provider && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 mb-3">
-                <p className="text-xs text-blue-700 font-medium">
-                  <Shield className="w-3 h-3 inline mr-1" />
-                  Insured with {medicalProfile.insurance.provider}
-                </p>
-              </div>
+            {dog.bio && (
+              <p className="text-sm text-gray-700 line-clamp-2 leading-relaxed font-medium bg-gray-50 rounded-lg p-2 border border-gray-200">{dog.bio}</p>
             )}
           </div>
-          
-          {/* Enhanced medical info toggle with better visual design */}
-          <Button
-            onClick={onMedicalClick}
-            variant="outline"
-            className="w-full text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300 py-3 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center space-x-2"
-            data-testid="view-health-profile"
-          >
-            <CheckCircle className="w-4 h-4" />
-            <span>View Complete Health Profile</span>
-          </Button>
         </div>
         
         {/* Enhanced temperament section with better mobile optimization */}

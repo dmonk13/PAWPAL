@@ -17,20 +17,21 @@ export default function Discover() {
   return (
     <div className="flex flex-col h-full">
       {/* Enhanced Header */}
-      <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 p-4 flex items-center justify-between sticky top-0 z-40 shadow-sm">
+      <header className="bg-gradient-to-r from-pink-500 to-red-500 text-white p-6 flex items-center justify-between sticky top-0 z-40 shadow-lg">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-red-500 rounded-full flex items-center justify-center">
-            <PawPrint className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+            <PawPrint className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-red-600 bg-clip-text text-transparent">
-            PupMatch
-          </h1>
+          <div>
+            <h1 className="text-2xl font-bold">PupMatch</h1>
+            <p className="text-pink-100 text-sm">Find your pup's perfect match</p>
+          </div>
         </div>
         <div className="flex items-center space-x-3">
           <Button
             variant="ghost"
             size="sm"
-            className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full p-2 transition-all duration-200"
+            className="text-white hover:bg-white/20 rounded-full p-2 transition-all duration-200"
             onClick={() => setShowFilters(true)}
           >
             <Sliders className="w-5 h-5" />
