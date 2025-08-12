@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import AuthWrapper from "@/pages/auth-wrapper";
 import NotFound from "@/pages/not-found";
+
 import Discover from "@/pages/discover";
 import Matches from "@/pages/matches";
 import Messages from "@/pages/messages";
@@ -18,6 +19,7 @@ import Checkout from "@/pages/checkout";
 function Router() {
   return (
     <Switch>
+
       <Route path="/" component={Discover} />
       <Route path="/discover" component={Discover} />
       <Route path="/matches" component={Matches} />

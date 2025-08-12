@@ -23,7 +23,8 @@ export function UserNav() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      navigate("/login");
+      // Clear user data and let AuthWrapper handle the redirect to login
+      queryClient.setQueryData(["/api/auth/user"], null);
       toast({
         title: "Logged out",
         description: "You have been successfully logged out.",
