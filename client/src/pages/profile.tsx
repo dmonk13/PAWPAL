@@ -171,7 +171,7 @@ export default function Profile() {
         </div>
       </header>
       
-      <div className="flex-1 overflow-auto p-4 bg-gray-50 pb-20">
+      <div className="flex-1 overflow-auto p-4 bg-gray-50">
         <div className="max-w-md mx-auto space-y-4">
 
           {/* Premium Upgrade Banner */}
@@ -583,6 +583,48 @@ export default function Profile() {
                 </Card>
               )}
 
+              {/* Logout Button - Profile Specific */}
+              <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+                  <AlertDialogTrigger asChild>
+                    <Button 
+                      variant="outline"
+                      className="w-full h-11 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition-all duration-200"
+                      data-testid="button-logout"
+                      aria-label="Log out"
+                    >
+                      <LogOut className="w-5 h-5 mr-2" />
+                      Log Out
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="text-gray-900 dark:text-white">
+                        Are you sure you want to log out?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription className="text-gray-600 dark:text-gray-300">
+                        You'll need to sign in again to access your account and continue using PupMatch.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="gap-2">
+                      <AlertDialogCancel 
+                        className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 border-gray-300 dark:border-gray-600"
+                        data-testid="button-cancel-logout"
+                      >
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={handleLogout}
+                        className="bg-red-600 hover:bg-red-700 text-white border-0"
+                        data-testid="button-confirm-logout"
+                        disabled={logoutMutation.isPending}
+                      >
+                        {logoutMutation.isPending ? 'Logging out...' : 'Log Out'}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
 
             </div>
           )}
@@ -590,51 +632,6 @@ export default function Profile() {
       </div>
 
       <BottomNav />
-
-      {/* Persistent Logout Button */}
-      <div className="fixed bottom-16 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-4 py-3" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-        <div className="max-w-md mx-auto">
-          <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
-            <AlertDialogTrigger asChild>
-              <Button 
-                variant="outline"
-                className="w-full h-11 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition-all duration-200"
-                data-testid="button-logout"
-                aria-label="Log out"
-              >
-                <LogOut className="w-5 h-5 mr-2" />
-                Log Out
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-              <AlertDialogHeader>
-                <AlertDialogTitle className="text-gray-900 dark:text-white">
-                  Are you sure you want to log out?
-                </AlertDialogTitle>
-                <AlertDialogDescription className="text-gray-600 dark:text-gray-300">
-                  You'll need to sign in again to access your account and continue using PupMatch.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter className="gap-2">
-                <AlertDialogCancel 
-                  className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 border-gray-300 dark:border-gray-600"
-                  data-testid="button-cancel-logout"
-                >
-                  Cancel
-                </AlertDialogCancel>
-                <AlertDialogAction 
-                  onClick={handleLogout}
-                  className="bg-red-600 hover:bg-red-700 text-white border-0"
-                  data-testid="button-confirm-logout"
-                  disabled={logoutMutation.isPending}
-                >
-                  {logoutMutation.isPending ? 'Logging out...' : 'Log Out'}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-      </div>
 
       {/* Edit/Add Dog Form */}
       {showEditForm && (
