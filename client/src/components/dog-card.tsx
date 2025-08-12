@@ -54,13 +54,13 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
   
   return (
     <div 
-      className={`absolute inset-4 bg-[hsl(var(--surface-white))] rounded-2xl shadow-xl overflow-hidden ${className}`}
+      className={`h-full w-full max-w-md mx-auto bg-[hsl(var(--surface-white))] rounded-2xl shadow-xl overflow-hidden flex flex-col ${className}`}
       role="region"
       aria-labelledby={`dog-${dog.id}-name`}
       aria-describedby={`dog-${dog.id}-details`}
     >
       {/* Hero Photo Section - Fixed Height */}
-      <div className="relative h-3/5 flex-shrink-0">
+      <div className="relative h-2/5 flex-shrink-0">
         <img 
           src={dog.photos?.[0] || "/placeholder-dog.jpg"}
           alt={`${dog.name}, ${dog.breed} dog`}

@@ -147,28 +147,32 @@ export default function SwipeArea() {
   return (
     <>
       <main 
-        className="relative h-[calc(100vh-8rem)] overflow-hidden"
+        className="relative h-[calc(100vh-8rem)] overflow-hidden p-4"
         {...swipeHandlers}
       >
         {/* Next card (behind) */}
         {nextDog && (
-          <DogCard
-            dog={nextDog}
-            onMedicalClick={() => setSelectedDog(nextDog)}
-            className="z-8"
-          />
+          <div className="absolute inset-4 z-8">
+            <DogCard
+              dog={nextDog}
+              onMedicalClick={() => setSelectedDog(nextDog)}
+              className=""
+            />
+          </div>
         )}
 
         {/* Current card */}
-        <DogCard
-          dog={currentDog}
-          onMedicalClick={() => setSelectedDog(currentDog)}
-          onSwipe={handleSwipe}
-          className={`z-10 swipe-card ${
-            swipingDirection === "left" ? "swiping-left" : 
-            swipingDirection === "right" ? "swiping-right" : ""
-          }`}
-        />
+        <div className={`absolute inset-4 z-10 swipe-card ${
+          swipingDirection === "left" ? "swiping-left" : 
+          swipingDirection === "right" ? "swiping-right" : ""
+        }`}>
+          <DogCard
+            dog={currentDog}
+            onMedicalClick={() => setSelectedDog(currentDog)}
+            onSwipe={handleSwipe}
+            className=""
+          />
+        </div>
 
 
       </main>
