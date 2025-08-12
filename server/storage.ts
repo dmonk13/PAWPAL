@@ -393,7 +393,10 @@ export class MemStorage implements IStorage {
         gender: "Male",
         size: "Large",
         bio: "Loves playing fetch and swimming. Great with kids and other dogs!",
-        photos: ["https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
+        photos: [
+          "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600",
+          "https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"
+        ],
         temperament: ["Playful", "Energetic", "Friendly"],
         matingPreference: false,
         distanceRadius: 15,
@@ -411,7 +414,10 @@ export class MemStorage implements IStorage {
         gender: "Female", 
         size: "Medium",
         bio: "Energetic and playful! Loves short walks and belly rubs.",
-        photos: ["https://images.unsplash.com/photo-1605568427561-40dd23c2acea?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
+        photos: [
+          "https://images.unsplash.com/photo-1605568427561-40dd23c2acea?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600",
+          "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"
+        ],
         temperament: ["Energetic", "Playful", "Curious"],
         matingPreference: true,
         distanceRadius: 10,
@@ -429,7 +435,10 @@ export class MemStorage implements IStorage {
         gender: "Male",
         size: "Large",
         bio: "Athletic and adventurous! Perfect hiking companion who loves cold weather.",
-        photos: ["https://images.unsplash.com/photo-1605568427561-40dd23c2acea?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
+        photos: [
+          "https://images.unsplash.com/photo-1615751072497-5f5169febe17?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600",
+          "https://images.unsplash.com/photo-1605568427561-40dd23c2acea?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"
+        ],
         temperament: ["Athletic", "Independent", "Alert"],
         matingPreference: false,
         distanceRadius: 25,
@@ -447,7 +456,10 @@ export class MemStorage implements IStorage {
         gender: "Female",
         size: "Medium",
         bio: "Sweet puppy who loves treats and sniffing everything! Still learning commands.",
-        photos: ["https://images.unsplash.com/photo-1544717297-fa95b6ee9643?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
+        photos: [
+          "https://images.unsplash.com/photo-1544717297-fa95b6ee9643?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600",
+          "https://images.unsplash.com/photo-1551717743-49959800b1f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"
+        ],
         temperament: ["Curious", "Gentle", "Food-motivated"],
         matingPreference: false,
         distanceRadius: 8,
@@ -465,7 +477,10 @@ export class MemStorage implements IStorage {
         gender: "Male",
         size: "Medium",
         bio: "Well-trained and loves meeting new friends. Great with children and other pets.",
-        photos: ["https://images.unsplash.com/photo-1616190280147-d6b5ac788b10?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
+        photos: [
+          "https://images.unsplash.com/photo-1616190280147-d6b5ac788b10?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600",
+          "https://images.unsplash.com/photo-1594149831265-35c4c48ed8bf?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"
+        ],
         temperament: ["Intelligent", "Social", "Obedient"],
         matingPreference: true,
         distanceRadius: 12,
@@ -483,7 +498,10 @@ export class MemStorage implements IStorage {
         gender: "Female",
         size: "Large",
         bio: "Loves water activities and playing with tennis balls. Very loyal and friendly.",
-        photos: ["https://images.unsplash.com/photo-1518717758536-85ae29035b6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
+        photos: [
+          "https://images.unsplash.com/photo-1518717758536-85ae29035b6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600",
+          "https://images.unsplash.com/photo-1591160690555-5debfba289f0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"
+        ],
         temperament: ["Loyal", "Playful", "Water-loving"],
         matingPreference: true,
         distanceRadius: 18,
@@ -609,7 +627,10 @@ export class MemStorage implements IStorage {
         gender: "Female",
         size: "Medium",
         bio: "Sweet and gentle girl who loves water activities and swimming. Perfect companion for beach trips and outdoor adventures.",
-        photos: ["https://images.unsplash.com/photo-1518717758536-85ae29035b6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
+        photos: [
+          "https://images.unsplash.com/photo-1518717758536-85ae29035b6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600",
+          "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"
+        ],
         temperament: ["Sweet", "Gentle", "Water-loving", "Social"],
         matingPreference: true,
         distanceRadius: 15,
@@ -1210,6 +1231,18 @@ export class MemStorage implements IStorage {
         dog1Id: "dog-3",
         dog2Id: "dog-6",
         createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1 hour ago
+      },
+      {
+        id: "match-3",
+        dog1Id: "dog-5",
+        dog2Id: "dog-8",
+        createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
+      },
+      {
+        id: "match-4",
+        dog1Id: "dog-4",
+        dog2Id: "dog-12",
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
       }
     ];
 
@@ -1258,6 +1291,34 @@ export class MemStorage implements IStorage {
         senderId: "user-6",
         content: "That's perfect! Ruby loves hiking trails. Do you know Prospect Park well?",
         createdAt: new Date(Date.now() - 15 * 60 * 1000), // 15 minutes ago
+      },
+      {
+        id: "msg-7",
+        matchId: "match-3",
+        senderId: "user-5",
+        content: "Charlie would love to meet Milo! They seem like they'd get along great.",
+        createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
+      },
+      {
+        id: "msg-8",
+        matchId: "match-3",
+        senderId: "user-2",
+        content: "Definitely! Milo is great with other dogs. How about meeting at the small dog area?",
+        createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 hours ago
+      },
+      {
+        id: "msg-9",
+        matchId: "match-4",
+        senderId: "user-4",
+        content: "Hi! Bella is still young but Thor looks so gentle with puppies.",
+        createdAt: new Date(Date.now() - 36 * 60 * 60 * 1000), // 36 hours ago
+      },
+      {
+        id: "msg-10",
+        matchId: "match-4",
+        senderId: "user-6",
+        content: "Thor is wonderful with young dogs! He's very patient and protective. Would love to arrange a meet-up!",
+        createdAt: new Date(Date.now() - 30 * 60 * 60 * 1000), // 30 hours ago
       }
     ];
 

@@ -68,7 +68,10 @@ async function seedData() {
         gender: "Male",
         size: "Large",
         bio: "Loves playing fetch and swimming. Great with kids and other dogs!",
-        photos: ["https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
+        photos: [
+          "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600",
+          "https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"
+        ],
         temperament: ["Playful", "Energetic", "Friendly"],
         matingPreference: false,
         distanceRadius: 15,
@@ -84,7 +87,10 @@ async function seedData() {
         gender: "Female",
         size: "Medium",
         bio: "Energetic and playful! Loves short walks and belly rubs.",
-        photos: ["https://images.unsplash.com/photo-1605568427561-40dd23c2acea?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
+        photos: [
+          "https://images.unsplash.com/photo-1605568427561-40dd23c2acea?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600",
+          "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"
+        ],
         temperament: ["Energetic", "Playful", "Curious"],
         matingPreference: true,
         distanceRadius: 10,
@@ -100,7 +106,10 @@ async function seedData() {
         gender: "Male",
         size: "Large",
         bio: "Athletic and adventurous! Perfect hiking companion who loves cold weather.",
-        photos: ["https://images.unsplash.com/photo-1605568427561-40dd23c2acea?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
+        photos: [
+          "https://images.unsplash.com/photo-1615751072497-5f5169febe17?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600",
+          "https://images.unsplash.com/photo-1605568427561-40dd23c2acea?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"
+        ],
         temperament: ["Athletic", "Independent", "Alert"],
         matingPreference: false,
         distanceRadius: 25,
@@ -116,7 +125,10 @@ async function seedData() {
         gender: "Female",
         size: "Medium",
         bio: "Sweet puppy who loves treats and sniffing everything! Still learning commands.",
-        photos: ["https://images.unsplash.com/photo-1544717297-fa95b6ee9643?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
+        photos: [
+          "https://images.unsplash.com/photo-1544717297-fa95b6ee9643?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600",
+          "https://images.unsplash.com/photo-1551717743-49959800b1f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"
+        ],
         temperament: ["Curious", "Gentle", "Food-motivated"],
         matingPreference: false,
         distanceRadius: 8,
@@ -132,7 +144,10 @@ async function seedData() {
         gender: "Male",
         size: "Medium",
         bio: "Well-trained and loves meeting new friends. Great with children and other pets.",
-        photos: ["https://images.unsplash.com/photo-1616190280147-d6b5ac788b10?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
+        photos: [
+          "https://images.unsplash.com/photo-1616190280147-d6b5ac788b10?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600",
+          "https://images.unsplash.com/photo-1594149831265-35c4c48ed8bf?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"
+        ],
         temperament: ["Intelligent", "Social", "Obedient"],
         matingPreference: true,
         distanceRadius: 12,
@@ -148,7 +163,10 @@ async function seedData() {
         gender: "Female",
         size: "Large",
         bio: "Loves water activities and playing with tennis balls. Very loyal and friendly.",
-        photos: ["https://images.unsplash.com/photo-1518717758536-85ae29035b6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
+        photos: [
+          "https://images.unsplash.com/photo-1518717758536-85ae29035b6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600",
+          "https://images.unsplash.com/photo-1591160690555-5debfba289f0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"
+        ],
         temperament: ["Loyal", "Playful", "Water-loving"],
         matingPreference: true,
         distanceRadius: 18,
@@ -426,6 +444,14 @@ async function seedData() {
       {
         dog1Id: insertedDogs[0].id,
         dog2Id: insertedDogs[1].id,
+      },
+      {
+        dog1Id: insertedDogs[0].id,
+        dog2Id: insertedDogs[2].id,
+      },
+      {
+        dog1Id: insertedDogs[1].id,
+        dog2Id: insertedDogs[3].id,
       }
     ];
 
@@ -448,6 +474,26 @@ async function seedData() {
         matchId: insertedMatches[0].id,
         senderId: insertedUsers[0].id,
         content: "Perfect! Let's meet at the dog run around 10 AM. Buddy will be so excited!",
+      },
+      {
+        matchId: insertedMatches[1].id,
+        senderId: insertedUsers[0].id,
+        content: "Hey! Zeus looks like an amazing hiking companion. Would you be interested in a group hike this weekend?",
+      },
+      {
+        matchId: insertedMatches[1].id,
+        senderId: insertedUsers[2].id,
+        content: "Absolutely! Zeus loves hiking and would enjoy meeting Buddy. I know some great trails nearby.",
+      },
+      {
+        matchId: insertedMatches[2].id,
+        senderId: insertedUsers[1].id,
+        content: "Bella is such a cute puppy! Luna would love to be her mentor. How is her training going?",
+      },
+      {
+        matchId: insertedMatches[2].id,
+        senderId: insertedUsers[3].id,
+        content: "Thank you! Bella is doing well with basic commands. A playdate with Luna would be perfect for her socialization!",
       }
     ];
 
