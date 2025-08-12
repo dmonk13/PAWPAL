@@ -45,12 +45,12 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
       aria-labelledby={`dog-${dog.id}-name`}
       aria-describedby={`dog-${dog.id}-details`}
     >
-      <div className="relative h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
-        {/* Hero Photo */}
+      {/* Hero Photo Section - Fixed Height */}
+      <div className="relative h-3/5 flex-shrink-0">
         <img 
           src={dog.photos?.[0] || "/placeholder-dog.jpg"}
           alt={`${dog.name}, ${dog.breed} dog`}
-          className="w-full h-2/3 object-cover"
+          className="w-full h-full object-cover"
         />
         
         {/* Distance Badge - Top Right */}
@@ -98,11 +98,13 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
             </Badge>
           )}
         </div>
+      </div>
 
-        {/* Premium Profile Content */}
-        <div className="p-4 bg-[hsl(var(--surface-white))] min-h-[40%] flex flex-col justify-between pb-safe">
-          {/* Header Section */}
-          <div>
+      {/* Scrollable Content Section */}
+      <div className="flex-1 flex flex-col bg-[hsl(var(--surface-white))] overflow-hidden">
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
+          <div className="p-4">
             {/* Name & Age Row */}
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1 min-w-0">
@@ -203,8 +205,10 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
               </div>
             )}
           </div>
-          
-          {/* Primary Action Row */}
+        </div>
+
+        {/* Fixed Action Bar - Outside Scroll Area */}
+        <div className="flex-shrink-0 p-4 bg-[hsl(var(--surface-white))] border-t border-[hsl(var(--borders-light))] pb-safe">
           <div className="space-y-3">
             {/* Medical Profile - Prominent Action */}
             <Button
