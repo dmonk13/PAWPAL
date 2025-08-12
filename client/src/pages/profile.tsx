@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Settings, Camera, Heart, Edit3, Plus, MapPin, CheckCircle, Users, Star, Crown, Shield } from "lucide-react";
+import { Settings, Camera, Heart, Edit3, Plus, MapPin, CheckCircle, Users, Star, Crown, Shield, PawPrint } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -34,17 +34,26 @@ export default function Profile() {
   if (isLoading) {
     return (
       <div className="flex flex-col h-full">
-        <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 p-4 sticky top-0 z-40 shadow-sm flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold dark-gray">Profile</h1>
-            <p className="medium-gray">Manage your dog's profiles</p>
+        <header className="bg-gradient-to-r from-pink-500 to-red-500 text-white p-6 sticky top-0 z-40 shadow-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <Settings className="w-6 h-6" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold">My Profile</h1>
+                <p className="text-pink-100 text-sm">Manage your dogs and preferences</p>
+              </div>
+            </div>
+            <Link href="/settings">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 border-white/30">
+                <Settings className="w-4 h-4" />
+              </Button>
+            </Link>
           </div>
-          <Button variant="outline" size="sm">
-            <Settings className="w-4 h-4" />
-          </Button>
         </header>
         
-        <div className="flex-1 overflow-auto p-4">
+        <div className="flex-1 overflow-auto p-4 bg-gradient-to-b from-gray-50 to-white">
           <div className="animate-pulse space-y-4">
             <Card>
               <CardContent className="p-6">
@@ -68,17 +77,26 @@ export default function Profile() {
 
   return (
     <div className="flex flex-col h-full">
-      <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 p-4 sticky top-0 z-40 shadow-sm flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold dark-gray">Profile</h1>
-          <p className="medium-gray">Manage your dog's profiles</p>
+      <header className="bg-gradient-to-r from-pink-500 to-red-500 text-white p-6 sticky top-0 z-40 shadow-lg">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <Settings className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">My Profile</h1>
+              <p className="text-pink-100 text-sm">Manage your dogs and preferences</p>
+            </div>
+          </div>
+          <Link href="/settings">
+            <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 border-white/30">
+              <Settings className="w-4 h-4" />
+            </Button>
+          </Link>
         </div>
-        <Button variant="outline" size="sm">
-          <Settings className="w-4 h-4" />
-        </Button>
       </header>
       
-      <div className="flex-1 overflow-auto p-4">
+      <div className="flex-1 overflow-auto p-4 bg-gradient-to-b from-gray-50 to-white">
 
         {/* Premium Upgrade Card */}
         <Card className="mb-6 bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
@@ -109,51 +127,64 @@ export default function Profile() {
         </Card>
 
         {dogs.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-              <Plus className="w-8 h-8 medium-gray" />
+          <div className="text-center py-16">
+            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-pink-100 to-red-100 rounded-full flex items-center justify-center shadow-lg">
+              <Plus className="w-12 h-12 text-pink-600" />
             </div>
-            <h3 className="text-xl font-bold mb-2 dark-gray">Add Your First Dog</h3>
-            <p className="medium-gray mb-6">
-              Create a profile for your dog to start matching with other pups!
+            <h3 className="text-2xl font-bold mb-3 text-gray-900">Add Your First Dog</h3>
+            <p className="text-gray-600 mb-8 max-w-sm mx-auto leading-relaxed">
+              Create a profile for your furry friend to start connecting with other dogs in your area!
             </p>
             <Button 
-              className="bg-coral text-white"
+              size="lg"
+              className="bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
               onClick={() => setShowEditForm(true)}
             >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Dog Profile
+              <Plus className="w-5 h-5 mr-2" />
+              Create Dog Profile
             </Button>
           </div>
         ) : (
           <div className="space-y-6">
             {/* Dog selector if multiple dogs */}
             {dogs.length > 1 && (
-              <div className="flex space-x-2 overflow-x-auto">
-                {dogs.map((dog: any) => (
-                  <Button
-                    key={dog.id}
-                    variant={selectedDog === dog.id ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedDog(dog.id)}
-                    className="whitespace-nowrap"
-                  >
-                    {dog.name}
-                  </Button>
-                ))}
-              </div>
+              <Card className="bg-white shadow-md border-0">
+                <CardContent className="p-4">
+                  <h4 className="font-bold text-gray-900 mb-3">Select Your Dog</h4>
+                  <div className="flex space-x-3 overflow-x-auto pb-2">
+                    {dogs.map((dog: any) => (
+                      <Button
+                        key={dog.id}
+                        variant={selectedDog === dog.id ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setSelectedDog(dog.id)}
+                        className={`whitespace-nowrap transition-all duration-200 ${
+                          selectedDog === dog.id 
+                            ? "bg-gradient-to-r from-pink-500 to-red-500 text-white shadow-md" 
+                            : "hover:border-pink-300 hover:text-pink-600"
+                        }`}
+                      >
+                        {dog.name}
+                      </Button>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             )}
 
             {/* Temperament section */}
             {currentDog?.temperament && currentDog.temperament.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Temperament</CardTitle>
+              <Card className="bg-white shadow-md border-0">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg font-bold text-gray-900 flex items-center">
+                    <Star className="w-5 h-5 mr-2 text-yellow-500" />
+                    Personality Traits
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
                     {currentDog.temperament.map((trait: string, index: number) => (
-                      <Badge key={index} className="bg-coral bg-opacity-10 text-coral border-coral">
+                      <Badge key={index} className="bg-gradient-to-r from-pink-100 to-red-100 text-pink-700 border-pink-200 px-3 py-1 text-sm font-medium">
                         {trait}
                       </Badge>
                     ))}
@@ -164,53 +195,53 @@ export default function Profile() {
 
             {/* Main profile card */}
             {currentDog && (
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-4 mb-4">
+              <Card className="bg-white shadow-lg border-0 overflow-hidden">
+                <div className="bg-gradient-to-r from-pink-500 to-red-500 p-4">
+                  <div className="flex items-center space-x-4">
                     <div className="relative">
                       <img
                         src={currentDog.photos?.[0] || "/placeholder-dog.jpg"}
                         alt={currentDog.name}
-                        className="w-20 h-20 rounded-full object-cover"
+                        className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
                       />
                       <Button
                         size="sm"
-                        className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-coral text-white p-0"
+                        className="absolute -bottom-1 -right-1 w-10 h-10 rounded-full bg-white text-pink-600 p-0 shadow-lg hover:bg-gray-50"
                       >
-                        <Camera className="w-4 h-4" />
+                        <Camera className="w-5 h-5" />
                       </Button>
                     </div>
                     
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <h2 className="text-xl font-bold dark-gray">{currentDog.name}</h2>
+                    <div className="flex-1 text-white">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <h2 className="text-2xl font-bold">{currentDog.name}</h2>
                         <Button 
                           variant="ghost" 
                           size="sm" 
-                          className="p-1"
+                          className="p-2 text-white hover:bg-white/20 rounded-full"
                           onClick={() => {
                             setEditingDog(currentDog);
                             setShowEditForm(true);
                           }}
                         >
-                          <Edit3 className="w-4 h-4" />
+                          <Edit3 className="w-5 h-5" />
                         </Button>
                       </div>
-                      <p className="medium-gray mb-2">
+                      <p className="text-pink-100 mb-3 text-lg">
                         {currentDog.breed} • {currentDog.age} years • {currentDog.size}
                       </p>
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Badge variant={currentDog.isActive ? "default" : "secondary"}>
+                      <div className="flex items-center space-x-2 mb-3">
+                        <Badge variant={currentDog.isActive ? "default" : "secondary"} className="bg-white/20 text-white border-white/30">
                           {currentDog.isActive ? "Active" : "Inactive"}
                         </Badge>
                         {currentDog.medicalProfile?.vaccinations?.length > 0 && (
-                          <Badge variant="secondary">
+                          <Badge className="bg-white/20 text-white border-white/30">
                             <Heart className="w-3 h-3 mr-1" />
                             Vaccinated
                           </Badge>
                         )}
                         {currentDog.medicalProfile?.vetClearance && (
-                          <Badge className="bg-green-100 text-green-800">
+                          <Badge className="bg-green-500 text-white border-green-400">
                             <CheckCircle className="w-3 h-3 mr-1" />
                             Vet Approved
                           </Badge>
@@ -218,36 +249,40 @@ export default function Profile() {
                       </div>
                       
                       {/* Additional info row */}
-                      <div className="flex items-center space-x-4 text-sm medium-gray">
+                      <div className="flex items-center space-x-4 text-sm text-pink-100">
                         {currentDog.distanceRadius && (
                           <div className="flex items-center">
-                            <MapPin className="w-3 h-3 mr-1" />
+                            <MapPin className="w-4 h-4 mr-1" />
                             <span>{currentDog.distanceRadius}mi radius</span>
                           </div>
                         )}
                         {currentDog.matingPreference && (
                           <div className="flex items-center">
-                            <Users className="w-3 h-3 mr-1" />
+                            <Users className="w-4 h-4 mr-1" />
                             <span>Open to mating</span>
                           </div>
                         )}
                       </div>
                     </div>
                   </div>
-                  
-                  <p className="text-sm medium-gray mb-4">
-                    {currentDog.bio || "No bio yet. Add one to attract more matches!"}
-                  </p>
+                </div>
+                
+                <CardContent className="p-6">
+                  <div className="mb-4">
+                    <h4 className="font-bold text-gray-900 mb-2">About {currentDog.name}</h4>
+                    <p className="text-gray-600 leading-relaxed">
+                      {currentDog.bio || "No bio yet. Add one to attract more matches!"}
+                    </p>
+                  </div>
                   
                   <Button 
-                    variant="outline" 
-                    className="w-full"
+                    className="w-full bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white font-medium py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
                     onClick={() => {
                       setEditingDog(currentDog);
                       setShowEditForm(true);
                     }}
                   >
-                    <Edit3 className="w-4 h-4 mr-2" />
+                    <Edit3 className="w-5 h-5 mr-2" />
                     Edit Profile
                   </Button>
                 </CardContent>
@@ -256,28 +291,35 @@ export default function Profile() {
 
             {/* Medical profile section */}
             {currentDog?.medicalProfile && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span>Medical Profile</span>
-                    <Button variant="ghost" size="sm">
+              <Card className="bg-white shadow-md border-0">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center justify-between text-lg font-bold text-gray-900">
+                    <div className="flex items-center">
+                      <Shield className="w-5 h-5 mr-2 text-blue-600" />
+                      Medical Profile
+                    </div>
+                    <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-700">
                       <Edit3 className="w-4 h-4" />
                     </Button>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6">
                   <div>
-                    <h4 className="font-semibold mb-2">Vaccinations</h4>
+                    <h4 className="font-bold text-gray-900 mb-3 flex items-center">
+                      <Heart className="w-4 h-4 mr-2 text-red-500" />
+                      Vaccinations
+                    </h4>
                     {currentDog.medicalProfile.vaccinations?.length > 0 ? (
-                      <div className="space-y-1">
+                      <div className="space-y-2">
                         {currentDog.medicalProfile.vaccinations.map((vax: any, index: number) => (
-                          <div key={index} className="text-sm medium-gray">
-                            {vax.type} - {new Date(vax.date).toLocaleDateString()}
+                          <div key={index} className="bg-green-50 border border-green-200 rounded-lg p-3">
+                            <div className="font-medium text-green-800">{vax.type}</div>
+                            <div className="text-sm text-green-600">{new Date(vax.date).toLocaleDateString()}</div>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-sm medium-gray">No vaccination records</p>
+                      <p className="text-gray-500 bg-gray-50 p-3 rounded-lg">No vaccination records</p>
                     )}
                   </div>
                   
@@ -324,11 +366,10 @@ export default function Profile() {
 
             {/* Add new dog button */}
             <Button 
-              variant="outline" 
-              className="w-full"
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium py-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
               onClick={() => setShowEditForm(true)}
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-5 h-5 mr-2" />
               Add Another Dog
             </Button>
           </div>
