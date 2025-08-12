@@ -64,63 +64,81 @@ export default function FilterModal({ onClose, onApplyFilters }: FilterModalProp
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
-      <div className="bg-white p-6 rounded-b-3xl">
-        <div className="flex items-center justify-between mb-6">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex flex-col">
+      <div className="bg-white rounded-t-3xl mt-16 flex-1 flex flex-col max-h-[calc(100vh-4rem)]">
+        {/* Fixed Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-100 flex-shrink-0">
           <h3 className="text-xl font-bold dark-gray">Filters</h3>
-          <Button variant="ghost" size="sm" onClick={onClose}>
+          <Button variant="ghost" size="sm" onClick={onClose} className="touch-manipulation min-h-[44px] min-w-[44px]">
             <X className="w-5 h-5" />
           </Button>
         </div>
         
-        <div className="space-y-6">
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto overscroll-contain px-6 pb-6">
+          <div className="space-y-6 py-2">
           {/* Distance */}
           <div>
-            <Label className="block text-sm font-semibold dark-gray mb-3">
+            <Label className="block text-sm font-semibold dark-gray mb-4">
               Distance ({distance[0]} miles)
             </Label>
-            <Slider
-              value={distance}
-              onValueChange={setDistance}
-              max={50}
-              min={1}
-              step={1}
-              className="w-full"
-            />
-            <div className="flex justify-between text-xs medium-gray mt-1">
-              <span>1 mi</span>
-              <span>25 mi</span>
-              <span>50 mi</span>
+            <div className="px-2 py-4">
+              <Slider
+                value={distance}
+                onValueChange={setDistance}
+                max={50}
+                min={1}
+                step={1}
+                className="w-full touch-manipulation"
+              />
+              <div className="flex justify-between text-xs medium-gray mt-2 px-1">
+                <span>1 mi</span>
+                <span>25 mi</span>
+                <span>50 mi</span>
+              </div>
             </div>
           </div>
           
           {/* Age Range */}
           <div>
-            <Label className="block text-sm font-semibold dark-gray mb-3">Age Range</Label>
+            <Label className="block text-sm font-semibold dark-gray mb-4">Age Range</Label>
             <Select value={ageRange} onValueChange={setAgeRange}>
-              <SelectTrigger>
+              <SelectTrigger className="touch-manipulation min-h-[48px] text-left">
                 <SelectValue placeholder="Select age range" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Puppy (0-1 year)">Puppy (0-1 year)</SelectItem>
-                <SelectItem value="Young (1-3 years)">Young (1-3 years)</SelectItem>
-                <SelectItem value="Adult (3-7 years)">Adult (3-7 years)</SelectItem>
-                <SelectItem value="Senior (7+ years)">Senior (7+ years)</SelectItem>
+              <SelectContent className="touch-manipulation">
+                <SelectItem value="Puppy (0-1 year)" className="min-h-[48px] flex items-center">
+                  <Baby className="w-4 h-4 mr-2 text-pink-500" />
+                  Puppy (0-1 year)
+                </SelectItem>
+                <SelectItem value="Young (1-3 years)" className="min-h-[48px] flex items-center">
+                  <Heart className="w-4 h-4 mr-2 text-green-500" />
+                  Young (1-3 years)
+                </SelectItem>
+                <SelectItem value="Adult (3-7 years)" className="min-h-[48px] flex items-center">
+                  <Shield className="w-4 h-4 mr-2 text-blue-500" />
+                  Adult (3-7 years)
+                </SelectItem>
+                <SelectItem value="Senior (7+ years)" className="min-h-[48px] flex items-center">
+                  <MapPin className="w-4 h-4 mr-2 text-gray-500" />
+                  Senior (7+ years)
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
           
           {/* Size */}
           <div>
-            <Label className="block text-sm font-semibold dark-gray mb-3">Size</Label>
-            <div className="flex flex-wrap gap-2">
+            <Label className="block text-sm font-semibold dark-gray mb-4">Size</Label>
+            <div className="grid grid-cols-3 gap-3">
               {["Small", "Medium", "Large"].map((sizeOption) => (
                 <Button
                   key={sizeOption}
                   variant={size === sizeOption ? "default" : "outline"}
-                  size="sm"
                   onClick={() => setSize(size === sizeOption ? "" : sizeOption)}
-                  className={size === sizeOption ? "bg-coral text-white" : ""}
+                  className={`touch-manipulation min-h-[48px] text-sm font-medium ${
+                    size === sizeOption ? "bg-coral text-white border-coral" : "border-2"
+                  }`}
                 >
                   {sizeOption}
                 </Button>
@@ -130,63 +148,74 @@ export default function FilterModal({ onClose, onApplyFilters }: FilterModalProp
           
           {/* Medical Requirements */}
           <div>
-            <Label className="block text-sm font-semibold dark-gray mb-3">Medical Requirements</Label>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3">
+            <Label className="block text-sm font-semibold dark-gray mb-4">Medical Requirements</Label>
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4 p-3 rounded-lg bg-gray-50 touch-manipulation min-h-[56px]">
                 <Checkbox
                   id="vaccinated"
                   checked={vaccinated}
                   onCheckedChange={(checked) => setVaccinated(checked === true)}
+                  className="touch-manipulation"
                 />
-                <Label htmlFor="vaccinated" className="text-sm flex items-center">
-                  <Heart className="w-4 h-4 mr-1 text-red-500" />
+                <Label htmlFor="vaccinated" className="text-sm flex items-center flex-1 cursor-pointer">
+                  <Heart className="w-4 h-4 mr-2 text-red-500" />
                   Must be vaccinated
                 </Label>
               </div>
               
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-4 p-3 rounded-lg bg-gray-50 touch-manipulation min-h-[56px]">
                 <Checkbox
                   id="vet-clearance"
                   checked={vetClearance}
                   onCheckedChange={(checked) => setVetClearance(checked === true)}
+                  className="touch-manipulation"
                 />
-                <Label htmlFor="vet-clearance" className="text-sm flex items-center">
-                  <CheckCircle className="w-4 h-4 mr-1 text-green-500" />
+                <Label htmlFor="vet-clearance" className="text-sm flex items-center flex-1 cursor-pointer">
+                  <CheckCircle className="w-4 h-4 mr-2 text-green-500" />
                   Vet clearance required
                 </Label>
               </div>
               
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-4 p-3 rounded-lg bg-gray-50 touch-manipulation min-h-[56px]">
                 <Checkbox
                   id="spayedNeutered"
                   checked={spayedNeutered}
                   onCheckedChange={(checked) => setSpayedNeutered(checked === true)}
+                  className="touch-manipulation"
                 />
-                <Label htmlFor="spayedNeutered" className="text-sm">Spayed/Neutered only</Label>
+                <Label htmlFor="spayedNeutered" className="text-sm flex-1 cursor-pointer">
+                  <Scissors className="w-4 h-4 mr-2 text-blue-500" />
+                  Spayed/Neutered only
+                </Label>
               </div>
               
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-4 p-3 rounded-lg bg-gray-50 touch-manipulation min-h-[56px]">
                 <Checkbox
                   id="noAllergies"
                   checked={noAllergies}
                   onCheckedChange={(checked) => setNoAllergies(checked === true)}
+                  className="touch-manipulation"
                 />
-                <Label htmlFor="noAllergies" className="text-sm">No food allergies</Label>
+                <Label htmlFor="noAllergies" className="text-sm flex-1 cursor-pointer">
+                  <AlertTriangle className="w-4 h-4 mr-2 text-orange-500" />
+                  No food allergies
+                </Label>
               </div>
             </div>
           </div>
 
           {/* Special Preferences */}
           <div>
-            <Label className="block text-sm font-semibold dark-gray mb-3">Special Preferences</Label>
-            <div className="flex items-center space-x-3">
+            <Label className="block text-sm font-semibold dark-gray mb-4">Special Preferences</Label>
+            <div className="flex items-center space-x-4 p-3 rounded-lg bg-gray-50 touch-manipulation min-h-[56px]">
               <Checkbox
                 id="mating"
                 checked={matingPreference}
                 onCheckedChange={(checked) => setMatingPreference(checked === true)}
+                className="touch-manipulation"
               />
-              <Label htmlFor="mating" className="text-sm flex items-center">
-                <Users className="w-4 h-4 mr-1 text-purple-500" />
+              <Label htmlFor="mating" className="text-sm flex items-center flex-1 cursor-pointer">
+                <Users className="w-4 h-4 mr-2 text-purple-500" />
                 Looking for mating partners only
               </Label>
             </div>
@@ -194,18 +223,21 @@ export default function FilterModal({ onClose, onApplyFilters }: FilterModalProp
 
           {/* Temperament Filter */}
           <div>
-            <Label className="block text-sm font-semibold dark-gray mb-3">
+            <Label className="block text-sm font-semibold dark-gray mb-4">
               Temperament (select traits you prefer)
             </Label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-3">
               {temperamentOptions.map((temperament) => (
                 <Button
                   key={temperament}
                   type="button"
                   variant={selectedTemperaments.includes(temperament) ? "default" : "outline"}
-                  size="sm"
                   onClick={() => toggleTemperament(temperament)}
-                  className={selectedTemperaments.includes(temperament) ? "bg-coral text-white" : ""}
+                  className={`touch-manipulation min-h-[48px] text-sm font-medium ${
+                    selectedTemperaments.includes(temperament) 
+                      ? "bg-coral text-white border-coral" 
+                      : "border-2 hover:border-coral hover:text-coral"
+                  }`}
                 >
                   {temperament}
                 </Button>
@@ -213,17 +245,23 @@ export default function FilterModal({ onClose, onApplyFilters }: FilterModalProp
             </div>
           </div>
           
-          {/* Action Buttons */}
-          <div className="flex space-x-4 pt-4">
+          {/* Bottom spacing for mobile */}
+          <div className="h-20"></div>
+        </div>
+      </div>
+        
+        {/* Fixed Action Buttons */}
+        <div className="flex-shrink-0 p-6 border-t border-gray-100 bg-white">
+          <div className="flex space-x-4">
             <Button 
               variant="outline" 
-              className="flex-1" 
+              className="flex-1 touch-manipulation min-h-[48px]" 
               onClick={handleReset}
             >
               Reset
             </Button>
             <Button 
-              className="flex-1 bg-coral text-white hover:bg-coral/90" 
+              className="flex-1 bg-coral text-white hover:bg-coral/90 touch-manipulation min-h-[48px]" 
               onClick={handleApply}
             >
               Apply Filters

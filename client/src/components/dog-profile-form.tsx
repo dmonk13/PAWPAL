@@ -184,20 +184,22 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
-      <div className="min-h-screen p-4">
-        <div className="bg-white rounded-2xl max-w-2xl mx-auto">
-          <div className="sticky top-0 bg-white rounded-t-2xl border-b p-4 flex items-center justify-between">
-            <h2 className="text-xl font-bold dark-gray">
-              {dog?.id ? "Edit Dog Profile" : "Add Dog Profile"}
-            </h2>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="w-5 h-5" />
-            </Button>
-          </div>
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex flex-col">
+      <div className="bg-white rounded-t-3xl mt-8 flex-1 flex flex-col max-h-[calc(100vh-2rem)]">
+        {/* Fixed Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-100 flex-shrink-0">
+          <h2 className="text-xl font-bold dark-gray">
+            {dog?.id ? "Edit Dog Profile" : "Add Dog Profile"}
+          </h2>
+          <Button variant="ghost" size="sm" onClick={onClose} className="touch-manipulation min-h-[44px] min-w-[44px]">
+            <X className="w-5 h-5" />
+          </Button>
+        </div>
 
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto overscroll-contain">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 space-y-6">
+            <form id="dog-profile-form" onSubmit={form.handleSubmit(onSubmit)} className="p-6 space-y-6">
               {/* Basic Information */}
               <Card>
                 <CardHeader>
@@ -302,8 +304,12 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
                         <FormControl>
                           <Textarea 
                             placeholder="Tell us about your dog's personality and what they love..."
-                            className="resize-none"
-                            {...field}
+                            className="resize-none touch-manipulation min-h-[100px]"
+                            value={field.value || ""}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                            ref={field.ref}
                           />
                         </FormControl>
                         <FormMessage />
@@ -319,19 +325,22 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
                   <CardTitle>Temperament</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Label className="text-sm font-medium mb-3 block">
+                  <Label className="text-sm font-medium mb-4 block">
                     Select traits that describe your dog (choose up to 6)
                   </Label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 gap-3">
                     {temperamentOptions.map((temperament) => (
                       <Button
                         key={temperament}
                         type="button"
                         variant={selectedTemperaments.includes(temperament) ? "default" : "outline"}
-                        size="sm"
                         onClick={() => toggleTemperament(temperament)}
                         disabled={!selectedTemperaments.includes(temperament) && selectedTemperaments.length >= 6}
-                        className={selectedTemperaments.includes(temperament) ? "bg-coral text-white" : ""}
+                        className={`touch-manipulation min-h-[48px] text-sm font-medium ${
+                          selectedTemperaments.includes(temperament) 
+                            ? "bg-coral text-white border-coral" 
+                            : "border-2 hover:border-coral hover:text-coral"
+                        }`}
                       >
                         {temperament}
                       </Button>
@@ -567,21 +576,27 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
                 </CardContent>
               </Card>
 
-              {/* Action Buttons */}
-              <div className="flex gap-4 pt-6 border-t">
-                <Button type="button" variant="outline" onClick={onClose} className="flex-1">
-                  Cancel
-                </Button>
-                <Button 
-                  type="submit" 
-                  className="flex-1 bg-coral text-white hover:bg-coral/90"
-                  disabled={saveDogMutation.isPending}
-                >
-                  {saveDogMutation.isPending ? "Saving..." : dog?.id ? "Update Profile" : "Create Profile"}
-                </Button>
-              </div>
+              {/* Bottom spacing for mobile */}
+              <div className="h-20"></div>
             </form>
           </Form>
+        </div>
+
+        {/* Fixed Action Buttons */}
+        <div className="flex-shrink-0 p-6 border-t border-gray-100 bg-white">
+          <div className="flex gap-4">
+            <Button type="button" variant="outline" onClick={onClose} className="flex-1 touch-manipulation min-h-[48px]">
+              Cancel
+            </Button>
+            <Button 
+              type="submit" 
+              form="dog-profile-form"
+              className="flex-1 bg-coral text-white hover:bg-coral/90 touch-manipulation min-h-[48px]"
+              disabled={saveDogMutation.isPending}
+            >
+              {saveDogMutation.isPending ? "Saving..." : dog?.id ? "Update Profile" : "Create Profile"}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
