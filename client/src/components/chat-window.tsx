@@ -11,7 +11,30 @@ import {
   Smile,
   Flag,
   UserMinus,
-  Info
+  Info,
+  MapPin,
+  Calendar,
+  Plus,
+  Clock,
+  CheckCircle2,
+  Heart,
+  ThumbsUp,
+  ChevronUp,
+  Volume2,
+  VolumeX,
+  Shield,
+  Eye,
+  EyeOff,
+  Copy,
+  Reply,
+  MoreHorizontal,
+  Edit3,
+  Trash2,
+  ExternalLink,
+  Users,
+  DollarSign,
+  CheckSquare,
+  AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +50,10 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Switch } from "@/components/ui/switch";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 import ReportModal from "./report-modal";
 import RemoveMatchModal from "./remove-match-modal";
 
@@ -35,9 +62,37 @@ interface Message {
   senderId: string;
   content: string;
   timestamp: Date;
-  type: "text" | "image" | "audio";
+  type: "text" | "image" | "audio" | "location" | "playdate" | "poll" | "payment" | "checklist";
   mediaUrl?: string;
   isRead: boolean;
+  isEdited?: boolean;
+  replyTo?: string;
+  reactions?: { emoji: string; users: string[] }[];
+  metadata?: {
+    location?: { lat: number; lng: number; name: string; address: string };
+    playdate?: { 
+      title: string; 
+      date: string; 
+      time: string; 
+      location: string; 
+      status: 'proposed' | 'confirmed' | 'declined';
+      notes?: string;
+    };
+    poll?: {
+      question: string;
+      options: { text: string; votes: string[] }[];
+      allowMultiple: boolean;
+    };
+    payment?: {
+      amount: number;
+      description: string;
+      status: 'pending' | 'completed' | 'declined';
+    };
+    checklist?: {
+      title: string;
+      items: { text: string; completed: boolean; assignedTo?: string }[];
+    };
+  };
 }
 
 interface ChatWindowProps {
@@ -48,6 +103,13 @@ interface ChatWindowProps {
   onBack: () => void;
 }
 
+interface SuggestionChip {
+  id: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  action: () => void;
+}
+
 export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBack }: ChatWindowProps) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([
@@ -55,7 +117,7 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
       id: "1",
       senderId: "other",
       content: "Hi! Our dogs matched! Would love to set up a playdate 🐕",
-      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
       type: "text",
       isRead: true
     },
@@ -79,25 +141,209 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
       id: "4",
       senderId: "me",
       content: "Perfect! Saturday morning works for us. Looking forward to it!",
-      timestamp: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
+      timestamp: new Date(Date.now() - 30 * 60 * 1000),
       type: "text",
       isRead: true
+    },
+    {
+      id: "5",
+      senderId: "other",
+      content: "",
+      timestamp: new Date(Date.now() - 15 * 60 * 1000),
+      type: "playdate",
+      isRead: true,
+      metadata: {
+        playdate: {
+          title: "Dog Park Playdate",
+          date: "2025-08-16",
+          time: "10:00 AM",
+          location: "Koramangala Dog Park, Bangalore",
+          status: "proposed",
+          notes: "Bring water bowls and some toys! Luna loves playing fetch."
+        }
+      }
     }
   ]);
+  
   const [isTyping, setIsTyping] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
+  const [isOnline, setIsOnline] = useState(true);
+  const [lastSeen, setLastSeen] = useState("2 min ago");
+  const [showJumpToBottom, setShowJumpToBottom] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(true);
+  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+  const [replyTo, setReplyTo] = useState<Message | null>(null);
+  const [textareaRows, setTextareaRows] = useState(1);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const handleScroll = () => {
+    if (messagesContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+      setShowJumpToBottom(!isNearBottom);
+    }
+  };
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      return () => container.removeEventListener('scroll', handleScroll);
+    }
+  }, []);
+
+  // Smart suggestion chips
+  const suggestionChips: SuggestionChip[] = [
+    {
+      id: "location",
+      label: "Share Location",
+      icon: MapPin,
+      action: () => handleSuggestionAction("location")
+    },
+    {
+      id: "playdate",
+      label: "Propose Playdate",
+      icon: Calendar,
+      action: () => handleSuggestionAction("playdate")
+    },
+    {
+      id: "poll",
+      label: "Create Poll",
+      icon: Plus,
+      action: () => handleSuggestionAction("poll")
+    },
+    {
+      id: "profile",
+      label: "Share Dog Profile",
+      icon: Heart,
+      action: () => handleSuggestionAction("profile")
+    }
+  ];
+
+  const handleSuggestionAction = (action: string) => {
+    switch (action) {
+      case "location":
+        const locationMessage: Message = {
+          id: Date.now().toString(),
+          senderId: "me",
+          content: "Current Location",
+          timestamp: new Date(),
+          type: "location",
+          isRead: false,
+          metadata: {
+            location: {
+              lat: 12.9352,
+              lng: 77.6245,
+              name: "Cubbon Park",
+              address: "Cubbon Park, Bangalore, Karnataka 560001"
+            }
+          }
+        };
+        setMessages(prev => [...prev, locationMessage]);
+        break;
+        
+      case "playdate":
+        const playdateMessage: Message = {
+          id: Date.now().toString(),
+          senderId: "me",
+          content: "",
+          timestamp: new Date(),
+          type: "playdate",
+          isRead: false,
+          metadata: {
+            playdate: {
+              title: "Weekend Playdate",
+              date: "2025-08-17",
+              time: "4:00 PM", 
+              location: "Lalbagh Botanical Garden",
+              status: "proposed",
+              notes: "Perfect weather for outdoor play!"
+            }
+          }
+        };
+        setMessages(prev => [...prev, playdateMessage]);
+        break;
+        
+      case "poll":
+        const pollMessage: Message = {
+          id: Date.now().toString(),
+          senderId: "me",
+          content: "",
+          timestamp: new Date(),
+          type: "poll",
+          isRead: false,
+          metadata: {
+            poll: {
+              question: "Best time for our playdate?",
+              options: [
+                { text: "Saturday Morning", votes: [] },
+                { text: "Saturday Evening", votes: [] },
+                { text: "Sunday Morning", votes: [] }
+              ],
+              allowMultiple: false
+            }
+          }
+        };
+        setMessages(prev => [...prev, pollMessage]);
+        break;
+    }
+    setShowSuggestions(false);
+  };
+
+  const handleReaction = (messageId: string, emoji: string) => {
+    setMessages(prev => prev.map(msg => {
+      if (msg.id === messageId) {
+        const reactions = msg.reactions || [];
+        const existingReaction = reactions.find(r => r.emoji === emoji);
+        
+        if (existingReaction) {
+          const hasUserReacted = existingReaction.users.includes("me");
+          if (hasUserReacted) {
+            existingReaction.users = existingReaction.users.filter(u => u !== "me");
+          } else {
+            existingReaction.users.push("me");
+          }
+        } else {
+          reactions.push({ emoji, users: ["me"] });
+        }
+        
+        return { ...msg, reactions: reactions.filter(r => r.users.length > 0) };
+      }
+      return msg;
+    }));
+  };
+
+  const handleDeleteMessage = (messageId: string) => {
+    setMessages(prev => prev.filter(msg => msg.id !== messageId));
+    toast({ title: "Message deleted" });
+  };
+
+  const handleEditMessage = (messageId: string, newContent: string) => {
+    setMessages(prev => prev.map(msg => 
+      msg.id === messageId 
+        ? { ...msg, content: newContent, isEdited: true }
+        : msg
+    ));
+    toast({ title: "Message edited" });
+  };
+
+  const handleReply = (message: Message) => {
+    setReplyTo(message);
+  };
 
   const handleSendMessage = () => {
     if (!message.trim()) return;
@@ -108,11 +354,14 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
       content: message,
       timestamp: new Date(),
       type: "text",
-      isRead: false
+      isRead: false,
+      replyTo: replyTo?.id
     };
 
     setMessages(prev => [...prev, newMessage]);
     setMessage("");
+    setReplyTo(null);
+    setTextareaRows(1);
 
     // Simulate typing indicator and response
     setIsTyping(true);
@@ -214,8 +463,111 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
     onBack();
   };
 
+  // Render different message types
+  const renderMessageContent = (msg: Message) => {
+    switch (msg.type) {
+      case "location":
+        return (
+          <div className="bg-white rounded-lg border border-gray-200 p-3 max-w-xs">
+            <div className="flex items-center space-x-2 mb-2">
+              <MapPin className="w-4 h-4 text-blue-500" />
+              <span className="font-semibold text-sm">Live Location</span>
+            </div>
+            <div className="text-sm text-gray-600 mb-2">
+              <div className="font-medium">{msg.metadata?.location?.name}</div>
+              <div className="text-xs">{msg.metadata?.location?.address}</div>
+            </div>
+            <Button variant="outline" size="sm" className="w-full">
+              <ExternalLink className="w-3 h-3 mr-1" />
+              View on Map
+            </Button>
+          </div>
+        );
+
+      case "playdate":
+        const playdate = msg.metadata?.playdate;
+        return (
+          <div className="bg-white rounded-lg border border-gray-200 p-4 max-w-sm">
+            <div className="flex items-center space-x-2 mb-3">
+              <Calendar className="w-5 h-5 text-green-500" />
+              <span className="font-semibold">Playdate Proposal</span>
+            </div>
+            <div className="space-y-2 mb-3">
+              <div className="font-medium">{playdate?.title}</div>
+              <div className="flex items-center space-x-4 text-sm text-gray-600">
+                <div className="flex items-center space-x-1">
+                  <Calendar className="w-3 h-3" />
+                  <span>{playdate?.date}</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <Clock className="w-3 h-3" />
+                  <span>{playdate?.time}</span>
+                </div>
+              </div>
+              <div className="flex items-center space-x-1 text-sm text-gray-600">
+                <MapPin className="w-3 h-3" />
+                <span>{playdate?.location}</span>
+              </div>
+              {playdate?.notes && (
+                <div className="text-sm text-gray-600 italic">"{playdate.notes}"</div>
+              )}
+            </div>
+            {playdate?.status === "proposed" && msg.senderId === "other" && (
+              <div className="flex space-x-2">
+                <Button 
+                  size="sm" 
+                  className="flex-1 bg-green-500 hover:bg-green-600"
+                  onClick={() => toast({ title: "Playdate accepted!" })}
+                >
+                  Accept
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex-1"
+                  onClick={() => toast({ title: "Suggest new time" })}
+                >
+                  Suggest New Time
+                </Button>
+              </div>
+            )}
+            {playdate?.status === "confirmed" && (
+              <div className="flex items-center space-x-2 text-green-600 text-sm">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Confirmed</span>
+              </div>
+            )}
+          </div>
+        );
+
+      case "poll":
+        const poll = msg.metadata?.poll;
+        return (
+          <div className="bg-white rounded-lg border border-gray-200 p-4 max-w-sm">
+            <div className="font-semibold mb-3">{poll?.question}</div>
+            <div className="space-y-2">
+              {poll?.options.map((option, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  className="w-full justify-between text-left"
+                  onClick={() => toast({ title: `Voted for: ${option.text}` })}
+                >
+                  <span>{option.text}</span>
+                  <Badge variant="secondary">{option.votes.length}</Badge>
+                </Button>
+              ))}
+            </div>
+          </div>
+        );
+
+      default:
+        return <p className="text-sm">{msg.content}</p>;
+    }
+  };
+
   return (
-    <>
+    <TooltipProvider>
       {showReportModal && (
         <ReportModal
           dogName={dogName}
@@ -233,8 +585,8 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
       )}
 
       <div className="flex flex-col h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3">
+      {/* Enhanced Header */}
+      <div className="bg-white border-b border-gray-200 px-4 py-3 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Button
@@ -246,37 +598,58 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
               <ArrowLeft className="w-5 h-5" />
             </Button>
             
-            <Avatar className="w-10 h-10">
-              <AvatarImage src={dogPhoto} alt={dogName} />
-              <AvatarFallback>{dogName[0]}</AvatarFallback>
-            </Avatar>
+            <div className="relative">
+              <Avatar className="w-10 h-10">
+                <AvatarImage src={dogPhoto} alt={dogName} />
+                <AvatarFallback>{dogName[0]}</AvatarFallback>
+              </Avatar>
+              {isOnline && (
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+              )}
+            </div>
             
             <div>
               <h2 className="font-semibold text-gray-900" data-testid="text-dog-name">{dogName}</h2>
-              {ownerName && (
-                <p className="text-sm text-gray-500" data-testid="text-owner-name">with {ownerName}</p>
-              )}
+              <div className="flex items-center space-x-2">
+                {ownerName && (
+                  <p className="text-xs text-gray-500" data-testid="text-owner-name">with {ownerName}</p>
+                )}
+                <span className="text-xs text-gray-400">•</span>
+                <p className="text-xs text-gray-500">
+                  {isOnline ? "Online" : `Last seen ${lastSeen}`}
+                </p>
+              </div>
             </div>
           </div>
           
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleAudioCall}
-              data-testid="button-audio-call"
-            >
-              <Phone className="w-5 h-5 text-green-600" />
-            </Button>
+          <div className="flex items-center space-x-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleAudioCall}
+                  data-testid="button-audio-call"
+                >
+                  <Phone className="w-5 h-5 text-green-600" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Voice Call</TooltipContent>
+            </Tooltip>
             
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleVideoCall}
-              data-testid="button-video-call"
-            >
-              <Video className="w-5 h-5 text-blue-600" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleVideoCall}
+                  data-testid="button-video-call"
+                >
+                  <Video className="w-5 h-5 text-blue-600" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Video Call</TooltipContent>
+            </Tooltip>
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -284,10 +657,24 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
                   <MoreVertical className="w-5 h-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem data-testid="menu-view-profile">
                   <Info className="w-4 h-4 mr-2" />
                   View Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIsMuted(!isMuted)}>
+                  {isMuted ? <Volume2 className="w-4 h-4 mr-2" /> : <VolumeX className="w-4 h-4 mr-2" />}
+                  {isMuted ? "Unmute" : "Mute"} Notifications
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <Eye className="w-4 h-4 mr-2" />
+                  Read Receipts
+                  <Switch className="ml-auto" defaultChecked />
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Shield className="w-4 h-4 mr-2" />
+                  Disappearing Messages
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
@@ -296,7 +683,7 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
                   onClick={() => setShowReportModal(true)}
                 >
                   <Flag className="w-4 h-4 mr-2" />
-                  Report Match
+                  Report
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   className="text-red-600" 
@@ -304,7 +691,7 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
                   onClick={() => setShowRemoveModal(true)}
                 >
                   <UserMinus className="w-4 h-4 mr-2" />
-                  Remove Match
+                  Block
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -313,51 +700,162 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div 
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto p-4 space-y-4"
+        onScroll={handleScroll}
+      >
         {messages.map((msg, index) => {
           const showDate = index === 0 || 
             formatDate(messages[index - 1].timestamp) !== formatDate(msg.timestamp);
+          const replyToMsg = msg.replyTo ? messages.find(m => m.id === msg.replyTo) : null;
+          const isMyMessage = msg.senderId === 'me';
           
           return (
             <div key={msg.id}>
               {showDate && (
-                <div className="text-center text-sm text-gray-500 mb-4">
+                <div className="text-center text-sm text-gray-500 mb-4 bg-gray-200 rounded-full px-3 py-1 inline-block mx-auto">
                   {formatDate(msg.timestamp)}
                 </div>
               )}
               
-              <div className={`flex ${msg.senderId === 'me' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
-                  msg.senderId === 'me' 
-                    ? 'bg-blue-500 text-white' 
-                    : 'bg-white border border-gray-200 text-gray-900'
-                }`}>
-                  {msg.type === 'image' && msg.mediaUrl && (
-                    <div className="mb-2">
-                      <img 
-                        src={msg.mediaUrl} 
-                        alt="Shared image"
-                        className="rounded-lg max-w-full h-auto"
-                        data-testid="message-image"
-                      />
+              <div className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} group`}>
+                <div className="flex flex-col max-w-xs lg:max-w-md">
+                  {/* Reply preview */}
+                  {replyToMsg && (
+                    <div className={`text-xs p-2 mb-1 rounded-lg border-l-2 ${
+                      isMyMessage 
+                        ? 'bg-blue-100 border-blue-300 text-blue-800' 
+                        : 'bg-gray-100 border-gray-300 text-gray-600'
+                    }`}>
+                      <div className="font-medium">Replying to:</div>
+                      <div className="truncate">{replyToMsg.content || "Media message"}</div>
                     </div>
                   )}
                   
-                  {msg.type === 'audio' && msg.mediaUrl && (
-                    <div className="mb-2">
-                      <audio controls className="max-w-full" data-testid="message-audio">
-                        <source src={msg.mediaUrl} />
-                        Your browser does not support the audio element.
-                      </audio>
-                    </div>
-                  )}
-                  
-                  <p className="text-sm" data-testid="message-content">{msg.content}</p>
-                  <p className={`text-xs mt-1 ${
-                    msg.senderId === 'me' ? 'text-blue-100' : 'text-gray-500'
+                  <div className={`relative px-4 py-2 rounded-2xl ${
+                    isMyMessage 
+                      ? 'bg-blue-500 text-white' 
+                      : 'bg-white border border-gray-200 text-gray-900'
                   }`}>
-                    {formatTime(msg.timestamp)}
-                  </p>
+                    {/* Message content */}
+                    {msg.type === 'image' && msg.mediaUrl && (
+                      <div className="mb-2">
+                        <img 
+                          src={msg.mediaUrl} 
+                          alt="Shared image"
+                          className="rounded-lg max-w-full h-auto"
+                          data-testid="message-image"
+                        />
+                      </div>
+                    )}
+                    
+                    {msg.type === 'audio' && msg.mediaUrl && (
+                      <div className="mb-2">
+                        <audio controls className="max-w-full" data-testid="message-audio">
+                          <source src={msg.mediaUrl} />
+                          Your browser does not support the audio element.
+                        </audio>
+                      </div>
+                    )}
+                    
+                    {/* Rich message types */}
+                    {['location', 'playdate', 'poll'].includes(msg.type) ? (
+                      renderMessageContent(msg)
+                    ) : (
+                      <>
+                        <div className="text-sm" data-testid="message-content">
+                          {msg.content}
+                          {msg.isEdited && (
+                            <span className={`ml-2 text-xs ${isMyMessage ? 'text-blue-200' : 'text-gray-400'}`}>
+                              (edited)
+                            </span>
+                          )}
+                        </div>
+                      </>
+                    )}
+                    
+                    <div className={`text-xs mt-1 flex items-center justify-between ${
+                      isMyMessage ? 'text-blue-100' : 'text-gray-500'
+                    }`}>
+                      <span>{formatTime(msg.timestamp)}</span>
+                      {isMyMessage && (
+                        <div className="flex items-center space-x-1">
+                          {msg.isRead && <CheckCircle2 className="w-3 h-3" />}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Message actions - visible on hover */}
+                    <div className={`absolute ${isMyMessage ? '-left-8' : '-right-8'} top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity`}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="w-6 h-6 p-0 bg-white border shadow-sm">
+                            <MoreHorizontal className="w-3 h-3" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align={isMyMessage ? "end" : "start"} className="w-40">
+                          <DropdownMenuItem onClick={() => handleReply(msg)}>
+                            <Reply className="w-3 h-3 mr-2" />
+                            Reply
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => navigator.clipboard.writeText(msg.content)}>
+                            <Copy className="w-3 h-3 mr-2" />
+                            Copy
+                          </DropdownMenuItem>
+                          {isMyMessage && (
+                            <>
+                              <DropdownMenuItem onClick={() => handleEditMessage(msg.id, prompt("Edit message:", msg.content) || msg.content)}>
+                                <Edit3 className="w-3 h-3 mr-2" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                className="text-red-600"
+                                onClick={() => handleDeleteMessage(msg.id)}
+                              >
+                                <Trash2 className="w-3 h-3 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            </>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+
+                  {/* Reactions */}
+                  {msg.reactions && msg.reactions.length > 0 && (
+                    <div className={`flex flex-wrap gap-1 mt-1 ${isMyMessage ? 'justify-end' : 'justify-start'}`}>
+                      {msg.reactions.map((reaction, idx) => (
+                        <Button
+                          key={idx}
+                          variant="outline"
+                          size="sm"
+                          className="h-6 px-2 text-xs bg-white"
+                          onClick={() => handleReaction(msg.id, reaction.emoji)}
+                        >
+                          {reaction.emoji} {reaction.users.length}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Quick reactions */}
+                  <div className={`flex space-x-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity ${
+                    isMyMessage ? 'justify-end' : 'justify-start'
+                  }`}>
+                    {['👍', '❤️', '😂', '😮'].map((emoji) => (
+                      <Button
+                        key={emoji}
+                        variant="ghost"
+                        size="sm"
+                        className="w-6 h-6 p-0 text-sm hover:bg-gray-100 rounded-full"
+                        onClick={() => handleReaction(msg.id, emoji)}
+                      >
+                        {emoji}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -379,70 +877,150 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
-      <div className="bg-white border-t border-gray-200 px-4 py-3">
-        <div className="flex items-end space-x-2">
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileUpload}
-            accept="image/*,audio/*"
-            className="hidden"
-          />
-          
+      {/* Jump to bottom FAB */}
+      {showJumpToBottom && (
+        <div className="absolute bottom-24 right-4 z-10">
           <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => fileInputRef.current?.click()}
-            data-testid="button-attach"
+            onClick={scrollToBottom}
+            className="bg-blue-500 hover:bg-blue-600 text-white rounded-full p-3 shadow-lg"
           >
-            <Paperclip className="w-5 h-5 text-gray-500" />
+            <ChevronUp className="w-5 h-5 rotate-180" />
           </Button>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            data-testid="button-image"
-          >
-            <ImageIcon className="w-5 h-5 text-gray-500" />
-          </Button>
-          
-          <div className="flex-1">
-            <Textarea
-              placeholder="Type a message..."
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-              className="min-h-0 resize-none border-0 bg-gray-100 rounded-full px-4 py-2"
-              rows={1}
-              data-testid="input-message"
-            />
+        </div>
+      )}
+
+      {/* Smart Suggestion Chips */}
+      {showSuggestions && (
+        <div className="border-t border-gray-200 bg-gray-50 px-4 py-2">
+          <div className="flex flex-wrap gap-2">
+            {suggestionChips.map((chip) => (
+              <Button
+                key={chip.id}
+                variant="outline"
+                size="sm"
+                className="bg-white hover:bg-gray-100 text-gray-700 text-xs h-8 px-3"
+                onClick={chip.action}
+              >
+                <chip.icon className="w-3 h-3 mr-1.5" />
+                {chip.label}
+              </Button>
+            ))}
           </div>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            data-testid="button-emoji"
-          >
-            <Smile className="w-5 h-5 text-gray-500" />
-          </Button>
-          
-          <Button
-            onClick={handleSendMessage}
-            disabled={!message.trim()}
-            className="bg-blue-500 hover:bg-blue-600 text-white rounded-full p-2"
-            data-testid="button-send"
-          >
-            <Send className="w-4 h-4" />
-          </Button>
+        </div>
+      )}
+
+      {/* Enhanced Input Area */}
+      <div className="bg-white border-t border-gray-200">
+        {/* Reply Bar */}
+        {replyTo && (
+          <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex-1 text-sm">
+                <div className="text-gray-600">Replying to:</div>
+                <div className="text-gray-900 truncate">{replyTo.content || "Media message"}</div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setReplyTo(null)}
+              >
+                ×
+              </Button>
+            </div>
+          </div>
+        )}
+
+        <div className="px-4 py-3">
+          <div className="flex items-end space-x-2">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              accept="image/*,audio/*"
+              className="hidden"
+            />
+            
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  data-testid="button-attach"
+                >
+                  <Paperclip className="w-5 h-5 text-gray-500" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Attach File</TooltipContent>
+            </Tooltip>
+            
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  data-testid="button-image"
+                >
+                  <ImageIcon className="w-5 h-5 text-gray-500" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Send Photo</TooltipContent>
+            </Tooltip>
+            
+            <div className="flex-1 relative">
+              <Textarea
+                placeholder="Type a message..."
+                value={message}
+                onChange={(e) => {
+                  setMessage(e.target.value);
+                  // Auto-resize
+                  const lines = e.target.value.split('\n').length;
+                  setTextareaRows(Math.min(Math.max(lines, 1), 4));
+                }}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }
+                }}
+                className="min-h-0 resize-none border-0 bg-gray-100 rounded-full px-4 py-2 pr-10"
+                rows={textareaRows}
+                data-testid="input-message"
+              />
+              
+              {/* Emoji button inside textarea */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-2 top-1/2 -translate-y-1/2"
+                data-testid="button-emoji"
+              >
+                <Smile className="w-4 h-4 text-gray-500" />
+              </Button>
+            </div>
+            
+            {message.trim() ? (
+              <Button
+                onClick={handleSendMessage}
+                className="bg-blue-500 hover:bg-blue-600 text-white rounded-full p-2 min-w-[40px] h-10"
+                data-testid="button-send"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="rounded-full p-2 min-w-[40px] h-10"
+                data-testid="button-mic"
+              >
+                <Mic className="w-4 h-4 text-gray-500" />
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>
-    </>
+    </TooltipProvider>
   );
 }
