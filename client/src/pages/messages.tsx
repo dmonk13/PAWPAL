@@ -66,12 +66,13 @@ export default function Messages() {
   }
 
   return (
-    <>
-      <div className="min-h-screen p-4 pb-20">
-        <header className="mb-6">
-          <h1 className="text-2xl font-bold dark-gray">Messages</h1>
-          <p className="medium-gray">Chat with your matches</p>
-        </header>
+    <div className="flex flex-col h-full">
+      <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 p-4 sticky top-0 z-40 shadow-sm">
+        <h1 className="text-2xl font-bold dark-gray">Messages</h1>
+        <p className="medium-gray">Chat with your matches</p>
+      </header>
+      
+      <div className="flex-1 overflow-auto p-4">
         
         {/* Search */}
         <div className="relative mb-6">
@@ -162,6 +163,6 @@ export default function Messages() {
       </div>
       
       <BottomNav />
-    </>
+    </div>
   );
 }

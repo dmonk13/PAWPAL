@@ -40,8 +40,10 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <AuthWrapper>
-          <div className={`${isVetPage ? 'max-w-full' : 'max-w-sm mx-auto'} bg-white min-h-screen relative overflow-hidden`}>
-            <Router />
+          <div className={`${isVetPage ? 'max-w-full' : 'max-w-sm mx-auto'} bg-white min-h-screen relative flex flex-col`}>
+            <div className="flex-1 overflow-auto pb-20">
+              <Router />
+            </div>
           </div>
         </AuthWrapper>
       </TooltipProvider>

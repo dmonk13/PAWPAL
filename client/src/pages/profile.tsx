@@ -33,18 +33,18 @@ export default function Profile() {
 
   if (isLoading) {
     return (
-      <>
-        <div className="min-h-screen p-4 pb-20">
-          <header className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-2xl font-bold dark-gray">Profile</h1>
-              <p className="medium-gray">Manage your dog's profiles</p>
-            </div>
-            <Button variant="outline" size="sm">
-              <Settings className="w-4 h-4" />
-            </Button>
-          </header>
-          
+      <div className="flex flex-col h-full">
+        <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 p-4 sticky top-0 z-40 shadow-sm flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold dark-gray">Profile</h1>
+            <p className="medium-gray">Manage your dog's profiles</p>
+          </div>
+          <Button variant="outline" size="sm">
+            <Settings className="w-4 h-4" />
+          </Button>
+        </header>
+        
+        <div className="flex-1 overflow-auto p-4">
           <div className="animate-pulse space-y-4">
             <Card>
               <CardContent className="p-6">
@@ -60,24 +60,25 @@ export default function Profile() {
           </div>
         </div>
         <BottomNav />
-      </>
+      </div>
     );
   }
 
   const currentDog = dogs.find((dog: any) => dog.id === selectedDog) || dogs[0];
 
   return (
-    <>
-      <div className="min-h-screen p-4 pb-20">
-        <header className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold dark-gray">Profile</h1>
-            <p className="medium-gray">Manage your dog's profiles</p>
-          </div>
-          <Button variant="outline" size="sm">
-            <Settings className="w-4 h-4" />
-          </Button>
-        </header>
+    <div className="flex flex-col h-full">
+      <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 p-4 sticky top-0 z-40 shadow-sm flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold dark-gray">Profile</h1>
+          <p className="medium-gray">Manage your dog's profiles</p>
+        </div>
+        <Button variant="outline" size="sm">
+          <Settings className="w-4 h-4" />
+        </Button>
+      </header>
+      
+      <div className="flex-1 overflow-auto p-4">
 
         {/* Premium Upgrade Card */}
         <Card className="mb-6 bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
@@ -346,6 +347,6 @@ export default function Profile() {
           }}
         />
       )}
-    </>
+    </div>
   );
 }

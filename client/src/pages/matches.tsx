@@ -19,13 +19,13 @@ export default function Matches() {
 
   if (isLoading) {
     return (
-      <>
-        <div className="min-h-screen p-4">
-          <header className="mb-6">
-            <h1 className="text-2xl font-bold dark-gray">Matches</h1>
-            <p className="medium-gray">Dogs that liked you back</p>
-          </header>
-          
+      <div className="flex flex-col h-full">
+        <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 p-4 sticky top-0 z-40 shadow-sm">
+          <h1 className="text-2xl font-bold dark-gray">Matches</h1>
+          <p className="medium-gray">Dogs that liked you back</p>
+        </header>
+        
+        <div className="flex-1 overflow-auto p-4">
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="animate-pulse">
@@ -45,17 +45,18 @@ export default function Matches() {
           </div>
         </div>
         <BottomNav />
-      </>
+      </div>
     );
   }
 
   return (
-    <>
-      <div className="min-h-screen p-4 pb-20">
-        <header className="mb-6">
-          <h1 className="text-2xl font-bold dark-gray">Matches</h1>
-          <p className="medium-gray">Dogs that liked you back</p>
-        </header>
+    <div className="flex flex-col h-full">
+      <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 p-4 sticky top-0 z-40 shadow-sm">
+        <h1 className="text-2xl font-bold dark-gray">Matches</h1>
+        <p className="medium-gray">Dogs that liked you back</p>
+      </header>
+      
+      <div className="flex-1 overflow-auto p-4">
         
         {matches.length === 0 ? (
           <div className="text-center py-12">
@@ -123,6 +124,6 @@ export default function Matches() {
       </div>
       
       <BottomNav />
-    </>
+    </div>
   );
 }

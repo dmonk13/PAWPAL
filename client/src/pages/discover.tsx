@@ -15,9 +15,9 @@ export default function Discover() {
   };
 
   return (
-    <>
+    <div className="flex flex-col h-full">
       {/* Enhanced Header */}
-      <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 p-4 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+      <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 p-4 flex items-center justify-between sticky top-0 z-40 shadow-sm">
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-red-500 rounded-full flex items-center justify-center">
             <PawPrint className="w-5 h-5 text-white" />
@@ -40,7 +40,7 @@ export default function Discover() {
       </header>
 
       {/* Main content - Hinge style background */}
-      <div className="flex-1 bg-gray-50">
+      <div className="flex-1 bg-gray-50 overflow-hidden">
         <SwipeArea />
       </div>
 
@@ -54,6 +54,6 @@ export default function Discover() {
           onApplyFilters={handleApplyFilters}
         />
       )}
-    </>
+    </div>
   );
 }

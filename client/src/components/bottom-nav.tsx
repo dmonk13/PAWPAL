@@ -13,7 +13,7 @@ export default function BottomNav() {
   ];
 
   return (
-    <nav className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2">
+    <nav className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-sm bg-white border-t border-gray-200 px-4 py-2 z-50">
       <div className="flex justify-around">
         {tabs.map((tab) => {
           const Icon = tab.icon;

@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Phone, Star, Clock, Calendar, ExternalLink } from "lucide-react";
 import { useGeolocation } from "@/hooks/use-geolocation";
+import BottomNav from "@/components/bottom-nav";
 
 interface VeterinarianWithDistance {
   id: string;
@@ -128,11 +129,14 @@ export default function VetConnect() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">VET CONNECT + SAFETY</h1>
-          <p className="text-gray-600 text-lg">Find trusted veterinarians near you</p>
+    <div className="flex flex-col h-full">
+      <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 p-4 sticky top-0 z-40 shadow-sm">
+        <h1 className="text-2xl font-bold text-gray-900">Vet Connect</h1>
+        <p className="text-gray-600">Find trusted veterinarians near you</p>
+      </header>
+      
+      <div className="flex-1 overflow-auto p-4">
+        <div className="text-center mb-6">
           <div className="flex items-center justify-center space-x-2 mt-4">
             <Badge variant="secondary" className="bg-primary/10 text-primary font-medium">
               Premium Feature
