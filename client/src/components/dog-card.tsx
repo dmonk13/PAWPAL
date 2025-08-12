@@ -76,11 +76,10 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
         )}
 
         {/* Status Badges - Top Left */}
-        <div className="absolute top-4 left-4 flex flex-col gap-2 max-w-[60%]">
+        <div className="absolute top-4 left-4 flex flex-wrap gap-2 max-w-[60%]">
           {isVaccinated && (
             <Badge 
-              variant="status"
-              className="text-[hsl(var(--success-green))] border-[hsl(var(--success-green))]/30"
+              className="bg-white/95 backdrop-blur-sm text-[hsl(var(--success-green))] text-xs font-bold px-2.5 py-1.5 rounded-full shadow-lg border-2 border-[hsl(var(--success-green))]/30"
               data-tone="success"
               role="status"
               aria-label="Vaccinated dog"
@@ -92,8 +91,7 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
           
           {medicalProfile?.vetClearance && (
             <Badge 
-              variant="status"
-              className="text-[hsl(var(--primary-rose))] border-[hsl(var(--primary-rose))]/30"
+              className="bg-white/95 backdrop-blur-sm text-[hsl(var(--primary-rose))] text-xs font-bold px-2.5 py-1.5 rounded-full shadow-lg border-2 border-[hsl(var(--primary-rose))]/30"
               data-tone="primary"
               role="status"  
               aria-label="Veterinary clearance confirmed"
@@ -105,8 +103,7 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
           
           {hasAllergies && (
             <Badge 
-              variant="status"
-              className="text-[hsl(var(--warning-amber))] border-[hsl(var(--warning-amber))]/30"
+              className="bg-white/95 backdrop-blur-sm text-[hsl(var(--warning-amber))] text-xs font-bold px-2.5 py-1.5 rounded-full shadow-lg border-2 border-[hsl(var(--warning-amber))]/30"
               data-tone="warning"
               role="status"
               aria-label="Has known allergies"
@@ -117,68 +114,53 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
         </div>
       </div>
 
-      {/* Single-Column Content Section */}
+      {/* Scrollable Content Section */}
       <div className="flex-1 flex flex-col bg-[hsl(var(--surface-white))] overflow-hidden">
         {/* Scrollable Content Area */}
         <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
-          <div className="p-4 space-y-4">
-            {/* Name & Age Section */}
-            <div className="space-y-2">
-              <h2 
-                id={`dog-${dog.id}-name`}
-                className="text-2xl font-bold text-[hsl(var(--text-primary))] leading-tight"
-              >
-                {dog.name}
-              </h2>
-              <div className="bg-[hsl(var(--primary-rose))] text-white px-3 py-1.5 rounded-full shadow-sm inline-flex items-center">
+          <div className="p-4">
+            {/* Name & Age Row */}
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1 min-w-0">
+                <h2 
+                  id={`dog-${dog.id}-name`}
+                  className="text-2xl font-bold text-[hsl(var(--text-primary))] truncate"
+                >
+                  {dog.name}
+                </h2>
+              </div>
+              <div className="bg-[hsl(var(--primary-rose))] text-white px-3 py-1.5 rounded-full shadow-sm ml-3 flex-shrink-0">
                 <span className="text-base font-bold">{dog.age}</span>
                 <span className="text-sm ml-1">yrs</span>
               </div>
             </div>
 
-            {/* Premium Meta Badges - Single Column with proper spacing */}
-            <div className="space-y-2">
-              {/* Gender Badge */}
-              <div className="flex">
-                <Badge 
-                  variant="premium"
-                  size="lg"
-                  className="flex-1"
-                  data-testid="badge-gender"
-                  aria-label={`Gender: ${dog.gender}`}
-                >
-                  <User className="w-4 h-4 mr-2" />
-                  {dog.gender}
-                </Badge>
-              </div>
-              
-              {/* Size Badge */}
-              <div className="flex">
-                <Badge 
-                  variant="premium"
-                  size="lg"
-                  className="flex-1"
-                  data-testid="badge-size"
-                  aria-label={`Size: ${dog.size}`}
-                >
-                  <Dog className="w-4 h-4 mr-2" />
-                  {dog.size}
-                </Badge>
-              </div>
-              
-              {/* Breed Badge */}
-              <div className="flex">
-                <Badge 
-                  variant="premium"
-                  size="lg"
-                  className="flex-1"
-                  data-testid="badge-breed"
-                  aria-label={`Breed: ${dog.breed}`}
-                >
-                  <Star className="w-4 h-4 mr-2" />
-                  {dog.breed}
-                </Badge>
-              </div>
+            {/* Meta Badges Row - Gender, Size, Breed */}
+            <div className="flex items-center flex-wrap gap-1.5 mb-4">
+              <Badge 
+                className="bg-[hsl(var(--info-blue))]/10 text-[hsl(var(--info-blue))] border-[hsl(var(--info-blue))]/30 px-2.5 py-1 font-bold text-xs rounded-full"
+                data-tone="info"
+                data-testid="badge-gender"
+                aria-label={`Gender: ${dog.gender}`}
+              >
+                {dog.gender}
+              </Badge>
+              <Badge 
+                className="bg-[hsl(var(--warning-amber))]/10 text-[hsl(var(--warning-amber))] border-[hsl(var(--warning-amber))]/30 px-2.5 py-1 font-bold text-xs rounded-full"
+                data-tone="warning"
+                data-testid="badge-size"
+                aria-label={`Size: ${dog.size}`}
+              >
+                {dog.size}
+              </Badge>
+              <Badge 
+                className="bg-[hsl(var(--primary-rose))]/10 text-[hsl(var(--primary-rose))] border-[hsl(var(--primary-rose))]/30 px-2.5 py-1 font-bold text-xs rounded-full"
+                data-tone="primary"
+                data-testid="badge-breed"
+                aria-label={`Breed: ${dog.breed}`}
+              >
+                {dog.breed}
+              </Badge>
             </div>
             
             {/* Bio Section with Truncation */}
@@ -207,40 +189,35 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
               )}
             </div>
             
-            {/* Premium Personality Section - Single Column */}
+            {/* Compact High-Contrast Personality Pills */}
             {dog.temperament && dog.temperament.length > 0 && (
-              <div className="space-y-4">
-                <h4 className="text-sm font-bold text-[hsl(var(--text-primary))] uppercase tracking-wide">Personality</h4>
-                <div className="space-y-2">
+              <div className="mb-4">
+                <h4 className="text-sm font-bold text-[hsl(var(--text-primary))] mb-3">Personality</h4>
+                <div className="flex flex-wrap gap-2">
                   {dog.temperament.slice(0, 3).map((trait: string, index: number) => {
                     const IconComponent = personalityIcons[trait] || Star;
                     return (
-                      <div key={index} className="flex">
-                        <Badge 
-                          variant="personality"
-                          size="lg"
-                          className="flex-1"
-                          role="button"
-                          tabIndex={0}
-                          data-testid={`personality-${trait.toLowerCase()}`}
-                          aria-label={`Personality trait: ${trait}`}
-                        >
-                          <IconComponent className="w-4 h-4 mr-2" />
-                          {trait}
-                        </Badge>
-                      </div>
+                      <Badge 
+                        key={index} 
+                        className="bg-[hsl(var(--text-primary))] text-white border-0 px-3 py-2 font-bold text-xs rounded-full shadow-md hover:shadow-lg transition-all duration-200 min-h-[44px] flex items-center touch-manipulation"
+                        data-tone="primary"
+                        role="button"
+                        tabIndex={0}
+                        data-testid={`personality-${trait.toLowerCase()}`}
+                        aria-label={`Personality trait: ${trait}`}
+                      >
+                        <IconComponent className="w-3 h-3 mr-1.5" />
+                        {trait}
+                      </Badge>
                     );
                   })}
                   {dog.temperament.length > 3 && (
-                    <div className="flex">
-                      <Badge 
-                        className="bg-[hsl(var(--borders-light))] text-[hsl(var(--text-secondary))] border-0 px-4 py-3 font-bold text-sm rounded-full min-h-[48px] flex items-center flex-1 uppercase tracking-wide"
-                        aria-label={`${dog.temperament.length - 3} more personality traits`}
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        {dog.temperament.length - 3} More
-                      </Badge>
-                    </div>
+                    <Badge 
+                      className="bg-[hsl(var(--borders-light))] text-[hsl(var(--text-secondary))] border-0 px-3 py-2 font-medium text-xs rounded-full min-h-[44px] flex items-center"
+                      aria-label={`${dog.temperament.length - 3} more personality traits`}
+                    >
+                      +{dog.temperament.length - 3}
+                    </Badge>
                   )}
                 </div>
               </div>
