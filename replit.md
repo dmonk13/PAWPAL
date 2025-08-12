@@ -16,6 +16,9 @@ PupMatch is a mobile-first dog dating application that allows dog owners to conn
 - Enhanced action buttons positioned at bottom with proper spacing and hover effects
 - Maintained all existing functionality while improving visual clarity and performance
 - Implemented clean mobile-first design patterns with consistent spacing and typography
+- Removed duplicate action buttons from swipe area, keeping only profile card buttons
+- Fixed messages section to dynamically fetch user's dogs instead of using hardcoded dog ID
+- Verified API data availability: sample matches exist for dog-1 (Buddy) with dog-2 (Luna)
 
 ## User Preferences
 

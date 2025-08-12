@@ -7,19 +7,39 @@ import { Card, CardContent } from "@/components/ui/card";
 import BottomNav from "@/components/bottom-nav";
 import ChatWindow from "@/components/chat-window";
 
-const CURRENT_DOG_ID = "975edab1-60b7-452c-962c-32fb2a622a7f"; // Buddy's ID
-
 export default function Messages() {
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
   
+  // First get the current user
+  const { data: currentUser } = useQuery({
+    queryKey: ["/api/auth/user"],
+  });
+
+  // Get the user's dogs
+  const { data: userDogs = [] } = useQuery({
+    queryKey: ["/api/users", currentUser?.id, "dogs"],
+    queryFn: async () => {
+      if (!currentUser?.id) return [];
+      const response = await fetch(`/api/users/${currentUser.id}/dogs`);
+      if (!response.ok) throw new Error('Failed to fetch user dogs');
+      return response.json();
+    },
+    enabled: !!currentUser?.id,
+  });
+
+  // Use the first dog's ID to fetch matches
+  const currentDogId = userDogs[0]?.id;
+  
   // Fetch matches which we'll use as conversations
   const { data: matches = [], isLoading } = useQuery({
-    queryKey: ["/api/dogs", CURRENT_DOG_ID, "matches"],
+    queryKey: ["/api/dogs", currentDogId, "matches"],
     queryFn: async () => {
-      const response = await fetch(`/api/dogs/${CURRENT_DOG_ID}/matches`);
+      if (!currentDogId) return [];
+      const response = await fetch(`/api/dogs/${currentDogId}/matches`);
       if (!response.ok) throw new Error('Failed to fetch matches');
       return response.json();
     },
+    enabled: !!currentDogId,
   });
 
   // Transform matches into conversations with mock last messages
@@ -83,7 +103,7 @@ export default function Messages() {
           />
         </div>
         
-        {isLoading ? (
+        {isLoading || !currentDogId ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
               <Card key={i} className="animate-pulse">
