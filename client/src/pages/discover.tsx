@@ -16,22 +16,22 @@ export default function Discover() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Enhanced Header */}
-      <header className="bg-gradient-to-r from-rose-500 to-amber-500 text-white p-6 flex items-center justify-between sticky top-0 z-40 shadow-lg backdrop-blur-sm">
+      {/* Enhanced Header with subtle, calming colors */}
+      <header className="bg-card border-b border-border p-6 flex items-center justify-between sticky top-0 z-40 shadow-sm">
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center shadow-md">
-            <PawPrint className="w-7 h-7 text-white" />
+          <div className="w-12 h-12 bg-divider rounded-full flex items-center justify-center shadow-sm">
+            <PawPrint className="w-7 h-7 text-secondary-gray" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">PupMatch</h1>
-            <p className="text-rose-100 text-sm font-medium">Find your pup's perfect match</p>
+            <h1 className="text-2xl font-bold tracking-tight text-secondary-gray">PupMatch</h1>
+            <p className="text-secondary-gray/70 text-sm font-medium">Find your pup's perfect match</p>
           </div>
         </div>
         <div className="flex items-center space-x-3">
           <Button
             variant="ghost"
             size="sm"
-            className="text-white hover:bg-white/20 rounded-full p-3 transition-all duration-200 shadow-sm border border-white/20 hover:border-white/40"
+            className="text-secondary-gray hover:text-primary-dark hover:bg-divider rounded-full p-3 transition-all duration-200 shadow-sm border border-divider hover:border-secondary-gray/30"
             onClick={() => setShowFilters(true)}
           >
             <Sliders className="w-5 h-5" />
@@ -40,8 +40,8 @@ export default function Discover() {
         </div>
       </header>
 
-      {/* Main content - Hinge style background */}
-      <div className="flex-1 bg-gradient-to-b from-rose-50/30 to-amber-50/30 overflow-hidden">
+      {/* Main content with subtle background */}
+      <div className="flex-1 bg-background overflow-hidden">
         <SwipeArea />
       </div>
 

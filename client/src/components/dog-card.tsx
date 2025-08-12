@@ -71,37 +71,38 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
           )}
         </div>
 
-        {/* Enhanced Profile info with gradient background */}
-        <div className="p-6 bg-gradient-to-b from-white to-gray-50 min-h-[40%] flex flex-col justify-between">
+        {/* Enhanced Profile info with new color scheme */}
+        <div className="p-6 bg-card min-h-[40%] flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-red-600 bg-clip-text text-transparent">{dog.name}</h2>
-              <div className="text-right bg-gradient-to-r from-pink-500 to-red-500 text-white px-3 py-2 rounded-full shadow-md">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex-1">
+                <h2 className="text-3xl font-bold text-primary-dark mb-2">{dog.name}</h2>
+                <div className="flex items-center flex-wrap gap-2 mb-3">
+                  <Badge className="bg-primary-rose/10 text-primary-rose border-primary-rose/20 px-3 py-1.5 font-semibold text-sm">
+                    {dog.breed}
+                  </Badge>
+                  <Badge className="bg-coral/10 text-coral border-coral/20 px-3 py-1.5 font-semibold text-sm">
+                    {dog.size}
+                  </Badge>
+                  <Badge className="bg-success/10 text-success border-success/20 px-3 py-1.5 font-semibold text-sm">
+                    {dog.gender}
+                  </Badge>
+                </div>
+              </div>
+              <div className="bg-primary-rose text-white px-4 py-2 rounded-full shadow-lg ml-4">
                 <span className="text-lg font-bold">{dog.age}</span>
                 <span className="text-sm ml-1">yrs</span>
               </div>
             </div>
             
-            <div className="flex items-center space-x-3 mb-4">
-              <Badge className="bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border-blue-200 px-3 py-1 font-semibold text-sm">
-                {dog.breed}
-              </Badge>
-              <Badge className="bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 border-purple-200 px-3 py-1 font-semibold text-sm">
-                {dog.size}
-              </Badge>
-              <Badge className="bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-green-200 px-3 py-1 font-semibold text-sm">
-                {dog.gender}
-              </Badge>
-            </div>
-            
-            <div className="bg-gray-50 rounded-lg p-3 mb-4 border border-gray-200">
-              <p className="text-sm text-gray-700 line-clamp-3 leading-relaxed font-medium">{dog.bio}</p>
+            <div className="bg-divider rounded-lg p-3 mb-4 border border-border">
+              <p className="text-sm text-primary-dark line-clamp-3 leading-relaxed font-medium">{dog.bio}</p>
             </div>
             
             {/* Enhanced Temperament tags */}
             {dog.temperament && dog.temperament.length > 0 && (
               <div className="mb-4">
-                <h4 className="text-sm font-bold text-gray-800 mb-2">Personality</h4>
+                <h4 className="text-sm font-bold text-primary-dark mb-2">Personality</h4>
                 <div className="flex flex-wrap gap-2">
                   {dog.temperament.slice(0, 3).map((trait: string, index: number) => (
                     <Badge 
