@@ -58,6 +58,19 @@
   touch-action: pan-y;
 }
 
+/* Clean swipe animations */
+.swiping-left {
+  transform: translateX(-100%) rotate(-12deg);
+  opacity: 0;
+  transition: all 0.3s ease-out;
+}
+
+.swiping-right {
+  transform: translateX(100%) rotate(12deg);
+  opacity: 0;
+  transition: all 0.3s ease-out;
+}
+
 :root {
   /* Backgrounds */
   --background: hsl(0, 0%, 100%); /* #FFFFFF - Pure white */

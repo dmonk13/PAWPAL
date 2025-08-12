@@ -146,37 +146,59 @@ export default function SwipeArea() {
 
   return (
     <>
-      <main 
-        className="relative h-[calc(100vh-8rem)] overflow-hidden p-4"
-      >
-        {/* Next card (behind) */}
-        {nextDog && (
-          <div className="absolute inset-4 z-8">
+      <main className="relative h-[calc(100vh-8rem)] overflow-hidden bg-gray-50">
+        <div className="absolute inset-4">
+          {/* Next card (behind, slightly scaled) */}
+          {nextDog && (
+            <div className="absolute inset-0 z-8 transform scale-95 opacity-70">
+              <DogCard
+                dog={nextDog}
+                onMedicalClick={() => setSelectedDog(nextDog)}
+                className="pointer-events-none"
+              />
+            </div>
+          )}
+
+          {/* Current card */}
+          <div 
+            className={`absolute inset-0 z-10 transition-transform duration-300 ${
+              swipingDirection === "left" ? "transform -translate-x-full rotate-12 opacity-0" : 
+              swipingDirection === "right" ? "transform translate-x-full rotate-12 opacity-0" : ""
+            }`}
+            {...swipeHandlers}
+          >
             <DogCard
-              dog={nextDog}
-              onMedicalClick={() => setSelectedDog(nextDog)}
+              dog={currentDog}
+              onMedicalClick={() => setSelectedDog(currentDog)}
+              onSwipe={handleSwipe}
               className=""
             />
           </div>
-        )}
-
-        {/* Current card */}
-        <div 
-          className={`absolute inset-4 z-10 swipe-card ${
-            swipingDirection === "left" ? "swiping-left" : 
-            swipingDirection === "right" ? "swiping-right" : ""
-          }`}
-          {...swipeHandlers}
-        >
-          <DogCard
-            dog={currentDog}
-            onMedicalClick={() => setSelectedDog(currentDog)}
-            onSwipe={handleSwipe}
-            className=""
-          />
         </div>
 
-
+        {/* Action buttons at bottom */}
+        <div className="absolute bottom-8 left-0 right-0 flex justify-center space-x-6 z-20">
+          <Button
+            onClick={() => handleSwipe("left")}
+            className="w-16 h-16 rounded-full bg-white shadow-lg hover:shadow-xl border-2 border-gray-200 hover:border-gray-300 text-gray-600 hover:text-red-500 transition-all duration-200"
+            disabled={swipeMutation.isPending}
+          >
+            <X className="w-8 h-8" />
+          </Button>
+          <Button
+            onClick={() => handleSwipe("right")}
+            className="w-16 h-16 rounded-full bg-rose-500 hover:bg-rose-600 shadow-lg hover:shadow-xl text-white transition-all duration-200"
+            disabled={swipeMutation.isPending}
+          >
+            <Heart className="w-8 h-8 fill-current" />
+          </Button>
+          <Button
+            onClick={() => setSelectedDog(currentDog)}
+            className="w-16 h-16 rounded-full bg-white shadow-lg hover:shadow-xl border-2 border-gray-200 hover:border-blue-300 text-gray-600 hover:text-blue-500 transition-all duration-200"
+          >
+            <Info className="w-8 h-8" />
+          </Button>
+        </div>
       </main>
 
       {/* Medical Modal */}

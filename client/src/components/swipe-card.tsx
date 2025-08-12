@@ -120,22 +120,19 @@ export default function SwipeCard({ dog, onMedicalClick, className = "", style }
       className={`swipe-card absolute inset-4 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden ${className}`}
       style={style}
     >
-      <div className="relative h-full">
-        {/* Main photo with Hinge-style overlay */}
-        <div className="relative h-full">
+      <div className="relative h-full flex flex-col">
+        {/* Clean photo section - no overlays */}
+        <div className="relative h-3/5 flex-shrink-0">
           <img 
             src={dog.photos?.[0] || "/placeholder-dog.jpg"}
             alt={`${dog.name} - ${dog.breed}`}
             className="w-full h-full object-cover"
           />
           
-          {/* Subtle gradient overlay for better text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-          
-          {/* Distance indicator - Hinge style */}
+          {/* Simple distance indicator */}
           {dog.distance && (
             <div 
-              className="absolute top-4 right-4 bg-white/90 backdrop-blur-md text-gray-800 px-3 py-2 rounded-full text-sm font-semibold shadow-lg border border-gray-200/50"
+              className="absolute top-4 right-4 bg-white text-gray-800 px-3 py-2 rounded-full text-sm font-semibold shadow-lg"
               data-testid="distance-tag"
             >
               <MapPin className="w-4 h-4 inline mr-1 text-rose-500" />
@@ -143,95 +140,80 @@ export default function SwipeCard({ dog, onMedicalClick, className = "", style }
             </div>
           )}
 
-          {/* Priority-based tag system with Hinge colors */}
-          <div className="absolute top-4 left-4 right-20 max-w-[70%]">
-            <div className="flex flex-wrap gap-2">
-              {visibleTags.map((tag) => (
-                <div
-                  key={tag.id}
-                  className="bg-white/90 backdrop-blur-md text-gray-800 px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg border border-white/50 transition-all duration-200 cursor-pointer hover:scale-105 hover:shadow-xl hover:bg-white flex items-center gap-1.5"
-                  data-testid={`tag-${tag.id}`}
-                  onClick={() => tag.category === 'health' ? onMedicalClick() : undefined}
-                >
-                  {tag.icon}
-                  <span>{tag.label}</span>
-                </div>
-              ))}
-              
-              {/* "More info" expansion option */}
-              {hiddenTagsCount > 0 && !expandedTags && (
-                <div
-                  className="bg-white/80 backdrop-blur-md text-gray-600 px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg border border-white/50 cursor-pointer hover:bg-white transition-colors"
-                  onClick={() => setExpandedTags(true)}
-                  data-testid="expand-tags"
-                >
-                  <Plus className="w-3 h-3 inline mr-1" />
-                  +{hiddenTagsCount} more
-                </div>
-              )}
-            </div>
+          {/* Clean status badges */}
+          <div className="absolute top-4 left-4 flex flex-wrap gap-2 max-w-[60%]">
+            {visibleTags.slice(0, 2).map((tag) => (
+              <div
+                key={tag.id}
+                className="bg-white text-gray-800 px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg border flex items-center gap-1.5"
+                data-testid={`tag-${tag.id}`}
+              >
+                {tag.icon}
+                <span>{tag.label}</span>
+              </div>
+            ))}
           </div>
+        </div>
 
-          {/* Enhanced Profile info with Hinge-inspired bottom overlay */}
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white/98 to-transparent p-6">
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-3xl font-bold text-gray-900 leading-tight">{dog.name}</h2>
-                <div className="bg-rose-500 text-white px-4 py-2 rounded-full shadow-md">
-                  <span className="text-lg font-bold">{dog.age}</span>
-                </div>
+        {/* Clean bottom section with white background */}
+        <div className="flex-1 bg-white p-6 flex flex-col">
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-3xl font-bold text-gray-900 leading-tight">{dog.name}</h2>
+              <div className="bg-rose-500 text-white px-4 py-2 rounded-full shadow-md">
+                <span className="text-lg font-bold">{dog.age}</span>
               </div>
-              
-              <div className="flex items-center space-x-2 mb-3">
-                <Badge className="bg-stone-100 text-stone-700 border-stone-200 px-3 py-1.5 font-medium text-sm rounded-full">
-                  {dog.breed}
-                </Badge>
-                <Badge className="bg-rose-100 text-rose-700 border-rose-200 px-3 py-1.5 font-medium text-sm rounded-full">
-                  {dog.size}
-                </Badge>
-                <Badge className="bg-amber-100 text-amber-700 border-amber-200 px-3 py-1.5 font-medium text-sm rounded-full">
-                  {dog.gender}
-                </Badge>
-              </div>
-              
-              {dog.bio && (
-                <p className="text-sm text-gray-700 line-clamp-2 leading-relaxed font-medium bg-stone-50/80 backdrop-blur rounded-lg p-3 border border-stone-200/50 shadow-sm">{dog.bio}</p>
-              )}
-
-              {/* Temperament traits - Hinge style inline */}
-              {dog.temperament && dog.temperament.length > 0 && (
-                <div className="mt-3">
-                  <div className="flex flex-wrap gap-2">
-                    {dog.temperament.slice(0, 3).map((trait: string, index: number) => (
-                      <span 
-                        key={index} 
-                        className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200 shadow-sm"
-                        data-testid={`temperament-${trait.toLowerCase()}`}
-                      >
-                        <Heart className="w-3 h-3 mr-1 fill-current" />
-                        {trait}
-                      </span>
-                    ))}
-                    {dog.temperament.length > 3 && (
-                      <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-stone-100 text-stone-600 border border-stone-200 shadow-sm">
-                        +{dog.temperament.length - 3}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
             
-            {/* Enhanced medical info toggle with Hinge-inspired button */}
-            <Button
-              onClick={onMedicalClick}
-              className="w-full bg-rose-500 hover:bg-rose-600 text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
-              data-testid="view-health-profile"
-            >
-              <Shield className="w-5 h-5" />
-              <span>View Health Profile</span>
-            </Button>
+            <div className="flex items-center space-x-2 mb-3">
+              <Badge className="bg-stone-100 text-stone-700 border-stone-200 px-3 py-1.5 font-medium text-sm rounded-full">
+                {dog.breed}
+              </Badge>
+              <Badge className="bg-rose-100 text-rose-700 border-rose-200 px-3 py-1.5 font-medium text-sm rounded-full">
+                {dog.size}
+              </Badge>
+              <Badge className="bg-amber-100 text-amber-700 border-amber-200 px-3 py-1.5 font-medium text-sm rounded-full">
+                {dog.gender}
+              </Badge>
+            </div>
+            
+            {dog.bio && (
+              <p className="text-sm text-gray-700 line-clamp-2 leading-relaxed font-medium">{dog.bio}</p>
+            )}
+
+            {/* Temperament traits */}
+            {dog.temperament && dog.temperament.length > 0 && (
+              <div className="mt-3">
+                <div className="flex flex-wrap gap-2">
+                  {dog.temperament.slice(0, 3).map((trait: string, index: number) => (
+                    <span 
+                      key={index} 
+                      className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200"
+                      data-testid={`temperament-${trait.toLowerCase()}`}
+                    >
+                      <Heart className="w-3 h-3 mr-1 fill-current" />
+                      {trait}
+                    </span>
+                  ))}
+                  {dog.temperament.length > 3 && (
+                    <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-stone-100 text-stone-600 border border-stone-200">
+                      +{dog.temperament.length - 3}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
+          
+          {/* Medical info button */}
+          <Button
+            onClick={onMedicalClick}
+            className="w-full bg-rose-500 hover:bg-rose-600 text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg"
+            data-testid="view-health-profile"
+          >
+            <Shield className="w-5 h-5" />
+            <span>View Health Profile</span>
+          </Button>
         </div>
       </div>
     </div>

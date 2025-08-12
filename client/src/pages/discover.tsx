@@ -15,23 +15,23 @@ export default function Discover() {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Enhanced Header with subtle, calming colors */}
-      <header className="bg-card border-b border-border p-6 flex items-center justify-between sticky top-0 z-40 shadow-sm">
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 bg-divider rounded-full flex items-center justify-center shadow-sm">
-            <PawPrint className="w-7 h-7 text-secondary-gray" />
+    <div className="flex flex-col h-full bg-gray-50">
+      {/* Clean Header */}
+      <header className="bg-white border-b border-gray-200 p-4 flex items-center justify-between sticky top-0 z-40 shadow-sm">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-rose-500 rounded-full flex items-center justify-center">
+            <PawPrint className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-secondary-gray">PupMatch</h1>
-            <p className="text-secondary-gray/70 text-sm font-medium">Find your pup's perfect match</p>
+            <h1 className="text-xl font-bold text-gray-900">PupMatch</h1>
+            <p className="text-gray-600 text-sm">Find your pup's perfect match</p>
           </div>
         </div>
         <div className="flex items-center space-x-3">
           <Button
             variant="ghost"
             size="sm"
-            className="text-secondary-gray hover:text-primary-dark hover:bg-divider rounded-full p-3 transition-all duration-200 shadow-sm border border-divider hover:border-secondary-gray/30"
+            className="text-gray-600 hover:text-rose-500 hover:bg-gray-100 rounded-full p-2"
             onClick={() => setShowFilters(true)}
           >
             <Sliders className="w-5 h-5" />
@@ -40,8 +40,8 @@ export default function Discover() {
         </div>
       </header>
 
-      {/* Main content with subtle background */}
-      <div className="flex-1 bg-background overflow-hidden">
+      {/* Main content */}
+      <div className="flex-1 overflow-hidden">
         <SwipeArea />
       </div>
 
