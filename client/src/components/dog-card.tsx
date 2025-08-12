@@ -117,7 +117,10 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
       {/* Scrollable Content Section */}
       <div className="flex-1 flex flex-col bg-[hsl(var(--surface-white))] overflow-hidden">
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 pb-safe">
+        <div 
+          className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 pb-safe"
+          data-scrollable="true"
+        >
           <div className="p-4">
             {/* Name & Age Row */}
             <div className="flex items-start justify-between mb-3">

@@ -19,6 +19,15 @@ export function useSwipe(handlers: SwipeHandlers) {
   const maxSwipeTime = 300;
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
+    // Check if touch started on a scrollable element
+    const target = e.target as HTMLElement;
+    const scrollableElement = target.closest('[data-scrollable="true"]');
+    
+    if (scrollableElement) {
+      // Don't handle swipe if touching scrollable content
+      return;
+    }
+    
     const touch = e.touches[0];
     touchState.current = {
       startX: touch.clientX,
@@ -29,6 +38,16 @@ export function useSwipe(handlers: SwipeHandlers) {
 
   const onTouchEnd = useCallback((e: React.TouchEvent) => {
     if (!touchState.current) return;
+
+    // Check if touch ended on a scrollable element
+    const target = e.target as HTMLElement;
+    const scrollableElement = target.closest('[data-scrollable="true"]');
+    
+    if (scrollableElement) {
+      // Don't handle swipe if touching scrollable content
+      touchState.current = null;
+      return;
+    }
 
     const touch = e.changedTouches[0];
     const { startX, startY, startTime } = touchState.current;
