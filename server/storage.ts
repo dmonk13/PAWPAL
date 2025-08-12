@@ -159,7 +159,7 @@ export class DatabaseStorage implements IStorage {
         )
       );
 
-    return dogsWithDistance.map(row => ({
+    return dogsWithDistance.map((row: any) => ({
       ...row.dog,
       medicalProfile: row.medicalProfile || undefined,
       distance: row.distance
@@ -249,7 +249,7 @@ export class DatabaseStorage implements IStorage {
       )
       .orderBy(sql`distance ASC`);
 
-    return vetsWithDistance.map(row => ({
+    return vetsWithDistance.map((row: any) => ({
       ...row.vet,
       distance: row.distance
     }));
