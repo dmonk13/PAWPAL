@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -10,6 +11,7 @@ import { type User } from "@shared/schema";
 
 export function UserNav() {
   const { toast } = useToast();
+  const [, navigate] = useLocation();
   
   const { data: user } = useQuery<User>({
     queryKey: ["/api/auth/user"],
@@ -21,6 +23,7 @@ export function UserNav() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      navigate("/login");
       toast({
         title: "Logged out",
         description: "You have been successfully logged out.",
@@ -41,6 +44,14 @@ export function UserNav() {
 
   const handleLogout = () => {
     logoutMutation.mutate();
+  };
+
+  const handleProfileClick = () => {
+    navigate("/profile");
+  };
+
+  const handleSettingsClick = () => {
+    navigate("/settings");
   };
 
   const initials = user.username
@@ -74,11 +85,11 @@ export function UserNav() {
           </div>
         </div>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleProfileClick}>
           <UserIcon className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleSettingsClick}>
           <Settings className="mr-2 h-4 w-4" />
           <span>Settings</span>
         </DropdownMenuItem>

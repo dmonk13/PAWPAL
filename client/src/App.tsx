@@ -9,6 +9,7 @@ import Discover from "@/pages/discover";
 import Matches from "@/pages/matches";
 import Messages from "@/pages/messages";
 import Profile from "@/pages/profile";
+import Settings from "@/pages/settings";
 import VetConnect from "@/pages/vet-connect";
 import VetProfile from "@/pages/vet-profile";
 import Premium from "@/pages/premium";
@@ -22,6 +23,7 @@ function Router() {
       <Route path="/matches" component={Matches} />
       <Route path="/messages" component={Messages} />
       <Route path="/profile" component={Profile} />
+      <Route path="/settings" component={Settings} />
       <Route path="/vet-connect" component={VetConnect} />
       <Route path="/vet-profile/:vetId" component={VetProfile} />
       <Route path="/premium" component={Premium} />
