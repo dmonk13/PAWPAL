@@ -50,7 +50,7 @@
   --muted-foreground: hsl(218, 6%, 56%); /* #8E8E93 - Medium gray (Secondary text) */
   
   /* Primary Colors - Deep Rose */
-  --primary: hsl(351, 82%, 63%); /* #E94057 - Deep rose (Main CTA buttons) */
+  --primary: hsl(339, 82%, 63%); /* #E94B6E - Primary rose */
   --primary-foreground: hsl(0, 0%, 100%); /* #FFFFFF - White text */
   
   /* Secondary Colors */
@@ -73,6 +73,17 @@
   /* Custom App Colors */
   --coral: hsl(8, 100%, 69%); /* #FF6B6B - Edit profile, soft coral */
   --purple-accent: hsl(261, 25%, 69%); /* #B39DDB - Premium actions */
+  
+  /* New Design System Colors */
+  --primary-rose: hsl(339, 82%, 63%); /* #E94B6E - Primary rose */
+  --success-green: hsl(142, 71%, 45%); /* #16A34A - Success */
+  --warning-amber: hsl(38, 92%, 50%); /* #F59E0B - Warning */
+  --danger-red: hsl(0, 84%, 60%); /* #DC2626 - Danger */
+  --info-blue: hsl(221, 83%, 53%); /* #2563EB - Info */
+  --background-light: hsl(339, 100%, 98%); /* #FFF5F7 - Background tint */
+  --text-primary: hsl(217, 19%, 27%); /* #1F2937 - Primary text */
+  --text-secondary: hsl(217, 10%, 47%); /* #4B5563 - Secondary text */
+  --borders-light: hsl(220, 13%, 91%); /* #E5E7EB - Borders */
   --profile-card: hsl(339, 100%, 97%); /* #FFF0F3 - Profile card background */
   --placeholder: hsl(220, 3%, 80%); /* #C7C7CC - Placeholder text */
   

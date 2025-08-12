@@ -1,0 +1,103 @@
+You are an expert UI/UX designer AI agent. Your task is to redesign the “My Profile” section of a pet app to make it cleaner, more intuitive, more visually appealing, and accessible while adding depth and useful context.
+
+Goals
+Improve clarity & hierarchy — well-defined, labeled sections (Header → Plan/Upgrade → Dog Switcher → Primary Dog Card → Personality → About → Medical Profile → Add Dog).
+
+Add Depth — show key info at a glance (status, due dates, actions, reminders).
+
+UX Friendliness — friendly copy, logical grouping, warm pet theme.
+
+Better Color Scheme — consistent color tokens, clear status indicators, accessible contrast.
+
+Accessibility — large tap targets, text + icon status, ARIA labels, WCAG AA compliance.
+
+Mobile-first — responsive layouts, cards, chips, collapsible content.
+
+UI Change Guidelines
+Profile Header & Upgrade Banner
+
+Minimalist header with Settings/Help icons.
+
+Upgrade banner with 2–3 perk chips + primary CTA (“Upgrade”) and secondary (“Compare Plans”).
+
+Light background tint matching theme color.
+
+Dog Switcher
+
+Horizontal scrollable chips with avatars & names.
+
+Highlight active dog chip with underline + bold + color accent.
+
+Last chip is “+ Add” button.
+
+Primary Dog Card
+
+Card with avatar, name, breed, age, size, search radius.
+
+Status shown as pills (icon + text) in success/warning/info colors.
+
+Menu icon for: Edit, Share, Hide profile.
+
+Personality Traits
+
+Rounded chips with small icons (e.g., paw, ball).
+
+“Manage Traits” link/button below them.
+
+About Section
+
+Collapsible text preview (2–3 lines) with “Read more...”
+
+Edit icon in corner.
+
+Medical Profile
+
+Table/list of vaccines: Name, Given On, Due/Expires, Status pill.
+
+Compute status:
+
+Overdue = red pill
+
+Due soon (<30 days) = amber
+
+Up to date = green
+
+Reminders list (max 3, nearest due first).
+
+Actions row: Update Records, Book Appointment, Download PDF.
+
+Add Another Dog CTA
+
+Full-width primary button with an icon.
+
+Color Tokens
+Primary: #E94B6E (rose)
+
+Success: #16A34A
+
+Warning: #F59E0B
+
+Danger: #DC2626
+
+Info: #2563EB
+
+Background-light: #FFF5F7 (tint of primary)
+
+Text-primary: #1F2937
+
+Text-secondary: #4B5563
+
+Borders: #E5E7EB
+
+All pills, chips, and buttons must have high contrast text and accessible hover/active/focus states.
+
+Output Requested from Agent
+Produce:
+
+UI JSON Schema for layout, with theming tokens, section structure, and computed status/reminder data.
+
+Fallback Plain Text Rendering for accessibility.
+
+Dark Mode Variants of the color scheme.
+
+Mobile & Tablet Layout Notes.

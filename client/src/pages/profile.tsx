@@ -1,18 +1,36 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Settings, Camera, Heart, Edit3, Plus, MapPin, CheckCircle, Users, Star, Crown, Shield, PawPrint } from "lucide-react";
+import { 
+  Settings, Camera, Heart, Edit3, Plus, MapPin, CheckCircle, Users, Star, Crown, Shield, PawPrint,
+  HelpCircle, MoreVertical, Calendar, FileText, AlertCircle, Clock, Activity
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import BottomNav from "@/components/bottom-nav";
 import DogProfileForm from "@/components/dog-profile-form";
 import { Link } from "wouter";
 import { type User } from "@shared/schema";
 
+// Helper function to calculate vaccination status
+const getVaccinationStatus = (vax: any) => {
+  if (!vax.nextDue) return { status: 'up-to-date', color: 'bg-green-100 text-green-800', icon: CheckCircle };
+  
+  const nextDue = new Date(vax.nextDue);
+  const today = new Date();
+  const daysUntil = Math.ceil((nextDue.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  
+  if (daysUntil < 0) return { status: 'overdue', color: 'bg-red-100 text-red-800', icon: AlertCircle };
+  if (daysUntil <= 30) return { status: 'due-soon', color: 'bg-amber-100 text-amber-800', icon: Clock };
+  return { status: 'up-to-date', color: 'bg-green-100 text-green-800', icon: CheckCircle };
+};
+
 export default function Profile() {
   const [selectedDog, setSelectedDog] = useState<string | null>(null);
   const [showEditForm, setShowEditForm] = useState(false);
   const [editingDog, setEditingDog] = useState<any>(null);
+  const [aboutExpanded, setAboutExpanded] = useState(false);
 
   // Get current user
   const { data: user } = useQuery<User>({
@@ -34,34 +52,49 @@ export default function Profile() {
   if (isLoading) {
     return (
       <div className="flex flex-col h-full">
-        <header className="bg-primary text-primary-foreground p-6 sticky top-0 z-40 shadow-lg">
+        {/* Minimalist Header */}
+        <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-40">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <Settings className="w-6 h-6" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold">My Profile</h1>
-                <p className="text-primary-foreground/80 text-sm">Manage your dogs and preferences</p>
-              </div>
-            </div>
-            <Link href="/settings">
-              <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-foreground/20 border-primary-foreground/30">
-                <Settings className="w-4 h-4" />
+            <h1 className="text-xl font-semibold text-gray-900">My Profile</h1>
+            <div className="flex items-center space-x-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="p-2 hover:bg-gray-100 rounded-full"
+                data-testid="button-help"
+                aria-label="Help"
+              >
+                <HelpCircle className="w-5 h-5 text-gray-600" />
               </Button>
-            </Link>
+              <Link href="/settings">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="p-2 hover:bg-gray-100 rounded-full"
+                  data-testid="button-settings"
+                  aria-label="Settings"
+                >
+                  <Settings className="w-5 h-5 text-gray-600" />
+                </Button>
+              </Link>
+            </div>
           </div>
         </header>
         
-        <div className="flex-1 overflow-auto p-4 bg-background">
-          <div className="animate-pulse space-y-4">
+        <div className="flex-1 overflow-auto p-4 bg-gray-50">
+          <div className="animate-pulse space-y-4 max-w-md mx-auto">
+            <Card className="bg-gradient-to-r from-pink-50 to-rose-50 border-pink-200">
+              <CardContent className="p-4">
+                <div className="h-16 bg-pink-100 rounded-lg"></div>
+              </CardContent>
+            </Card>
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4">
                 <div className="flex items-center space-x-4">
-                  <div className="w-20 h-20 bg-gray-200 rounded-full"></div>
+                  <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
                   <div className="flex-1">
-                    <div className="h-6 bg-gray-200 rounded w-24 mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-32"></div>
+                    <div className="h-4 bg-gray-200 rounded w-20 mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-16"></div>
                   </div>
                 </div>
               </CardContent>
@@ -77,303 +110,468 @@ export default function Profile() {
 
   return (
     <div className="flex flex-col h-full">
-      <header className="bg-primary text-primary-foreground p-6 sticky top-0 z-40 shadow-lg">
+      {/* Minimalist Header */}
+      <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-40">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-              <Settings className="w-6 h-6" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">My Profile</h1>
-              <p className="text-primary-foreground/80 text-sm">Manage your dogs and preferences</p>
-            </div>
-          </div>
-          <Link href="/settings">
-            <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-foreground/20 border-primary-foreground/30">
-              <Settings className="w-4 h-4" />
+          <h1 className="text-xl font-semibold text-gray-900">My Profile</h1>
+          <div className="flex items-center space-x-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="p-2 hover:bg-gray-100 rounded-full"
+              data-testid="button-help"
+              aria-label="Help"
+            >
+              <HelpCircle className="w-5 h-5 text-gray-600" />
             </Button>
-          </Link>
+            <Link href="/settings">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="p-2 hover:bg-gray-100 rounded-full"
+                data-testid="button-settings"
+                aria-label="Settings"
+              >
+                <Settings className="w-5 h-5 text-gray-600" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
       
-      <div className="flex-1 overflow-auto p-4 bg-background">
+      <div className="flex-1 overflow-auto p-4 bg-gray-50">
+        <div className="max-w-md mx-auto space-y-4">
 
-        {/* Premium Upgrade Card */}
-        <Card className="mb-6 bg-card border border-border">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-purple-accent/10 rounded-full flex items-center justify-center">
-                  <Crown className="w-5 h-5 text-purple-accent" />
+          {/* Premium Upgrade Banner */}
+          <Card className="bg-gradient-to-r from-pink-50 to-rose-50 border-pink-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
+                    <Crown className="w-5 h-5 text-pink-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Upgrade to Pro</h3>
+                    <p className="text-sm text-gray-600">Unlock premium features for your pup</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-primary-dark">Upgrade to Pro</h3>
-                  <p className="text-sm text-secondary-gray">Unlock premium features</p>
+                <div className="flex space-x-2">
+                  <Link href="/premium">
+                    <Button 
+                      size="sm" 
+                      className="bg-pink-600 hover:bg-pink-700 text-white shadow-sm"
+                      data-testid="button-upgrade"
+                    >
+                      <Star className="w-4 h-4 mr-1" />
+                      Upgrade
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="border-pink-300 text-pink-700 hover:bg-pink-50"
+                    data-testid="button-compare-plans"
+                  >
+                    Compare Plans
+                  </Button>
                 </div>
               </div>
-              <Link href="/premium">
-                <Button size="sm" className="bg-purple-accent hover:bg-purple-accent/90 text-white">
-                  <Star className="w-4 h-4 mr-1" />
-                  Upgrade
-                </Button>
-              </Link>
-            </div>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <Badge className="bg-divider text-secondary-gray text-xs">Vet Connect</Badge>
-              <Badge className="bg-divider text-secondary-gray text-xs">Unlimited Swipes</Badge>
-              <Badge className="bg-divider text-secondary-gray text-xs">Priority Visibility</Badge>
-            </div>
-          </CardContent>
-        </Card>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Badge className="bg-pink-100 text-pink-800 text-xs border-pink-200">
+                  <Shield className="w-3 h-3 mr-1" />
+                  Vet Connect
+                </Badge>
+                <Badge className="bg-pink-100 text-pink-800 text-xs border-pink-200">
+                  <Heart className="w-3 h-3 mr-1" />
+                  Unlimited Swipes
+                </Badge>
+                <Badge className="bg-pink-100 text-pink-800 text-xs border-pink-200">
+                  <Star className="w-3 h-3 mr-1" />
+                  Priority Visibility
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
 
-        {dogs.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 mx-auto mb-6 bg-primary-rose/10 rounded-full flex items-center justify-center shadow-sm">
-              <Plus className="w-12 h-12 text-primary-rose" />
+          {dogs.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="w-24 h-24 mx-auto mb-6 bg-pink-100 rounded-full flex items-center justify-center shadow-sm">
+                <Plus className="w-12 h-12 text-pink-600" />
+              </div>
+              <h3 className="text-2xl font-bold mb-3 text-gray-900">Add Your First Dog</h3>
+              <p className="text-gray-600 mb-8 max-w-sm mx-auto leading-relaxed">
+                Create a profile for your furry friend to start connecting with other dogs in your area!
+              </p>
+              <Button 
+                size="lg"
+                className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+                onClick={() => setShowEditForm(true)}
+                data-testid="button-create-dog-profile"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Create Dog Profile
+              </Button>
             </div>
-            <h3 className="text-2xl font-bold mb-3 text-primary-dark">Add Your First Dog</h3>
-            <p className="text-secondary-gray mb-8 max-w-sm mx-auto leading-relaxed">
-              Create a profile for your furry friend to start connecting with other dogs in your area!
-            </p>
-            <Button 
-              size="lg"
-              className="bg-primary-rose hover:bg-primary-rose/90 text-white px-8 py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
-              onClick={() => setShowEditForm(true)}
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Create Dog Profile
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* Dog selector if multiple dogs */}
-            {dogs.length > 1 && (
-              <Card className="bg-card border border-border shadow-sm">
-                <CardContent className="p-4">
-                  <h4 className="font-bold text-primary-dark mb-3">Select Your Dog</h4>
-                  <div className="flex space-x-3 overflow-x-auto pb-2">
-                    {dogs.map((dog: any) => (
-                      <Button
-                        key={dog.id}
-                        variant={selectedDog === dog.id ? "default" : "outline"}
+          ) : (
+            <div className="space-y-4">
+              {/* Dog Switcher - Horizontal scrollable chips */}
+              {dogs.length > 1 && (
+                <Card className="bg-white border border-gray-200 shadow-sm">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-semibold text-gray-900">Your Dogs</h4>
+                      <Button 
+                        variant="ghost" 
                         size="sm"
-                        onClick={() => setSelectedDog(dog.id)}
-                        className={`whitespace-nowrap transition-all duration-200 ${
-                          selectedDog === dog.id 
-                            ? "bg-primary-rose text-white shadow-sm" 
-                            : "hover:border-primary-rose/30 hover:text-primary-rose"
-                        }`}
+                        onClick={() => setShowEditForm(true)}
+                        className="text-pink-600 hover:bg-pink-50"
+                        data-testid="button-add-dog-chip"
                       >
-                        {dog.name}
-                      </Button>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Temperament section */}
-            {currentDog?.temperament && currentDog.temperament.length > 0 && (
-              <Card className="bg-card border border-border shadow-sm">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg font-bold text-primary-dark flex items-center">
-                    <Star className="w-5 h-5 mr-2 text-coral" />
-                    Personality Traits
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {currentDog.temperament.map((trait: string, index: number) => (
-                      <Badge key={index} className="bg-primary-rose/10 text-primary-rose border-primary-rose/20 px-3 py-1 text-sm font-medium">
-                        {trait}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Main profile card */}
-            {currentDog && (
-              <Card className="bg-card border border-border shadow-sm overflow-hidden">
-                <div className="bg-primary-rose p-4">
-                  <div className="flex items-center space-x-4">
-                    <div className="relative">
-                      <img
-                        src={currentDog.photos?.[0] || "/placeholder-dog.jpg"}
-                        alt={currentDog.name}
-                        className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
-                      />
-                      <Button
-                        size="sm"
-                        className="absolute -bottom-1 -right-1 w-10 h-10 rounded-full bg-white text-primary-rose p-0 shadow-md hover:bg-card"
-                      >
-                        <Camera className="w-5 h-5" />
+                        <Plus className="w-4 h-4 mr-1" />
+                        Add
                       </Button>
                     </div>
-                    
-                    <div className="flex-1 text-white">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h2 className="text-2xl font-bold">{currentDog.name}</h2>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="p-2 text-white hover:bg-white/20 rounded-full"
-                          onClick={() => {
-                            setEditingDog(currentDog);
-                            setShowEditForm(true);
-                          }}
+                    <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-thin">
+                      {dogs.map((dog: any) => (
+                        <Button
+                          key={dog.id}
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedDog(dog.id)}
+                          className={`flex items-center space-x-2 whitespace-nowrap transition-all duration-200 ${
+                            selectedDog === dog.id || (selectedDog === null && dog === dogs[0])
+                              ? "bg-pink-100 text-pink-800 border-b-2 border-pink-600 font-semibold" 
+                              : "hover:bg-gray-100 text-gray-600"
+                          }`}
+                          data-testid={`chip-dog-${dog.id}`}
                         >
-                          <Edit3 className="w-5 h-5" />
+                          <img 
+                            src={dog.photos?.[0] || "/placeholder-dog.jpg"} 
+                            alt={dog.name}
+                            className="w-6 h-6 rounded-full object-cover"
+                          />
+                          <span>{dog.name}</span>
                         </Button>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Primary Dog Card */}
+              {currentDog && (
+                <Card className="bg-white border border-gray-200 shadow-sm overflow-hidden">
+                  <div className="bg-gradient-to-r from-pink-500 to-rose-500 p-6">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className="relative">
+                          <img
+                            src={currentDog.photos?.[0] || "/placeholder-dog.jpg"}
+                            alt={currentDog.name}
+                            className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg"
+                            data-testid="img-dog-avatar"
+                          />
+                          <Button
+                            size="sm"
+                            className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white text-pink-600 p-0 shadow-md hover:bg-gray-50"
+                            data-testid="button-change-photo"
+                            aria-label="Change photo"
+                          >
+                            <Camera className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        
+                        <div className="text-white">
+                          <h2 className="text-2xl font-bold mb-1">{currentDog.name}</h2>
+                          <p className="text-white/90 text-sm">{currentDog.breed}</p>
+                          <div className="flex items-center space-x-3 mt-2 text-white/80 text-sm">
+                            <span>{currentDog.age} {currentDog.age === 1 ? 'year' : 'years'}</span>
+                            <span>•</span>
+                            <span>{currentDog.size}</span>
+                            <span>•</span>
+                            <span>{currentDog.distanceRadius}km radius</span>
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-white/80 mb-3 text-lg">
-                        {currentDog.breed} • {currentDog.age} years • {currentDog.size}
-                      </p>
-                      <div className="flex items-center space-x-2 mb-3">
-                        <Badge variant={currentDog.isActive ? "default" : "secondary"} className="bg-white/20 text-white border-white/30">
-                          {currentDog.isActive ? "Active" : "Inactive"}
+
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="p-2 text-white hover:bg-white/20 rounded-full"
+                        onClick={() => {
+                          setEditingDog(currentDog);
+                          setShowEditForm(true);
+                        }}
+                        data-testid="button-menu-options"
+                        aria-label="Edit profile"
+                      >
+                        <MoreVertical className="w-5 h-5" />
+                      </Button>
+                    </div>
+
+                    {/* Status Pills */}
+                    <div className="flex space-x-2 mt-4">
+                      <Badge className="bg-green-100 text-green-800 border-green-200">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        Active
+                      </Badge>
+                      <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+                        <MapPin className="w-3 h-3 mr-1" />
+                        Nearby
+                      </Badge>
+                      {currentDog.matingPreference && (
+                        <Badge className="bg-pink-100 text-pink-800 border-pink-200">
+                          <Heart className="w-3 h-3 mr-1" />
+                          Looking for love
                         </Badge>
-                        {currentDog.medicalProfile?.vaccinations?.length > 0 && (
-                          <Badge className="bg-white/20 text-white border-white/30">
-                            <Heart className="w-3 h-3 mr-1" />
-                            Vaccinated
-                          </Badge>
-                        )}
-                        {currentDog.medicalProfile?.vetClearance && (
-                          <Badge className="bg-success text-white border-success">
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            Vet Approved
-                          </Badge>
-                        )}
-                      </div>
-                      
-                      {/* Additional info row */}
-                      <div className="flex items-center space-x-4 text-sm text-white/70">
-                        {currentDog.distanceRadius && (
-                          <div className="flex items-center">
-                            <MapPin className="w-4 h-4 mr-1" />
-                            <span>{currentDog.distanceRadius}mi radius</span>
-                          </div>
-                        )}
-                        {currentDog.matingPreference && (
-                          <div className="flex items-center">
-                            <Users className="w-4 h-4 mr-1" />
-                            <span>Open to mating</span>
-                          </div>
-                        )}
-                      </div>
+                      )}
                     </div>
                   </div>
-                </div>
-                
-                <CardContent className="p-6">
-                  <div className="mb-4">
-                    <h4 className="font-bold text-primary-dark mb-2">About {currentDog.name}</h4>
-                    <p className="text-secondary-gray leading-relaxed bg-divider p-4 rounded-lg border border-border">
-                      {currentDog.bio || "No bio yet. Add one to attract more matches!"}
-                    </p>
-                  </div>
-                  
-                  <Button 
-                    className="w-full bg-primary-rose hover:bg-primary-rose/90 text-white font-medium py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
-                    onClick={() => {
-                      setEditingDog(currentDog);
-                      setShowEditForm(true);
-                    }}
-                  >
-                    <Edit3 className="w-5 h-5 mr-2" />
-                    Edit Profile
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
+                </Card>
+              )}
 
-            {/* Medical profile section */}
-            {currentDog?.medicalProfile && (
-              <Card className="bg-card border border-border shadow-sm">
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center justify-between text-lg font-bold text-primary-dark">
-                    <div className="flex items-center">
-                      <Shield className="w-5 h-5 mr-2 text-coral" />
-                      Medical Profile
+              {/* Personality Traits */}
+              {currentDog?.temperament && currentDog.temperament.length > 0 && (
+                <Card className="bg-white border border-gray-200 shadow-sm">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
+                        <PawPrint className="w-5 h-5 mr-2 text-pink-600" />
+                        Personality Traits
+                      </CardTitle>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-gray-500 hover:text-gray-700"
+                        data-testid="button-manage-traits"
+                      >
+                        Manage Traits
+                      </Button>
                     </div>
-                    <Button variant="ghost" size="sm" className="text-secondary-gray hover:text-primary-dark">
-                      <Edit3 className="w-4 h-4" />
-                    </Button>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <h4 className="font-bold text-primary-dark mb-3 flex items-center">
-                      <Heart className="w-4 h-4 mr-2 text-success" />
-                      Vaccinations
-                    </h4>
-                    {currentDog.medicalProfile.vaccinations?.length > 0 ? (
-                      <div className="space-y-2">
-                        {currentDog.medicalProfile.vaccinations.map((vax: any, index: number) => (
-                          <div key={index} className="bg-success/5 border border-success/20 rounded-lg p-3">
-                            <div className="font-medium text-success">{vax.type}</div>
-                            <div className="text-sm text-success/80">{new Date(vax.date).toLocaleDateString()}</div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-secondary-gray bg-divider p-3 rounded-lg border border-border">No vaccination records</p>
-                    )}
-                  </div>
-                  
-                  {currentDog.medicalProfile.allergies?.length > 0 && (
-                    <div>
-                      <h4 className="font-semibold mb-2 text-primary-dark">Allergies</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {currentDog.medicalProfile.allergies.map((allergy: string, index: number) => (
-                          <Badge key={index} className="bg-error/10 text-error border-error/20">
-                            {allergy}
-                          </Badge>
-                        ))}
-                      </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {currentDog.temperament.map((trait: string, index: number) => (
+                        <Badge 
+                          key={index} 
+                          className="bg-gray-100 text-gray-700 border-gray-200 px-3 py-1.5 text-sm font-medium rounded-full"
+                          data-testid={`trait-${trait.toLowerCase().replace(' ', '-')}`}
+                        >
+                          <Activity className="w-3 h-3 mr-1" />
+                          {trait}
+                        </Badge>
+                      ))}
                     </div>
-                  )}
-                  
-                  {currentDog.medicalProfile.lastVetVisit && (
-                    <div>
-                      <h4 className="font-semibold mb-2 text-primary-dark">Last Vet Visit</h4>
-                      <p className="text-sm text-secondary-gray">
-                        {new Date(currentDog.medicalProfile.lastVetVisit).toLocaleDateString()}
-                      </p>
-                    </div>
-                  )}
+                  </CardContent>
+                </Card>
+              )}
 
-                  {currentDog.medicalProfile.insurance && (
+              {/* About Section */}
+              {currentDog?.bio && (
+                <Card className="bg-white border border-gray-200 shadow-sm">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg font-semibold text-gray-900">About {currentDog.name}</CardTitle>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-gray-500 hover:text-gray-700"
+                        data-testid="button-edit-about"
+                        aria-label="Edit about section"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <Collapsible open={aboutExpanded} onOpenChange={setAboutExpanded}>
+                      <div className="text-gray-700 leading-relaxed">
+                        <p className={`${!aboutExpanded ? 'line-clamp-2' : ''}`}>
+                          {currentDog.bio}
+                        </p>
+                      </div>
+                      {currentDog.bio.length > 100 && (
+                        <CollapsibleTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="mt-2 p-0 h-auto text-pink-600 hover:text-pink-700"
+                            data-testid="button-read-more"
+                          >
+                            {aboutExpanded ? 'Show less' : 'Read more...'}
+                          </Button>
+                        </CollapsibleTrigger>
+                      )}
+                    </Collapsible>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Medical Profile */}
+              {currentDog?.medicalProfile && (
+                <Card className="bg-white border border-gray-200 shadow-sm">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
+                        <Shield className="w-5 h-5 mr-2 text-pink-600" />
+                        Medical Profile
+                      </CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Vaccinations Table */}
                     <div>
-                      <h4 className="font-semibold mb-2 flex items-center text-primary-dark">
-                        <Shield className="w-4 h-4 mr-2 text-coral" />
-                        Pet Insurance
+                      <h4 className="font-medium text-gray-900 mb-3 flex items-center">
+                        <Heart className="w-4 h-4 mr-2 text-green-600" />
+                        Vaccinations
                       </h4>
-                      <div className="space-y-1 text-sm text-secondary-gray">
-                        <p><span className="font-medium">Provider:</span> {currentDog.medicalProfile.insurance.provider}</p>
-                        <p><span className="font-medium">Coverage:</span> {currentDog.medicalProfile.insurance.coverageType}</p>
-                        {currentDog.medicalProfile.insurance.expirationDate && (
-                          <p><span className="font-medium">Expires:</span> {new Date(currentDog.medicalProfile.insurance.expirationDate).toLocaleDateString()}</p>
-                        )}
-                      </div>
+                      {currentDog.medicalProfile.vaccinations?.length > 0 ? (
+                        <div className="space-y-2">
+                          {currentDog.medicalProfile.vaccinations.map((vax: any, index: number) => {
+                            const status = getVaccinationStatus(vax);
+                            const StatusIcon = status.icon;
+                            return (
+                              <div 
+                                key={index} 
+                                className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg"
+                                data-testid={`vaccination-${vax.type.toLowerCase().replace(' ', '-')}`}
+                              >
+                                <div className="flex-1">
+                                  <div className="font-medium text-gray-900">{vax.type}</div>
+                                  <div className="text-sm text-gray-600">
+                                    Given: {new Date(vax.date).toLocaleDateString()}
+                                  </div>
+                                  {vax.nextDue && (
+                                    <div className="text-sm text-gray-600">
+                                      Due: {new Date(vax.nextDue).toLocaleDateString()}
+                                    </div>
+                                  )}
+                                </div>
+                                <Badge className={`${status.color} flex items-center`}>
+                                  <StatusIcon className="w-3 h-3 mr-1" />
+                                  {status.status}
+                                </Badge>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-200 text-center">
+                          <Shield className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                          <p>No vaccination records</p>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="mt-2"
+                            data-testid="button-add-vaccination"
+                          >
+                            Add vaccination
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
 
-            {/* Add new dog button */}
-            <Button 
-              className="w-full bg-purple-accent hover:bg-purple-accent/90 text-white font-medium py-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
-              onClick={() => setShowEditForm(true)}
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Add Another Dog
-            </Button>
-          </div>
-        )}
+                    {/* Reminders */}
+                    {currentDog.medicalProfile.vaccinations?.some((vax: any) => {
+                      const status = getVaccinationStatus(vax);
+                      return status.status === 'due-soon' || status.status === 'overdue';
+                    }) && (
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-3 flex items-center">
+                          <Clock className="w-4 h-4 mr-2 text-amber-600" />
+                          Reminders
+                        </h4>
+                        <div className="space-y-2">
+                          {currentDog.medicalProfile.vaccinations
+                            .filter((vax: any) => {
+                              const status = getVaccinationStatus(vax);
+                              return status.status === 'due-soon' || status.status === 'overdue';
+                            })
+                            .slice(0, 3)
+                            .map((vax: any, index: number) => {
+                              const status = getVaccinationStatus(vax);
+                              const StatusIcon = status.icon;
+                              return (
+                                <div 
+                                  key={index}
+                                  className={`p-3 rounded-lg border flex items-center justify-between ${
+                                    status.status === 'overdue' 
+                                      ? 'bg-red-50 border-red-200' 
+                                      : 'bg-amber-50 border-amber-200'
+                                  }`}
+                                  data-testid={`reminder-${vax.type.toLowerCase().replace(' ', '-')}`}
+                                >
+                                  <div className="flex items-center">
+                                    <StatusIcon className={`w-4 h-4 mr-2 ${
+                                      status.status === 'overdue' ? 'text-red-600' : 'text-amber-600'
+                                    }`} />
+                                    <div>
+                                      <div className="font-medium text-gray-900">{vax.type}</div>
+                                      <div className="text-sm text-gray-600">
+                                        {status.status === 'overdue' ? 'Overdue' : 'Due soon'}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <Button 
+                                    size="sm"
+                                    className="text-xs"
+                                    data-testid={`button-schedule-${vax.type.toLowerCase().replace(' ', '-')}`}
+                                  >
+                                    Schedule
+                                  </Button>
+                                </div>
+                              );
+                            })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Actions Row */}
+                    <div className="flex space-x-2 pt-4 border-t border-gray-200">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1"
+                        data-testid="button-update-records"
+                      >
+                        <FileText className="w-4 h-4 mr-2" />
+                        Update Records
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1"
+                        data-testid="button-book-appointment"
+                      >
+                        <Calendar className="w-4 h-4 mr-2" />
+                        Book Appointment
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1"
+                        data-testid="button-download-pdf"
+                      >
+                        <FileText className="w-4 h-4 mr-2" />
+                        Download PDF
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Add Another Dog CTA */}
+              <Button 
+                className="w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
+                onClick={() => setShowEditForm(true)}
+                data-testid="button-add-another-dog"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Add Another Dog
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
       
       <BottomNav />
