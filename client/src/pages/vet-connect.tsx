@@ -160,37 +160,53 @@ export default function VetConnect() {
   }
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header with Back Button, Title, and Filters */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-40 shadow-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="p-2 hover:bg-gray-100 rounded-full"
-              data-testid="button-back"
-              aria-label="Go back"
-            >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
-            </Button>
-            <div>
-              <h1 className="text-lg font-semibold text-gray-900">Vet Connect</h1>
-              <p className="text-sm text-gray-600">Find trusted veterinarians</p>
-            </div>
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
+      {/* Mobile-First Header - Single column layout with 16px gutters */}
+      <header 
+        className="bg-white dark:bg-gray-900 border-b border-[hsl(var(--borders-light))] px-4 py-4 sticky top-0 z-40 shadow-sm"
+        role="banner"
+        aria-label="Vet Connect navigation"
+      >
+        <div className="flex items-center justify-between min-h-[44px]">
+          {/* Back button with AA contrast and 44px tap target */}
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="min-w-[44px] min-h-[44px] p-0 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full flex items-center justify-center"
+            data-testid="button-back"
+            aria-label="Go back to previous screen"
+          >
+            <ArrowLeft className="w-6 h-6 text-[hsl(var(--text-primary))]" />
+          </Button>
+          
+          {/* Title section */}
+          <div className="flex-1 text-center mx-4">
+            <h1 className="text-xl font-bold text-[hsl(var(--text-primary))] leading-tight">
+              Vet Connect
+            </h1>
+            <p className="text-sm text-[hsl(var(--text-secondary))] mt-1">
+              Find trusted veterinarians
+            </p>
           </div>
+          
+          {/* Filters button with AA contrast and 44px tap target */}
           <Sheet open={showFilters} onOpenChange={setShowFilters}>
             <SheetTrigger asChild>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="p-2 hover:bg-gray-100 rounded-full relative"
+                className="min-w-[44px] min-h-[44px] p-0 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full relative flex items-center justify-center"
                 data-testid="button-filters"
-                aria-label="Sort and filter options"
+                aria-label={`Sort and filter options${(selectedSpecialties.length > 0 || sortBy !== "distance") ? " - Filters active" : ""}`}
               >
-                <SlidersHorizontal className="w-5 h-5 text-gray-600" />
+                <SlidersHorizontal className="w-6 h-6 text-[hsl(var(--text-primary))]" />
                 {(selectedSpecialties.length > 0 || sortBy !== "distance") && (
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-pink-600 rounded-full"></div>
+                  <div 
+                    className="absolute -top-1 -right-1 w-4 h-4 bg-[hsl(var(--primary-rose))] rounded-full flex items-center justify-center"
+                    aria-hidden="true"
+                  >
+                    <span className="text-white text-xs font-bold">{selectedSpecialties.length || 1}</span>
+                  </div>
                 )}
               </Button>
             </SheetTrigger>
@@ -198,72 +214,121 @@ export default function VetConnect() {
         </div>
       </header>
 
-      <div className="flex-1 overflow-auto bg-gray-50">
-        {/* Premium Badge and Location-Based Search */}
-        <div className="px-4 py-4 bg-gradient-to-r from-pink-50 to-rose-50 border-b border-pink-100">
-          <div className="flex items-center justify-center space-x-2">
-            <Badge className="bg-[#2563EB] text-white px-3 py-1.5 font-medium">
-              <Crown className="w-3 h-3 mr-1.5" />
-              Premium Feature
-            </Badge>
-            <Badge className="bg-[#16A34A] text-white px-3 py-1.5 font-medium">
-              <Navigation className="w-3 h-3 mr-1.5" />
-              Location-Based Search
-            </Badge>
+      {/* Main Content with safe-area bottom padding */}
+      <main 
+        className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-950 pb-safe"
+        role="main"
+        aria-label="Vet search results"
+      >
+        {/* Premium Feature Badges - Stacked mobile design */}
+        <section 
+          className="px-4 py-4 bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-950 dark:to-rose-950 border-b border-pink-100 dark:border-pink-900"
+          aria-label="Premium features"
+        >
+          <div className="flex flex-col space-y-2">
+            <div className="flex justify-center">
+              <Badge 
+                className="bg-[hsl(var(--info-blue))] text-white px-4 py-2 font-medium text-sm min-h-[44px] flex items-center"
+                data-tone="info"
+                role="status"
+                aria-label="Premium feature available"
+              >
+                <Crown className="w-4 h-4 mr-2" />
+                Premium Feature
+              </Badge>
+            </div>
+            <div className="flex justify-center">
+              <Badge 
+                className="bg-[hsl(var(--success-green))] text-white px-4 py-2 font-medium text-sm min-h-[44px] flex items-center"
+                data-tone="success"
+                role="status"
+                aria-label="Location-based search active"
+              >
+                <Navigation className="w-4 h-4 mr-2" />
+                Location-Based Search
+              </Badge>
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* Search Radius Control */}
-        <div className="px-4 py-4 bg-white border-b border-gray-200">
+        {/* Search Radius Control - 16px spacing */}
+        <section 
+          className="px-4 py-4 bg-white dark:bg-gray-900 border-b border-[hsl(var(--borders-light))]"
+          aria-label="Search radius control"
+        >
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-900">
+              <label 
+                htmlFor="search-radius"
+                className="text-base font-semibold text-[hsl(var(--text-primary))]"
+              >
                 Search Radius
               </label>
-              <span className="text-sm font-semibold text-gray-900">
+              <span className="text-lg font-bold text-[hsl(var(--text-primary))] min-w-[60px] text-right">
                 {searchRadius[0]} km
               </span>
             </div>
             <Slider
+              id="search-radius"
               value={searchRadius}
               onValueChange={setSearchRadius}
               max={50}
               min={1}
               step={1}
-              className="w-full"
+              className="w-full touch-manipulation"
               data-testid="slider-search-radius"
+              aria-label={`Search radius: ${searchRadius[0]} kilometers`}
             />
-            <div className="flex justify-between text-xs text-gray-500">
+            <div className="flex justify-between text-sm text-[hsl(var(--text-secondary))] mt-2">
               <span>1 km</span>
               <span>50 km</span>
             </div>
+            <Button
+              onClick={() => setSearchRadius([25])}
+              variant="outline"
+              size="sm"
+              className="w-full min-h-[44px] mt-4 text-[hsl(var(--text-primary))] border-[hsl(var(--borders-light))]"
+              data-testid="button-reset-radius"
+            >
+              Reset to Default (25 km)
+            </Button>
           </div>
-        </div>
+        </section>
 
-        {/* Results Summary */}
-        <div className="px-4 py-3 bg-white border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-gray-900">
-              {filteredVeterinarians.length} veterinarian{filteredVeterinarians.length !== 1 ? 's' : ''} found
-            </p>
-            <div className="flex items-center space-x-2">
+        {/* Results Summary - Mobile optimized */}
+        <section 
+          className="px-4 py-4 bg-white dark:bg-gray-900 border-b border-[hsl(var(--borders-light))]"
+          aria-label="Search results summary"
+        >
+          <div className="flex flex-col space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-lg font-semibold text-[hsl(var(--text-primary))]">
+                {filteredVeterinarians.length} veterinarian{filteredVeterinarians.length !== 1 ? 's' : ''} found
+              </p>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={() => setShowFilters(true)}
-                className="text-xs text-gray-600 hover:bg-gray-100 px-3 py-1.5 h-auto"
+                className="min-h-[44px] px-4 text-sm text-[hsl(var(--text-secondary))] hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
                 data-testid="button-sort-results"
+                aria-label={`Sort results. Currently sorted by ${sortBy}`}
               >
                 Sort: {sortBy === "distance" ? "Distance" : sortBy === "rating" ? "Rating" : "Price"}
-                <ChevronDown className="w-3 h-3 ml-1" />
+                <ChevronDown className="w-4 h-4 ml-2" />
               </Button>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Specialty Filter Chips */}
+        {/* Specialty Filter Chips - Mobile optimized with 8px spacing */}
         {allSpecialties.length > 0 && (
-          <div className="px-4 py-3 bg-white border-b border-gray-200">
+          <section 
+            className="px-4 py-4 bg-white dark:bg-gray-900 border-b border-[hsl(var(--borders-light))]"
+            aria-label="Specialty filters"
+          >
+            <h3 className="text-sm font-semibold text-[hsl(var(--text-primary))] mb-3">
+              Filter by Specialty
+            </h3>
             <div className="flex flex-wrap gap-2">
               {allSpecialties.slice(0, 6).map((specialty) => (
                 <Button
@@ -277,153 +342,191 @@ export default function VetConnect() {
                         : [...prev, specialty]
                     );
                   }}
-                  className={`px-3 py-1.5 h-auto text-xs rounded-full border transition-all duration-200 ${
+                  className={`min-h-[44px] px-4 py-2 text-sm rounded-full border transition-all duration-200 touch-manipulation ${
                     selectedSpecialties.includes(specialty)
-                      ? "bg-pink-100 text-pink-800 border-pink-300"
-                      : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100"
+                      ? "bg-[hsl(var(--primary-rose))] text-white border-[hsl(var(--primary-rose))]"
+                      : "bg-gray-50 dark:bg-gray-800 text-[hsl(var(--text-primary))] border-[hsl(var(--borders-light))] hover:bg-gray-100 dark:hover:bg-gray-700"
                   }`}
                   data-testid={`chip-specialty-${specialty.toLowerCase().replace(' ', '-')}`}
+                  data-tone={selectedSpecialties.includes(specialty) ? "info" : "default"}
+                  aria-pressed={selectedSpecialties.includes(specialty)}
+                  aria-label={`Filter by ${specialty}${selectedSpecialties.includes(specialty) ? " - currently selected" : ""}`}
                 >
                   {specialty}
                 </Button>
               ))}
             </div>
-          </div>
+          </section>
         )}
 
-        {/* Veterinarians List */}
-        <div className="px-4 py-4">{/* Grid container with consistent gutters */}
-
-          {/* Loading State */}
+        {/* Veterinarians List - Mobile-first with 16px gutters */}
+        <section 
+          className="px-4 py-4 bg-gray-50 dark:bg-gray-950"
+          aria-label="Veterinarian search results"
+          role="region"
+        >
+          {/* Loading State - Optimized for mobile */}
           {isLoading && (
-            <div className="space-y-4">
+            <div className="space-y-4" role="status" aria-label="Loading veterinarians">
               {[...Array(4)].map((_, i) => (
-                <Card key={i} className="animate-pulse bg-white shadow-sm">
+                <Card 
+                  key={i} 
+                  className="animate-pulse bg-white dark:bg-gray-900 shadow-sm border border-[hsl(var(--borders-light))] rounded-xl"
+                >
                   <CardContent className="p-4">
                     <div className="flex items-start space-x-4">
-                      <div className="w-14 h-14 bg-gray-200 rounded-full"></div>
-                      <div className="flex-1 space-y-2">
-                        <div className="h-4 bg-gray-200 rounded w-32"></div>
-                        <div className="h-3 bg-gray-200 rounded w-24"></div>
+                      <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                      <div className="flex-1 space-y-3">
+                        <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-40"></div>
+                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
                         <div className="flex space-x-2">
-                          <div className="h-5 bg-gray-200 rounded w-16"></div>
-                          <div className="h-5 bg-gray-200 rounded w-12"></div>
+                          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-20"></div>
+                          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-16"></div>
                         </div>
+                        <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-lg w-full mt-4"></div>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
               ))}
+              <span className="sr-only">Loading veterinarian results...</span>
             </div>
           )}
 
-          {/* Veterinarians Results */}
+          {/* Mobile-First Vet Cards */}
           {filteredVeterinarians && filteredVeterinarians.length > 0 && (
-            <div className="space-y-4">
+            <div className="space-y-4" role="list" aria-label={`${filteredVeterinarians.length} veterinarians found`}>
               {filteredVeterinarians.map((vet: VeterinarianWithDistance) => (
-                <Card key={vet.id} className="bg-white shadow-sm hover:shadow-md transition-shadow border border-gray-200">
+                <Card 
+                  key={vet.id} 
+                  className="bg-white dark:bg-gray-900 shadow-sm hover:shadow-md transition-all duration-200 border border-[hsl(var(--borders-light))] rounded-xl touch-manipulation"
+                  role="listitem"
+                >
                   <CardContent className="p-4">
-                    <div className="flex items-start space-x-4">
-                      {/* Left-aligned Avatar */}
-                      {vet.profilePhoto ? (
-                        <img 
-                          src={vet.profilePhoto} 
-                          alt={vet.name}
-                          className="w-14 h-14 rounded-full object-cover border-2 border-gray-100"
-                          data-testid={`img-vet-avatar-${vet.id}`}
-                        />
-                      ) : (
-                        <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center border-2 border-gray-100">
-                          <span className="text-blue-600 text-lg">👨‍⚕️</span>
+                    <div className="flex flex-col space-y-4">
+                      {/* Header: Avatar, Name, Rating */}
+                      <div className="flex items-start space-x-4">
+                        {vet.profilePhoto ? (
+                          <img 
+                            src={vet.profilePhoto} 
+                            alt={`${vet.name} profile photo`}
+                            className="w-16 h-16 rounded-full object-cover border-2 border-[hsl(var(--borders-light))]"
+                            data-testid={`img-vet-avatar-${vet.id}`}
+                          />
+                        ) : (
+                          <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-800 dark:to-blue-900 rounded-full flex items-center justify-center border-2 border-[hsl(var(--borders-light))]">
+                            <span className="text-blue-600 dark:text-blue-300 text-2xl" role="img" aria-label="Doctor">👨‍⚕️</span>
+                          </div>
+                        )}
+                        
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between mb-2">
+                            <h3 className="text-lg font-bold text-[hsl(var(--text-primary))] leading-tight truncate">
+                              {vet.name}
+                            </h3>
+                            <div className="flex items-center space-x-1 ml-2 bg-yellow-50 dark:bg-yellow-900/20 px-2 py-1 rounded-full">
+                              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                              <span className="text-sm font-semibold text-[hsl(var(--text-primary))]">{vet.rating}</span>
+                              <span className="text-xs text-[hsl(var(--text-secondary))]">({vet.reviewCount})</span>
+                            </div>
+                          </div>
+                          
+                          {/* Clinic + Distance */}
+                          <div className="flex items-center text-sm text-[hsl(var(--text-secondary))] mb-3">
+                            <MapPin className="w-4 h-4 mr-2 text-[hsl(var(--text-secondary))]" />
+                            <span className="truncate font-medium">{vet.clinicName}</span>
+                            <span className="mx-2 text-[hsl(var(--text-secondary))]">•</span>
+                            <span className="font-bold text-[hsl(var(--text-primary))]">{vet.distance} km</span>
+                          </div>
                         </div>
+                      </div>
+
+                      {/* Specialties with attribute-based styling */}
+                      <div className="flex flex-wrap gap-2">
+                        {vet.specialties.slice(0, 3).map((specialty: string, idx: number) => (
+                          <Badge 
+                            key={idx} 
+                            className="bg-[hsl(var(--info-blue))] text-white px-3 py-1 rounded-full text-sm font-medium"
+                            data-tone="info"
+                            data-testid={`specialty-${specialty.toLowerCase().replace(' ', '-')}`}
+                          >
+                            {specialty}
+                          </Badge>
+                        ))}
+                        {vet.emergencyServices && (
+                          <Badge 
+                            className="bg-[hsl(var(--warning-amber))] text-white px-3 py-1 rounded-full text-sm font-medium"
+                            data-tone="warning"
+                            role="status"
+                            aria-label="24/7 Emergency services available"
+                          >
+                            <Shield className="w-3 h-3 mr-1" />
+                            24/7 Emergency
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      {/* Availability Badge and Hours */}
+                      <div className="flex items-center justify-between py-2 px-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div className="flex items-center space-x-2">
+                          <Clock className="w-4 h-4 text-[hsl(var(--text-secondary))]" />
+                          <span className={`text-sm font-medium ${
+                            isOpenNow(vet.workingHours) 
+                              ? "text-[hsl(var(--success-green))]" 
+                              : "text-[hsl(var(--text-secondary))]"
+                          }`}>
+                            {getTodayHours(vet.workingHours)}
+                          </span>
+                          {isOpenNow(vet.workingHours) && (
+                            <Badge 
+                              className="bg-[hsl(var(--success-green))] text-white px-2 py-0.5 text-xs font-bold rounded-full"
+                              data-tone="success"
+                              role="status"
+                              aria-label="Currently open"
+                            >
+                              OPEN
+                            </Badge>
+                          )}
+                        </div>
+                        {vet.consultationFee && (
+                          <span className="text-sm font-bold text-[hsl(var(--text-primary))]">${vet.consultationFee}</span>
+                        )}
+                      </div>
+                      
+                      {/* Full-width Main Action Button */}
+                      {vet.onlineBooking && vet.bookingUrl ? (
+                        <Button 
+                          className="w-full bg-[hsl(var(--primary-rose))] hover:bg-[hsl(var(--primary-rose))]/90 text-white min-h-[48px] text-base font-semibold rounded-xl shadow-sm"
+                          onClick={() => window.open(vet.bookingUrl!, '_blank')}
+                          data-testid={`button-book-${vet.id}`}
+                          aria-label={`Book appointment with ${vet.name}`}
+                        >
+                          <Calendar className="w-5 h-5 mr-2" />
+                          Book Appointment
+                        </Button>
+                      ) : (
+                        <Button 
+                          className="w-full bg-[hsl(var(--primary-rose))] hover:bg-[hsl(var(--primary-rose))]/90 text-white min-h-[48px] text-base font-semibold rounded-xl shadow-sm"
+                          onClick={() => window.open(`tel:${vet.phoneNumber}`, '_self')}
+                          data-testid={`button-call-${vet.id}`}
+                          aria-label={`Call ${vet.name} at ${vet.phoneNumber}`}
+                        >
+                          <Phone className="w-5 h-5 mr-2" />
+                          Call Now
+                        </Button>
                       )}
                       
-                      <div className="flex-1 min-w-0">
-                        {/* Name + Rating */}
-                        <div className="flex items-center justify-between mb-1">
-                          <h3 className="font-semibold text-gray-900 text-base truncate">{vet.name}</h3>
-                          <div className="flex items-center space-x-1 ml-2">
-                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                            <span className="text-sm font-medium text-gray-900">{vet.rating}</span>
-                            <span className="text-xs text-gray-500">({vet.reviewCount})</span>
-                          </div>
-                        </div>
-                        
-                        {/* Clinic + Distance */}
-                        <div className="flex items-center text-sm text-gray-600 mb-3">
-                          <MapPin className="w-4 h-4 mr-1 text-gray-400" />
-                          <span className="truncate">{vet.clinicName}</span>
-                          <span className="mx-2 text-gray-400">•</span>
-                          <span className="font-medium">{vet.distance} km</span>
-                        </div>
-                        
-                        {/* Specialties Chips */}
-                        <div className="flex flex-wrap gap-1 mb-3">
-                          {vet.specialties.slice(0, 3).map((specialty: string, idx: number) => (
-                            <Badge 
-                              key={idx} 
-                              className="bg-blue-50 text-blue-700 border-blue-200 text-xs px-2 py-1 rounded-full"
-                              data-testid={`specialty-${specialty.toLowerCase().replace(' ', '-')}`}
-                            >
-                              {specialty}
-                            </Badge>
-                          ))}
-                          {vet.emergencyServices && (
-                            <Badge className="bg-[#F59E0B] text-white text-xs px-2 py-1 rounded-full font-medium">
-                              24/7 Emergency
-                            </Badge>
-                          )}
-                        </div>
-                        
-                        {/* Hours/Price Line */}
-                        <div className="flex items-center justify-between text-xs text-gray-600 mb-4">
-                          <div className="flex items-center">
-                            <Clock className="w-3 h-3 mr-1 text-gray-400" />
-                            <span className={isOpenNow(vet.workingHours) ? "text-[#16A34A] font-medium" : ""}>
-                              {getTodayHours(vet.workingHours)}
-                            </span>
-                          </div>
-                          {vet.consultationFee && (
-                            <span className="font-medium text-gray-900">${vet.consultationFee}</span>
-                          )}
-                        </div>
-                        
-                        {/* Primary and Secondary Actions */}
-                        <div className="flex space-x-2">
-                          {vet.onlineBooking && vet.bookingUrl ? (
-                            <Button 
-                              className="bg-pink-600 hover:bg-pink-700 text-white h-11 px-4 flex-1 font-medium"
-                              onClick={() => window.open(vet.bookingUrl!, '_blank')}
-                              data-testid={`button-book-${vet.id}`}
-                              aria-label={`Book appointment with ${vet.name}`}
-                            >
-                              <Calendar className="w-4 h-4 mr-2" />
-                              Book
-                            </Button>
-                          ) : (
-                            <Button 
-                              className="bg-pink-600 hover:bg-pink-700 text-white h-11 px-4 flex-1 font-medium"
-                              onClick={() => window.open(`tel:${vet.phoneNumber}`, '_self')}
-                              data-testid={`button-call-${vet.id}`}
-                              aria-label={`Call ${vet.name} at ${vet.phoneNumber}`}
-                            >
-                              <Phone className="w-4 h-4 mr-2" />
-                              Call
-                            </Button>
-                          )}
-                          
-                          <Link href={`/vet-profile/${vet.id}`} className="flex-1">
-                            <Button 
-                              variant="outline" 
-                              className="w-full h-11 border-gray-300 text-gray-700 hover:bg-gray-50 font-medium"
-                              data-testid={`button-view-profile-${vet.id}`}
-                              aria-label={`View ${vet.name}'s profile`}
-                            >
-                              View Profile
-                            </Button>
-                          </Link>
-                        </div>
-                      </div>
+                      {/* Secondary Action */}
+                      <Link href={`/vet-profile/${vet.id}`} className="w-full">
+                        <Button 
+                          variant="outline" 
+                          className="w-full min-h-[44px] border-[hsl(var(--borders-light))] text-[hsl(var(--text-primary))] hover:bg-gray-50 dark:hover:bg-gray-800 font-medium rounded-xl"
+                          data-testid={`button-view-profile-${vet.id}`}
+                          aria-label={`View detailed profile for ${vet.name}`}
+                        >
+                          View Profile
+                        </Button>
+                      </Link>
                     </div>
                   </CardContent>
                 </Card>
@@ -431,22 +534,22 @@ export default function VetConnect() {
             </div>
           )}
 
-          {/* No Results */}
+          {/* Empty State - Mobile optimized */}
           {filteredVeterinarians && filteredVeterinarians.length === 0 && !isLoading && (
-            <div className="text-center py-12">
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mx-auto">
-                <MapPin className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <div className="text-center py-12" role="status" aria-live="polite">
+              <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-[hsl(var(--borders-light))] p-8 mx-auto max-w-sm">
+                <MapPin className="w-16 h-16 mx-auto text-[hsl(var(--text-secondary))] mb-4" />
+                <h3 className="text-xl font-bold text-[hsl(var(--text-primary))] mb-3">
                   No veterinarians found
                 </h3>
-                <p className="text-gray-600 mb-4 leading-relaxed text-sm">
+                <p className="text-[hsl(var(--text-secondary))] mb-6 leading-relaxed">
                   Try adjusting your search radius or clearing filters to find more options in your area.
                 </p>
                 {selectedSpecialties.length > 0 && (
                   <Button 
                     variant="outline" 
                     onClick={() => setSelectedSpecialties([])}
-                    className="text-sm"
+                    className="min-h-[44px] border-[hsl(var(--borders-light))] text-[hsl(var(--text-primary))] hover:bg-gray-50 dark:hover:bg-gray-800"
                     data-testid="button-clear-filters"
                   >
                     Clear Filters
@@ -455,23 +558,25 @@ export default function VetConnect() {
               </div>
             </div>
           )}
-        </div>
-      </div>
+        </section>
+      </main>
 
-      {/* Sort & Filter Bottom Sheet */}
+      {/* Mobile-First Sort & Filter Bottom Sheet */}
       <Sheet open={showFilters} onOpenChange={setShowFilters}>
-        <SheetContent side="bottom" className="max-h-[80vh] bg-white border-t border-gray-200">
-          <SheetHeader className="pb-4 border-b border-gray-200">
-            <SheetTitle className="text-lg font-semibold text-gray-900">Sort & Filter</SheetTitle>
-            <SheetDescription className="text-sm text-gray-600">
+        <SheetContent side="bottom" className="max-h-[80vh] bg-white dark:bg-gray-900 border-t border-[hsl(var(--borders-light))]">
+          <SheetHeader className="pb-4 border-b border-[hsl(var(--borders-light))]">
+            <SheetTitle className="text-xl font-bold text-[hsl(var(--text-primary))]">
+              Sort & Filter
+            </SheetTitle>
+            <SheetDescription className="text-[hsl(var(--text-secondary))]">
               Customize your search results
             </SheetDescription>
           </SheetHeader>
           
           <div className="py-6 space-y-6">
-            {/* Sort Options */}
+            {/* Sort Options with 44px tap targets */}
             <div>
-              <h4 className="font-medium text-gray-900 mb-3">Sort by</h4>
+              <h4 className="font-semibold text-[hsl(var(--text-primary))] mb-4 text-lg">Sort by</h4>
               <div className="space-y-2">
                 {[
                   { value: "distance", label: "Distance", icon: MapPin },
@@ -482,41 +587,43 @@ export default function VetConnect() {
                     key={value}
                     variant="ghost"
                     onClick={() => setSortBy(value)}
-                    className={`w-full justify-start h-11 px-4 ${
+                    className={`w-full justify-start min-h-[44px] px-4 rounded-xl text-base ${
                       sortBy === value 
-                        ? "bg-pink-50 text-pink-700 border border-pink-200" 
-                        : "text-gray-700 hover:bg-gray-50"
+                        ? "bg-[hsl(var(--primary-rose))] text-white" 
+                        : "text-[hsl(var(--text-primary))] hover:bg-gray-50 dark:hover:bg-gray-800"
                     }`}
                     data-testid={`sort-option-${value}`}
+                    data-tone={sortBy === value ? "info" : "default"}
+                    aria-pressed={sortBy === value}
                   >
-                    {Icon && <Icon className="w-4 h-4 mr-3" />}
+                    {Icon && <Icon className="w-5 h-5 mr-3" />}
                     {label}
                     {sortBy === value && (
-                      <div className="ml-auto w-2 h-2 bg-pink-600 rounded-full"></div>
+                      <div className="ml-auto w-2 h-2 bg-white rounded-full"></div>
                     )}
                   </Button>
                 ))}
               </div>
             </div>
             
-            {/* Specialty Filters */}
+            {/* Specialty Filters with improved accessibility */}
             {allSpecialties.length > 0 && (
               <div>
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-medium text-gray-900">Specialties</h4>
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-[hsl(var(--text-primary))] text-lg">Specialties</h4>
                   {selectedSpecialties.length > 0 && (
                     <Button 
                       variant="ghost" 
                       size="sm" 
                       onClick={() => setSelectedSpecialties([])}
-                      className="text-xs text-gray-600 hover:text-gray-800 p-1 h-auto"
+                      className="text-[hsl(var(--text-secondary))] hover:text-[hsl(var(--text-primary))] min-h-[44px] px-3"
                       data-testid="button-clear-specialty-filters"
                     >
                       Clear all
                     </Button>
                   )}
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 gap-2">
                   {allSpecialties.map((specialty) => (
                     <Button
                       key={specialty}
@@ -528,12 +635,14 @@ export default function VetConnect() {
                             : [...prev, specialty]
                         );
                       }}
-                      className={`h-11 text-sm transition-all duration-200 ${
+                      className={`min-h-[44px] text-base transition-all duration-200 rounded-xl ${
                         selectedSpecialties.includes(specialty)
-                          ? "bg-pink-50 text-pink-700 border-pink-300"
-                          : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                          ? "bg-[hsl(var(--primary-rose))] text-white border-[hsl(var(--primary-rose))]"
+                          : "bg-white dark:bg-gray-800 text-[hsl(var(--text-primary))] border-[hsl(var(--borders-light))] hover:bg-gray-50 dark:hover:bg-gray-700"
                       }`}
                       data-testid={`filter-specialty-${specialty.toLowerCase().replace(' ', '-')}`}
+                      data-tone={selectedSpecialties.includes(specialty) ? "info" : "default"}
+                      aria-pressed={selectedSpecialties.includes(specialty)}
                     >
                       {specialty}
                     </Button>
@@ -543,10 +652,11 @@ export default function VetConnect() {
             )}
           </div>
           
-          <div className="py-4 border-t border-gray-200">
+          {/* Apply button with safe-area padding */}
+          <div className="py-4 pb-safe border-t border-[hsl(var(--borders-light))]">
             <Button 
               onClick={() => setShowFilters(false)}
-              className="w-full bg-pink-600 hover:bg-pink-700 text-white h-11 font-medium"
+              className="w-full bg-[hsl(var(--primary-rose))] hover:bg-[hsl(var(--primary-rose))]/90 text-white min-h-[48px] font-semibold text-base rounded-xl"
               data-testid="button-apply-filters"
             >
               Apply Filters ({filteredVeterinarians.length} result{filteredVeterinarians.length !== 1 ? 's' : ''})
@@ -555,6 +665,7 @@ export default function VetConnect() {
         </SheetContent>
       </Sheet>
 
+      {/* Persistent Bottom Navigation */}
       <BottomNav />
     </div>
   );
