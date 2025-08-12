@@ -578,36 +578,7 @@ export default function Profile() {
                       </div>
                     )}
 
-                    {/* Actions Row */}
-                    <div className="flex space-x-2 pt-4 border-t border-gray-200">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1"
-                        data-testid="button-update-records"
-                      >
-                        <FileText className="w-4 h-4 mr-2" />
-                        Update Records
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1"
-                        data-testid="button-book-appointment"
-                      >
-                        <Calendar className="w-4 h-4 mr-2" />
-                        Book Appointment
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1"
-                        data-testid="button-download-pdf"
-                      >
-                        <FileText className="w-4 h-4 mr-2" />
-                        Download PDF
-                      </Button>
-                    </div>
+
                   </CardContent>
                 </Card>
               )}
@@ -618,8 +589,10 @@ export default function Profile() {
         </div>
       </div>
 
+      <BottomNav />
+
       {/* Persistent Logout Button */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-4 py-3 safe-area-pb">
+      <div className="fixed bottom-16 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-4 py-3" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <div className="max-w-md mx-auto">
           <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
             <AlertDialogTrigger asChild>
@@ -662,8 +635,6 @@ export default function Profile() {
           </AlertDialog>
         </div>
       </div>
-      
-      <BottomNav />
 
       {/* Edit/Add Dog Form */}
       {showEditForm && (
