@@ -56,6 +56,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import ReportModal from "./report-modal";
 import RemoveMatchModal from "./remove-match-modal";
+import MatchedDogProfileModal from "./matched-dog-profile-modal";
+import { 
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 interface Message {
   id: string;
@@ -168,6 +174,9 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
   const [isTyping, setIsTyping] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
+  const [showDogProfile, setShowDogProfile] = useState(false);
+  const [showAvatarActionSheet, setShowAvatarActionSheet] = useState(false);
+  const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
   const [isOnline, setIsOnline] = useState(true);
   const [lastSeen, setLastSeen] = useState("2 min ago");
   const [showJumpToBottom, setShowJumpToBottom] = useState(false);
@@ -463,6 +472,69 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
     onBack();
   };
 
+  // Mock dog data for profile modal (in real app, this would come from props or API)
+  const mockDogData = {
+    id: 'matched-dog-1',
+    name: dogName,
+    age: 3,
+    breed: 'Golden Retriever',
+    size: 'Large',
+    photos: [
+      dogPhoto,
+      "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=500",
+      "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=500"
+    ],
+    temperament: ['Friendly', 'Playful', 'Gentle', 'Energetic'],
+    vaccinations: {
+      rabies: { status: 'up-to-date' as const, date: '2024-03-15' },
+      dhpp: { status: 'due-soon' as const, date: '2024-01-20' }
+    },
+    allergies: ['chicken', 'wheat'],
+    owner: {
+      name: ownerName || 'Sarah',
+      verified: true,
+      joinedDate: 'March 2023'
+    },
+    about: `${dogName} is a loving and energetic ${dogName.includes('Luna') ? 'girl' : 'boy'} who loves long walks, playing fetch, and meeting new friends at the dog park. Great with kids and other dogs!`,
+    medicalNotes: 'Healthy overall, just needs to watch diet due to food sensitivities.',
+    playPreferences: ['Fetch', 'Tug of war', 'Swimming', 'Dog park visits'],
+    recentCheckins: [
+      { park: 'Central Dog Park', date: '2 days ago' },
+      { park: 'Riverside Trail', date: '1 week ago' },
+      { park: 'Bark & Recreation', date: '2 weeks ago' }
+    ],
+    location: 'Brooklyn, NY',
+    distance: 2.4
+  };
+
+  const handleAvatarTap = () => {
+    if (typeof (window as any).gtag !== 'undefined') {
+      (window as any).gtag('event', 'avatar_tap_profile_open', {
+        dog_id: mockDogData.id,
+        source: 'chat_header'
+      });
+    }
+    setShowDogProfile(true);
+  };
+
+  const handleAvatarLongPressStart = () => {
+    const timer = setTimeout(() => {
+      setShowAvatarActionSheet(true);
+    }, 500); // 500ms long press
+    setLongPressTimer(timer);
+  };
+
+  const handleAvatarLongPressEnd = () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      setLongPressTimer(null);
+    }
+  };
+
+  const handleNameAreaTap = () => {
+    handleAvatarTap();
+  };
+
   // Render different message types
   const renderMessageContent = (msg: Message) => {
     switch (msg.type) {
@@ -584,6 +656,76 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
         />
       )}
 
+      {/* Matched Dog Profile Modal */}
+      <MatchedDogProfileModal
+        isOpen={showDogProfile}
+        onClose={() => setShowDogProfile(false)}
+        dog={mockDogData}
+        currentChatId="current-chat"
+      />
+
+      {/* Avatar Long Press Action Sheet */}
+      <Sheet open={showAvatarActionSheet} onOpenChange={setShowAvatarActionSheet}>
+        <SheetContent side="bottom" className="h-auto">
+          <div className="pb-6">
+            <div className="flex items-center space-x-3 mb-4">
+              <Avatar className="w-12 h-12">
+                <AvatarImage src={dogPhoto} alt={dogName} />
+                <AvatarFallback>{dogName[0]}</AvatarFallback>
+              </Avatar>
+              <div>
+                <h3 className="font-semibold text-gray-900">{dogName}</h3>
+                <p className="text-sm text-gray-600">with {ownerName}</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Button
+                variant="outline"
+                className="w-full justify-start h-12"
+                onClick={() => {
+                  setShowAvatarActionSheet(false);
+                  handleAvatarTap();
+                }}
+                data-testid="button-action-sheet-view-profile"
+              >
+                <Info className="w-4 h-4 mr-2" />
+                View Profile
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full justify-start h-12"
+                onClick={() => {
+                  setShowAvatarActionSheet(false);
+                  setIsMuted(!isMuted);
+                  toast({
+                    title: isMuted ? "Notifications enabled" : "Notifications muted",
+                    description: isMuted ? 
+                      "You'll receive notifications from this chat" :
+                      "You won't receive notifications from this chat"
+                  });
+                }}
+                data-testid="button-action-sheet-mute"
+              >
+                {isMuted ? <Volume2 className="w-4 h-4 mr-2" /> : <VolumeX className="w-4 h-4 mr-2" />}
+                {isMuted ? "Unmute" : "Mute"}
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full justify-start h-12 text-red-600 border-red-200 hover:bg-red-50"
+                onClick={() => {
+                  setShowAvatarActionSheet(false);
+                  setShowRemoveModal(true);
+                }}
+                data-testid="button-action-sheet-block"
+              >
+                <UserMinus className="w-4 h-4 mr-2" />
+                Block
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
       <div className="flex flex-col h-screen bg-gray-50">
       {/* Enhanced Header */}
       <div className="bg-white border-b border-gray-200 px-4 py-3 shadow-sm">
@@ -598,7 +740,17 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
               <ArrowLeft className="w-5 h-5" />
             </Button>
             
-            <div className="relative">
+            <div 
+              className="relative cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
+              onClick={handleAvatarTap}
+              onTouchStart={handleAvatarLongPressStart}
+              onTouchEnd={handleAvatarLongPressEnd}
+              onMouseDown={handleAvatarLongPressStart}
+              onMouseUp={handleAvatarLongPressEnd}
+              onMouseLeave={handleAvatarLongPressEnd}
+              data-testid="button-avatar-header"
+              aria-label="View dog profile"
+            >
               <Avatar className="w-10 h-10">
                 <AvatarImage src={dogPhoto} alt={dogName} />
                 <AvatarFallback>{dogName[0]}</AvatarFallback>
@@ -608,7 +760,12 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
               )}
             </div>
             
-            <div>
+            <div 
+              className="cursor-pointer flex-1 min-h-[44px] flex flex-col justify-center"
+              onClick={handleNameAreaTap}
+              data-testid="button-name-area"
+              aria-label="View dog profile"
+            >
               <h2 className="font-semibold text-gray-900" data-testid="text-dog-name">{dogName}</h2>
               <div className="flex items-center space-x-2">
                 {ownerName && (
@@ -658,10 +815,6 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem data-testid="menu-view-profile">
-                  <Info className="w-4 h-4 mr-2" />
-                  View Profile
-                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setIsMuted(!isMuted)}>
                   {isMuted ? <Volume2 className="w-4 h-4 mr-2" /> : <VolumeX className="w-4 h-4 mr-2" />}
                   {isMuted ? "Unmute" : "Mute"} Notifications
@@ -720,6 +873,21 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
               )}
               
               <div className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} group`}>
+                {/* Show avatar for other user's messages */}
+                {!isMyMessage && (
+                  <div 
+                    className="flex-shrink-0 mr-2 cursor-pointer min-h-[44px] min-w-[44px] flex items-end justify-center pb-2"
+                    onClick={handleAvatarTap}
+                    data-testid="button-message-avatar"
+                    aria-label="View dog profile"
+                  >
+                    <Avatar className="w-8 h-8">
+                      <AvatarImage src={dogPhoto} alt={dogName} />
+                      <AvatarFallback className="text-xs">{dogName[0]}</AvatarFallback>
+                    </Avatar>
+                  </div>
+                )}
+                
                 <div className="flex flex-col max-w-xs lg:max-w-md">
                   {/* Reply preview */}
                   {replyToMsg && (
