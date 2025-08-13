@@ -8,7 +8,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import DogCard from "./dog-card";
-import SimpleMedicalModal from "./simple-medical-modal";
+import ImmersiveMedicalView from "./immersive-medical-view";
 import MatchModal from "./match-modal";
 
 const CURRENT_DOG_ID = "dog-1"; // Buddy's ID from sample data
@@ -179,13 +179,12 @@ export default function SwipeArea() {
 
       </main>
 
-      {/* Simple Medical Modal for Discover */}
-      {selectedDog && (
-        <SimpleMedicalModal
-          dog={selectedDog}
-          onClose={() => setSelectedDog(null)}
-        />
-      )}
+      {/* Immersive Medical View for Discover */}
+      <ImmersiveMedicalView
+        dog={selectedDog}
+        isOpen={!!selectedDog}
+        onClose={() => setSelectedDog(null)}
+      />
 
       {/* Match Modal */}
       {matchedDog && (
