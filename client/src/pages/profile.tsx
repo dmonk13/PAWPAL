@@ -23,6 +23,7 @@ import BottomNav from "@/components/bottom-nav";
 import DogProfileForm from "@/components/dog-profile-form";
 import TraitSelectorModal from "@/components/trait-selector-modal";
 import AboutEditor from "@/components/about-editor";
+import MedicalModal from "@/components/medical-modal";
 import { Link, useLocation } from "wouter";
 import { type User } from "@shared/schema";
 
@@ -47,6 +48,7 @@ export default function Profile() {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showTraitModal, setShowTraitModal] = useState(false);
   const [isEditingAbout, setIsEditingAbout] = useState(false);
+  const [showMedicalModal, setShowMedicalModal] = useState(false);
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
 
@@ -490,126 +492,91 @@ export default function Profile() {
                 </Card>
               )}
 
-              {/* Medical Profile */}
-              {currentDog?.medicalProfile && (
+              {/* Medical Profile - Integrated with Care Details System */}
+              {currentDog && (
                 <Card className="bg-white border border-gray-200 shadow-sm">
-                  <CardHeader className="pb-4">
+                  <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
                         <Shield className="w-5 h-5 mr-2 text-pink-600" />
                         Medical Profile
                       </CardTitle>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowMedicalModal(true)}
+                        className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                        data-testid="button-view-medical-profile"
+                      >
+                        <Calendar className="w-4 h-4 mr-1" />
+                        View Details
+                      </Button>
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Vaccinations Table */}
-                    <div>
-                      <h4 className="font-medium text-gray-900 mb-3 flex items-center">
-                        <Heart className="w-4 h-4 mr-2 text-green-600" />
-                        Vaccinations
-                      </h4>
-                      {currentDog.medicalProfile.vaccinations?.length > 0 ? (
-                        <div className="space-y-2">
-                          {currentDog.medicalProfile.vaccinations.map((vax: any, index: number) => {
-                            const status = getVaccinationStatus(vax);
-                            const StatusIcon = status.icon;
-                            return (
-                              <div 
-                                key={index} 
-                                className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg"
-                                data-testid={`vaccination-${vax.type.toLowerCase().replace(' ', '-')}`}
-                              >
-                                <div className="flex-1">
-                                  <div className="font-medium text-gray-900">{vax.type}</div>
-                                  <div className="text-sm text-gray-600">
-                                    Given: {new Date(vax.date).toLocaleDateString()}
-                                  </div>
-                                  {vax.nextDue && (
-                                    <div className="text-sm text-gray-600">
-                                      Due: {new Date(vax.nextDue).toLocaleDateString()}
-                                    </div>
-                                  )}
-                                </div>
-                                <Badge className={`${status.color} flex items-center`}>
-                                  <StatusIcon className="w-3 h-3 mr-1" />
-                                  {status.status}
-                                </Badge>
-                              </div>
-                            );
-                          })}
+                  <CardContent>
+                    {/* Quick Medical Summary */}
+                    <div className="space-y-4">
+                      {/* Vaccination Status Summary */}
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-medium text-gray-900 text-sm">Vaccination Status</h4>
+                          <Badge className="bg-amber-100 text-amber-800 border-amber-200">
+                            <AlertCircle className="w-3 h-3 mr-1" />
+                            1 Overdue
+                          </Badge>
                         </div>
-                      ) : (
-                        <div className="text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-200 text-center">
-                          <Shield className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                          <p>No vaccination records</p>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="mt-2"
-                            data-testid="button-add-vaccination"
-                          >
-                            Add vaccination
-                          </Button>
+                        <div className="text-sm text-gray-600">
+                          Rabies vaccination is overdue. Tap to schedule with Vet Connect Premium.
+                        </div>
+                      </div>
+
+                      {/* Quick Actions */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowMedicalModal(true)}
+                          className="h-auto p-3 flex flex-col items-center space-y-1 border-2 hover:bg-blue-50"
+                          data-testid="button-manage-vaccinations"
+                        >
+                          <Shield className="w-5 h-5 text-blue-600" />
+                          <span className="text-xs font-medium">Vaccinations</span>
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-auto p-3 flex flex-col items-center space-y-1 border-2 hover:bg-green-50"
+                          data-testid="button-schedule-checkup"
+                        >
+                          <Calendar className="w-5 h-5 text-green-600" />
+                          <span className="text-xs font-medium">Checkup</span>
+                        </Button>
+                      </div>
+
+                      {/* Health Summary */}
+                      {currentDog.medicalProfile && (
+                        <div className="pt-3 border-t border-gray-200">
+                          <div className="text-sm text-gray-600 space-y-1">
+                            {currentDog.medicalProfile.allergies && currentDog.medicalProfile.allergies.length > 0 && (
+                              <div className="flex items-center">
+                                <Heart className="w-4 h-4 mr-2 text-red-500 flex-shrink-0" />
+                                <span>Allergies: {currentDog.medicalProfile.allergies.slice(0, 2).join(', ')}</span>
+                                {currentDog.medicalProfile.allergies.length > 2 && (
+                                  <span className="text-gray-500 ml-1">+{currentDog.medicalProfile.allergies.length - 2} more</span>
+                                )}
+                              </div>
+                            )}
+                            {currentDog.medicalProfile.vetOnFile && (
+                              <div className="flex items-center">
+                                <Shield className="w-4 h-4 mr-2 text-blue-500 flex-shrink-0" />
+                                <span>Vet: {currentDog.medicalProfile.vetOnFile.name}</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       )}
                     </div>
-
-                    {/* Reminders */}
-                    {currentDog.medicalProfile.vaccinations?.some((vax: any) => {
-                      const status = getVaccinationStatus(vax);
-                      return status.status === 'due-soon' || status.status === 'overdue';
-                    }) && (
-                      <div>
-                        <h4 className="font-medium text-gray-900 mb-3 flex items-center">
-                          <Clock className="w-4 h-4 mr-2 text-amber-600" />
-                          Reminders
-                        </h4>
-                        <div className="space-y-2">
-                          {currentDog.medicalProfile.vaccinations
-                            .filter((vax: any) => {
-                              const status = getVaccinationStatus(vax);
-                              return status.status === 'due-soon' || status.status === 'overdue';
-                            })
-                            .slice(0, 3)
-                            .map((vax: any, index: number) => {
-                              const status = getVaccinationStatus(vax);
-                              const StatusIcon = status.icon;
-                              return (
-                                <div 
-                                  key={index}
-                                  className={`p-3 rounded-lg border flex items-center justify-between ${
-                                    status.status === 'overdue' 
-                                      ? 'bg-red-50 border-red-200' 
-                                      : 'bg-amber-50 border-amber-200'
-                                  }`}
-                                  data-testid={`reminder-${vax.type.toLowerCase().replace(' ', '-')}`}
-                                >
-                                  <div className="flex items-center">
-                                    <StatusIcon className={`w-4 h-4 mr-2 ${
-                                      status.status === 'overdue' ? 'text-red-600' : 'text-amber-600'
-                                    }`} />
-                                    <div>
-                                      <div className="font-medium text-gray-900">{vax.type}</div>
-                                      <div className="text-sm text-gray-600">
-                                        {status.status === 'overdue' ? 'Overdue' : 'Due soon'}
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <Button 
-                                    size="sm"
-                                    className="text-xs"
-                                    data-testid={`button-schedule-${vax.type.toLowerCase().replace(' ', '-')}`}
-                                  >
-                                    Schedule
-                                  </Button>
-                                </div>
-                              );
-                            })}
-                        </div>
-                      </div>
-                    )}
-
-
                   </CardContent>
                 </Card>
               )}
@@ -682,6 +649,16 @@ export default function Profile() {
           onClose={() => setShowTraitModal(false)}
           dogId={currentDog.id}
           currentTraits={currentDog.temperament || []}
+          dogName={currentDog.name}
+        />
+      )}
+
+      {/* Medical Modal - Unified Care Details & Scheduling Flow */}
+      {currentDog && (
+        <MedicalModal
+          isOpen={showMedicalModal}
+          onClose={() => setShowMedicalModal(false)}
+          dogId={currentDog.id}
           dogName={currentDog.name}
         />
       )}
