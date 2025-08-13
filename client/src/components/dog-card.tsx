@@ -283,13 +283,6 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
                       <span>Share</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem 
-                      className="flex items-center space-x-2 px-4 py-3 text-gray-900 hover:bg-gray-100 rounded-lg cursor-pointer"
-                      aria-label={`Save ${dog.name} for later`}
-                    >
-                      <Bookmark className="w-4 h-4" />
-                      <span>Save</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
                       className="flex items-center space-x-2 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg cursor-pointer"
                       aria-label={`Report ${dog.name}'s profile`}
                     >
