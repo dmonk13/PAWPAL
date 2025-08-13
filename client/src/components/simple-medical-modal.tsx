@@ -1,8 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Shield, AlertTriangle, FileText, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Shield, AlertTriangle, FileText } from "lucide-react";
 import type { DogWithMedical } from "@shared/schema";
 
 interface SimpleMedicalModalProps {
@@ -22,17 +21,8 @@ export default function SimpleMedicalModal({
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="relative">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            className="absolute -top-2 -right-2 p-1 h-8 w-8 rounded-full hover:bg-gray-100"
-            data-testid="button-close-medical-modal"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-          <DialogTitle className="text-xl font-semibold text-gray-900 flex items-center pr-8">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-semibold text-gray-900 flex items-center">
             <Shield className="w-6 h-6 mr-2 text-pink-600" />
             {dog.name}'s Medical Profile
           </DialogTitle>
