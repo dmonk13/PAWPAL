@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import BottomNav from "@/components/bottom-nav";
 import DogProfileForm from "@/components/dog-profile-form";
+import TraitSelectorModal from "@/components/trait-selector-modal";
+import AboutEditor from "@/components/about-editor";
 import { Link, useLocation } from "wouter";
 import { type User } from "@shared/schema";
 
@@ -43,6 +45,8 @@ export default function Profile() {
   const [editingDog, setEditingDog] = useState<any>(null);
   const [aboutExpanded, setAboutExpanded] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [showTraitModal, setShowTraitModal] = useState(false);
+  const [isEditingAbout, setIsEditingAbout] = useState(false);
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
 
@@ -385,7 +389,7 @@ export default function Profile() {
               )}
 
               {/* Personality Traits */}
-              {currentDog?.temperament && currentDog.temperament.length > 0 && (
+              {currentDog && (
                 <Card className="bg-white border border-gray-200 shadow-sm">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
@@ -397,6 +401,7 @@ export default function Profile() {
                         variant="ghost" 
                         size="sm" 
                         className="text-gray-500 hover:text-gray-700"
+                        onClick={() => setShowTraitModal(true)}
                         data-testid="button-manage-traits"
                       >
                         Manage Traits
@@ -404,24 +409,32 @@ export default function Profile() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex flex-wrap gap-2">
-                      {currentDog.temperament.map((trait: string, index: number) => (
-                        <Badge 
-                          key={index} 
-                          className="bg-gray-100 text-gray-700 border-gray-200 px-3 py-1.5 text-sm font-medium rounded-full"
-                          data-testid={`trait-${trait.toLowerCase().replace(' ', '-')}`}
-                        >
-                          <Activity className="w-3 h-3 mr-1" />
-                          {trait}
-                        </Badge>
-                      ))}
-                    </div>
+                    {currentDog.temperament && currentDog.temperament.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {currentDog.temperament.map((trait: string, index: number) => (
+                          <Badge 
+                            key={index} 
+                            className="bg-gray-100 text-gray-700 border-gray-200 px-3 py-1.5 text-sm font-medium rounded-full"
+                            data-testid={`trait-${trait.toLowerCase().replace(' ', '-')}`}
+                          >
+                            <Activity className="w-3 h-3 mr-1" />
+                            {trait}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-6 text-gray-500">
+                        <PawPrint className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                        <p>No personality traits added yet</p>
+                        <p className="text-sm">Help others get to know {currentDog.name} better!</p>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               )}
 
               {/* About Section */}
-              {currentDog?.bio && (
+              {currentDog && (
                 <Card className="bg-white border border-gray-200 shadow-sm">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
@@ -430,6 +443,7 @@ export default function Profile() {
                         variant="ghost" 
                         size="sm" 
                         className="text-gray-500 hover:text-gray-700"
+                        onClick={() => setIsEditingAbout(true)}
                         data-testid="button-edit-about"
                         aria-label="Edit about section"
                       >
@@ -438,25 +452,40 @@ export default function Profile() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <Collapsible open={aboutExpanded} onOpenChange={setAboutExpanded}>
-                      <div className="text-gray-700 leading-relaxed">
-                        <p className={`${!aboutExpanded ? 'line-clamp-2' : ''}`}>
-                          {currentDog.bio}
-                        </p>
+                    {isEditingAbout ? (
+                      <AboutEditor
+                        dogId={currentDog.id}
+                        currentBio={currentDog.bio || ""}
+                        dogName={currentDog.name}
+                        onCancel={() => setIsEditingAbout(false)}
+                      />
+                    ) : currentDog.bio ? (
+                      <Collapsible open={aboutExpanded} onOpenChange={setAboutExpanded}>
+                        <div className="text-gray-700 leading-relaxed">
+                          <p className={`${!aboutExpanded ? 'line-clamp-2' : ''}`}>
+                            {currentDog.bio}
+                          </p>
+                        </div>
+                        {currentDog.bio.length > 100 && (
+                          <CollapsibleTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="mt-2 p-0 h-auto text-pink-600 hover:text-pink-700"
+                              data-testid="button-read-more"
+                            >
+                              {aboutExpanded ? 'Show less' : 'Read more...'}
+                            </Button>
+                          </CollapsibleTrigger>
+                        )}
+                      </Collapsible>
+                    ) : (
+                      <div className="text-center py-6 text-gray-500">
+                        <FileText className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                        <p>No bio added yet</p>
+                        <p className="text-sm">Share something special about {currentDog.name}!</p>
                       </div>
-                      {currentDog.bio.length > 100 && (
-                        <CollapsibleTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="mt-2 p-0 h-auto text-pink-600 hover:text-pink-700"
-                            data-testid="button-read-more"
-                          >
-                            {aboutExpanded ? 'Show less' : 'Read more...'}
-                          </Button>
-                        </CollapsibleTrigger>
-                      )}
-                    </Collapsible>
+                    )}
                   </CardContent>
                 </Card>
               )}
@@ -643,6 +672,17 @@ export default function Profile() {
             setShowEditForm(false);
             setEditingDog(null);
           }}
+        />
+      )}
+
+      {/* Trait Selector Modal */}
+      {currentDog && (
+        <TraitSelectorModal
+          isOpen={showTraitModal}
+          onClose={() => setShowTraitModal(false)}
+          dogId={currentDog.id}
+          currentTraits={currentDog.temperament || []}
+          dogName={currentDog.name}
         />
       )}
     </div>
