@@ -12,7 +12,7 @@ export default function Settings() {
     <div className="flex flex-col h-full">
       <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 p-4 sticky top-0 z-40 shadow-sm">
         <div className="flex items-center space-x-3">
-          <Link href="/discover">
+          <Link href="/profile">
             <Button variant="ghost" size="sm" className="p-2">
               <ArrowLeft className="w-5 h-5" />
             </Button>
