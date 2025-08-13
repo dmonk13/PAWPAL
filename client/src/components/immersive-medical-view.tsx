@@ -41,7 +41,7 @@ export default function ImmersiveMedicalView({
       
       {/* Bottom Sheet */}
       <div 
-        className={`relative mt-auto bg-white rounded-t-3xl shadow-2xl transition-transform duration-500 ease-out max-h-[85vh] overflow-hidden ${
+        className={`relative mt-auto bg-white rounded-t-3xl shadow-2xl transition-transform duration-500 ease-out max-h-[70vh] overflow-hidden ${
           isVisible ? 'translate-y-0' : 'translate-y-full'
         }`}
       >
@@ -51,15 +51,15 @@ export default function ImmersiveMedicalView({
         </div>
 
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4">
+        <div className="sticky top-0 bg-white border-b border-gray-100 px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <Shield className="w-6 h-6 mr-3 text-pink-600" />
+              <Shield className="w-5 h-5 mr-2 text-pink-600" />
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-lg font-semibold text-gray-900">
                   {dog.name}'s Medical Profile
                 </h2>
-                <p className="text-sm text-gray-600">
+                <p className="text-xs text-gray-600">
                   Health information and medical summary
                 </p>
               </div>
@@ -68,7 +68,7 @@ export default function ImmersiveMedicalView({
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="h-8 w-8 rounded-full hover:bg-gray-100"
+              className="h-7 w-7 rounded-full hover:bg-gray-100"
               data-testid="button-close-immersive-medical"
             >
               <X className="w-4 h-4" />
@@ -77,14 +77,14 @@ export default function ImmersiveMedicalView({
         </div>
 
         {/* Scrollable Content */}
-        <div className="overflow-y-auto px-6 pb-6">
-          <div className="space-y-6 pt-4">
+        <div className="overflow-y-auto px-4 pb-4">
+          <div className="space-y-4 pt-3">
             {/* Quick Stats */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <Card className="bg-blue-50 border-blue-200">
-                <CardContent className="p-4 text-center">
-                  <Activity className="w-6 h-6 mx-auto mb-2 text-blue-600" />
-                  <p className="text-sm font-medium text-blue-900">
+                <CardContent className="p-3 text-center">
+                  <Activity className="w-5 h-5 mx-auto mb-1 text-blue-600" />
+                  <p className="text-xs font-medium text-blue-900">
                     {dog.medicalProfile?.isSpayedNeutered ? 'Spayed/Neutered' : 'Not Spayed/Neutered'}
                   </p>
                   <p className="text-xs text-blue-700">
@@ -94,9 +94,9 @@ export default function ImmersiveMedicalView({
               </Card>
               
               <Card className="bg-green-50 border-green-200">
-                <CardContent className="p-4 text-center">
-                  <Shield className="w-6 h-6 mx-auto mb-2 text-green-600" />
-                  <p className="text-sm font-medium text-green-900">
+                <CardContent className="p-3 text-center">
+                  <Shield className="w-5 h-5 mx-auto mb-1 text-green-600" />
+                  <p className="text-xs font-medium text-green-900">
                     {dog.medicalProfile?.vetClearance ? 'Vet Cleared' : 'No Vet Clearance'}
                   </p>
                   <p className="text-xs text-green-700">
@@ -109,13 +109,13 @@ export default function ImmersiveMedicalView({
             {/* Medical Information */}
             {dog?.medicalProfile ? (
               <Card className="bg-blue-50 border-blue-200">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center">
                     <FileText className="w-4 h-4 mr-2 text-blue-600" />
                     Health Information
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 space-y-4 text-sm">
+                <CardContent className="pt-0 space-y-3 text-xs">
                   {/* Allergies */}
                   <div>
                     <span className="font-medium text-gray-700 block mb-2">Allergies:</span>
@@ -210,23 +210,14 @@ export default function ImmersiveMedicalView({
             </div>
 
             {/* Action Buttons */}
-            <div className="space-y-3 pt-2">
+            <div className="space-y-2 pt-1">
               <Button
-                className="w-full bg-pink-500 hover:bg-pink-600 text-white font-medium py-3 rounded-xl"
+                className="w-full bg-pink-500 hover:bg-pink-600 text-white font-medium py-2.5 rounded-xl text-sm"
                 onClick={onClose}
                 data-testid="button-continue-swiping"
               >
                 <ChevronDown className="w-4 h-4 mr-2" />
                 Continue Swiping
-              </Button>
-              
-              <Button
-                variant="outline"
-                className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-3 rounded-xl"
-                onClick={onClose}
-                data-testid="button-back-to-profile"
-              >
-                Back to {dog.name}'s Profile
               </Button>
             </div>
           </div>
