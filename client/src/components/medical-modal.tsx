@@ -4,6 +4,7 @@ import {
   Shield, Calendar, AlertTriangle, Clock, Plus, ChevronRight, 
   Activity, FileText, Phone, MapPin, User
 } from "lucide-react";
+import { DogWithMedical } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,26 +19,19 @@ import {
 import CareDetailsDialog from "@/components/care-details-dialog";
 
 interface MedicalModalProps {
-  isOpen: boolean;
+  dog: DogWithMedical;
   onClose: () => void;
-  dogId: string;
-  dogName: string;
 }
 
 export default function MedicalModal({ 
-  isOpen, 
-  onClose, 
-  dogId, 
-  dogName 
+  dog, 
+  onClose
 }: MedicalModalProps) {
   const [selectedVaccination, setSelectedVaccination] = useState<any>(null);
   const [showCareDetails, setShowCareDetails] = useState(false);
 
-  // Fetch dog data including medical profile
-  const { data: dog, isLoading } = useQuery({
-    queryKey: [`/api/dogs/${dogId}`],
-    enabled: isOpen
-  });
+  // Dog data is already provided as prop
+  const isLoading = false;
 
   // Use real vaccination data from medical profile or provide demo data
   const vaccinations = dog?.medicalProfile?.vaccinations || [
@@ -135,7 +129,7 @@ export default function MedicalModal({
 
   if (isLoading) {
     return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
+      <Dialog open={true} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-lg">
           <div className="animate-pulse space-y-4">
             <div className="h-6 bg-gray-200 rounded w-3/4"></div>
@@ -152,12 +146,12 @@ export default function MedicalModal({
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
+      <Dialog open={true} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-gray-900 flex items-center">
               <Shield className="w-6 h-6 mr-2 text-blue-600" />
-              {dogName}'s Medical Profile
+              {dog.name}'s Medical Profile
             </DialogTitle>
             <DialogDescription className="text-gray-600">
               Track vaccinations, health records, and care reminders
@@ -184,7 +178,7 @@ export default function MedicalModal({
               </div>
 
               <div className="space-y-3">
-                {vaccinations.map((vaccination) => {
+                {vaccinations.map((vaccination: any) => {
                   const status = getVaccinationStatus(vaccination.nextDue);
                   return (
                     <Card 
@@ -298,8 +292,8 @@ export default function MedicalModal({
           }}
           vaccination={selectedVaccination}
           dog={{
-            id: dogId,
-            name: dogName,
+            id: dog.id,
+            name: dog.name,
             breed: dog?.breed || '',
             age: dog?.age || 0,
             weight: dog?.weight,
