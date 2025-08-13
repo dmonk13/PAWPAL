@@ -215,22 +215,23 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       // Save dog profile first
-      await saveDogMutation.mutateAsync(data);
+      const savedDog = await saveDogMutation.mutateAsync(data);
+      const dogId = savedDog?.id || dog?.id;
       
       // Then save medical profile if it has data
-      if (dog?.id && (allergies.length > 0 || conditions.length > 0 || hasInsurance)) {
+      if (dogId && (allergies.length > 0 || conditions.length > 0 || hasInsurance)) {
         const medicalData = {
-          dogId: dog.id,
+          dogId: dogId,
           allergies,
           conditions,
-          vetClearance: dog.medicalProfile?.vetClearance || false,
+          vetClearance: dog?.medicalProfile?.vetClearance || false,
           insurance: hasInsurance ? insurance : null,
         };
 
-        if (dog.medicalProfile?.id) {
+        if (dog?.medicalProfile?.id) {
           await apiRequest("PATCH", `/api/medical-profiles/${dog.medicalProfile.id}`, medicalData);
         } else {
-          await apiRequest("POST", "/api/medical-profiles", medicalData);
+          await apiRequest("POST", `/api/dogs/${dogId}/medical`, medicalData);
         }
         
         queryClient.invalidateQueries({ queryKey: ["/api/users"] });

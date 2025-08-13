@@ -29,6 +29,7 @@ export interface IStorage {
   getMedicalProfile(dogId: string): Promise<MedicalProfile | undefined>;
   createMedicalProfile(profile: InsertMedicalProfile): Promise<MedicalProfile>;
   updateMedicalProfile(dogId: string, updates: Partial<MedicalProfile>): Promise<MedicalProfile | undefined>;
+  updateMedicalProfileById(medicalProfileId: string, updates: Partial<MedicalProfile>): Promise<MedicalProfile | undefined>;
 
   // Matching methods
   getDogsForMatching(currentDogId: string, latitude: number, longitude: number, maxDistance: number, filters?: any): Promise<DogWithMedical[]>;
@@ -123,6 +124,15 @@ export class DatabaseStorage implements IStorage {
       .update(medicalProfiles)
       .set(updates)
       .where(eq(medicalProfiles.dogId, dogId))
+      .returning();
+    return profile || undefined;
+  }
+
+  async updateMedicalProfileById(medicalProfileId: string, updates: Partial<MedicalProfile>): Promise<MedicalProfile | undefined> {
+    const [profile] = await db
+      .update(medicalProfiles)
+      .set(updates)
+      .where(eq(medicalProfiles.id, medicalProfileId))
       .returning();
     return profile || undefined;
   }
@@ -1491,6 +1501,15 @@ export class MemStorage implements IStorage {
     
     const updatedProfile = { ...profile, ...updates };
     this.medicalProfiles.set(dogId, updatedProfile);
+    return updatedProfile;
+  }
+
+  async updateMedicalProfileById(medicalProfileId: string, updates: Partial<MedicalProfile>): Promise<MedicalProfile | undefined> {
+    const profile = Array.from(this.medicalProfiles.values()).find(p => p.id === medicalProfileId);
+    if (!profile) return undefined;
+    
+    const updatedProfile = { ...profile, ...updates };
+    this.medicalProfiles.set(profile.dogId, updatedProfile);
     return updatedProfile;
   }
 

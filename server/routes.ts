@@ -384,6 +384,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create medical profile
+  app.post("/api/medical-profiles", async (req, res) => {
+    try {
+      const medicalData = insertMedicalProfileSchema.parse(req.body);
+      const newProfile = await storage.createMedicalProfile(medicalData);
+      res.status(201).json(newProfile);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid medical data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create medical profile" });
+    }
+  });
+
+  // Update medical profile by ID
+  app.patch("/api/medical-profiles/:medicalProfileId", async (req, res) => {
+    try {
+      const { medicalProfileId } = req.params;
+      const updatedProfile = await storage.updateMedicalProfileById(medicalProfileId, req.body);
+      
+      if (!updatedProfile) {
+        return res.status(404).json({ message: "Medical profile not found" });
+      }
+      
+      res.json(updatedProfile);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update medical profile" });
+    }
+  });
+
   // Get messages for a match
   app.get("/api/matches/:matchId/messages", async (req, res) => {
     try {
