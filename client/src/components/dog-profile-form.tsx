@@ -318,7 +318,7 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
           {/* Form Section */}
           <div className={`${showPreview ? "w-1/2 border-r border-gray-200" : "w-full"} overflow-y-auto overscroll-contain`}>
             <Form {...form}>
-              <form id="dog-profile-form" onSubmit={form.handleSubmit(onSubmit)} className="p-6 space-y-6">
+              <form id="dog-profile-form" onSubmit={form.handleSubmit(onSubmit)} className="p-8 space-y-8">
                 {/* Photos Tab */}
                 {activeTab === 'photos' && (
                   <Card>
@@ -429,12 +429,13 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
                 {/* Basic Info Tab */}
                 {activeTab === 'basic' && (
                   <>
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Basic Information</CardTitle>
+                    <Card className="border-gray-200 shadow-sm">
+                      <CardHeader className="pb-6">
+                        <CardTitle className="text-xl font-semibold text-gray-900 mb-2">Basic Information</CardTitle>
+                        <p className="text-sm text-gray-500">Essential details about your dog</p>
                       </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
+                      <CardContent className="space-y-6">
+                        <div className="grid grid-cols-2 gap-6">
                           <FormField
                             control={form.control}
                             name="name"
@@ -463,7 +464,7 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
                           />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-6">
                           <FormField
                             control={form.control}
                             name="breed"
@@ -548,15 +549,17 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
                     </Card>
 
                     {/* Temperament */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Temperament</CardTitle>
+                    <Card className="border-gray-200 shadow-sm">
+                      <CardHeader className="pb-6">
+                        <CardTitle className="text-xl font-semibold text-gray-900 mb-2">Temperament</CardTitle>
+                        <p className="text-sm text-gray-500">Select traits that best describe your dog's personality</p>
                       </CardHeader>
                       <CardContent>
-                        <Label className="text-sm font-medium mb-4 block">
-                          Select traits that describe your dog (choose up to 6)
-                        </Label>
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-4">
+                          <Label className="text-sm font-medium text-gray-700">
+                            Choose up to 6 traits that best describe your dog
+                          </Label>
+                          <div className="grid grid-cols-2 gap-4">
                           {temperamentOptions.map((temperament) => (
                             <Button
                               key={temperament}
@@ -573,6 +576,7 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
                               {temperament}
                             </Button>
                           ))}
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -816,14 +820,14 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
 
           {/* Preview Panel */}
           {showPreview && (
-            <div className="w-1/2 overflow-y-auto bg-gray-50 p-6">
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Live Preview</h3>
+            <div className="w-1/2 overflow-y-auto bg-gray-50 p-8">
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Live Preview</h3>
                 <p className="text-sm text-gray-500">See how your profile will look to other users</p>
               </div>
               
               {/* Dog Card Preview */}
-              <div className="bg-white rounded-lg shadow-sm border max-w-sm mx-auto">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 max-w-sm mx-auto">
                 {/* Photos */}
                 <div className="aspect-square relative overflow-hidden rounded-t-lg bg-gray-200">
                   {previewDog.photos.length > 0 ? (
@@ -846,34 +850,34 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
                 </div>
 
                 {/* Info */}
-                <div className="p-4">
-                  <div className="flex items-start justify-between mb-3">
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h3 className="text-lg font-bold text-gray-900">{previewDog.name}</h3>
-                      <p className="text-sm text-gray-600">
+                      <h3 className="text-xl font-bold text-gray-900">{previewDog.name}</h3>
+                      <p className="text-sm text-gray-600 mt-1">
                         {previewDog.breed} • {previewDog.age} {previewDog.age === 1 ? 'year' : 'years'} old
                       </p>
-                      <p className="text-sm text-gray-500">{previewDog.gender} • {previewDog.size}</p>
+                      <p className="text-sm text-gray-500 mt-0.5">{previewDog.gender} • {previewDog.size}</p>
                     </div>
                   </div>
 
                   {previewDog.bio && (
-                    <p className="text-sm text-gray-700 mb-3 line-clamp-3">{previewDog.bio}</p>
+                    <p className="text-sm text-gray-700 mb-4 line-clamp-3">{previewDog.bio}</p>
                   )}
 
                   {/* Temperament Tags */}
                   {previewDog.temperament.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-3">
+                    <div className="flex flex-wrap gap-2 mb-4">
                       {previewDog.temperament.slice(0, 3).map((trait) => (
                         <span
                           key={trait}
-                          className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                          className="px-3 py-1 bg-coral/10 text-coral text-xs font-medium rounded-full"
                         >
                           {trait}
                         </span>
                       ))}
                       {previewDog.temperament.length > 3 && (
-                        <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                        <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
                           +{previewDog.temperament.length - 3} more
                         </span>
                       )}
@@ -882,16 +886,16 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
 
                   {/* Personality Prompts Preview */}
                   {Object.keys(previewDog.personalityPrompts).length > 0 && (
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {Object.entries(previewDog.personalityPrompts)
                         .slice(0, 2)
                         .map(([promptId, answer]) => {
                           const prompt = personalityPrompts.find(p => p.id === promptId);
                           if (!prompt || !answer) return null;
                           return (
-                            <div key={promptId} className="bg-gray-50 p-2 rounded">
-                              <p className="text-xs font-medium text-gray-600 mb-1">{prompt.question}</p>
-                              <p className="text-xs text-gray-700 line-clamp-2">{answer}</p>
+                            <div key={promptId} className="bg-gray-50 p-3 rounded-lg">
+                              <p className="text-xs font-medium text-gray-700 mb-1">{prompt.question}</p>
+                              <p className="text-xs text-gray-600 line-clamp-2">{answer}</p>
                             </div>
                           );
                         })}
@@ -904,15 +908,20 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
         </div>
 
         {/* Fixed Action Buttons */}
-        <div className="flex-shrink-0 p-6 border-t border-gray-100 bg-white">
-          <div className="flex gap-4">
-            <Button type="button" variant="outline" onClick={onClose} className="flex-1 touch-manipulation min-h-[48px]">
+        <div className="flex-shrink-0 p-8 border-t border-gray-200 bg-white">
+          <div className="flex gap-6">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose} 
+              className="flex-1 touch-manipulation min-h-[48px] border-2 hover:border-gray-300"
+            >
               Cancel
             </Button>
             <Button 
               type="submit" 
               form="dog-profile-form"
-              className="flex-1 bg-coral text-white hover:bg-coral/90 touch-manipulation min-h-[48px]"
+              className="flex-1 bg-coral text-white hover:bg-coral/90 touch-manipulation min-h-[48px] font-medium"
               disabled={saveDogMutation.isPending}
             >
               {saveDogMutation.isPending ? "Saving..." : dog?.id ? "Update Profile" : "Create Profile"}
