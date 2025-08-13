@@ -105,9 +105,9 @@ export default function Messages() {
     console.log(`Action: ${action} on match: ${matchId}`);
   };
 
-  const handleAddMatch = () => {
-    // Handle adding new matches - navigate to discover or search
-    console.log('Add new match requested');
+  const handleNavigateToDiscover = () => {
+    // Navigate to discover page
+    window.location.href = '/discover';
   };
 
   return (
@@ -122,7 +122,7 @@ export default function Messages() {
         matches={stripMatches}
         onMatchSelect={setSelectedChat}
         onMatchAction={handleMatchAction}
-        onAddMatch={handleAddMatch}
+        onNavigateToDiscover={handleNavigateToDiscover}
       />
       
       <div className="flex-1 overflow-auto p-4">

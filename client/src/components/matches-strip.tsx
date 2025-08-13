@@ -1,32 +1,13 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { 
   Plus, 
-  MoreHorizontal, 
   VolumeX, 
   Pin, 
-  Trash2, 
-  Search,
-  UserPlus
+  Trash2
 } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 
@@ -47,19 +28,17 @@ interface MatchesStripProps {
   matches: Match[];
   onMatchSelect: (matchId: string) => void;
   onMatchAction?: (matchId: string, action: 'mute' | 'pin' | 'remove') => void;
-  onAddMatch?: () => void;
+  onNavigateToDiscover?: () => void;
 }
 
 export default function MatchesStrip({ 
   matches, 
   onMatchSelect, 
   onMatchAction = () => {},
-  onAddMatch
+  onNavigateToDiscover
 }: MatchesStripProps) {
   const [pressedMatch, setPressedMatch] = useState<string | null>(null);
   const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
-  const [showAddDialog, setShowAddDialog] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -117,7 +96,9 @@ export default function MatchesStrip({
   };
 
   const handleAddMatch = () => {
-    setShowAddDialog(true);
+    if (onNavigateToDiscover) {
+      onNavigateToDiscover();
+    }
   };
 
   // Keyboard navigation support
@@ -132,16 +113,6 @@ export default function MatchesStrip({
     <div className="bg-white border-b border-gray-200 px-4 py-3">
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-lg font-semibold text-gray-900">Matches</h2>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleAddMatch}
-          className="text-sm text-gray-600 hover:text-gray-900"
-          data-testid="button-add-match"
-        >
-          <Search className="w-4 h-4 mr-1" />
-          Find More
-        </Button>
       </div>
       
       <ScrollArea className="w-full">
@@ -287,49 +258,7 @@ export default function MatchesStrip({
         </div>
       </ScrollArea>
 
-      {/* Add Match Dialog */}
-      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="sm:max-w-md" aria-describedby="add-match-description">
-          <DialogHeader>
-            <DialogTitle>Find New Matches</DialogTitle>
-            <DialogDescription id="add-match-description">
-              Search for new dogs to connect with or invite friends to join.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Search for dogs or owners..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-                data-testid="input-search-matches"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <Button 
-                variant="outline" 
-                onClick={() => setShowAddDialog(false)}
-                className="w-full"
-                data-testid="button-browse-dogs"
-              >
-                <Search className="w-4 h-4 mr-2" />
-                Browse Dogs
-              </Button>
-              <Button 
-                className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
-                onClick={() => setShowAddDialog(false)}
-                data-testid="button-invite-friends"
-              >
-                <UserPlus className="w-4 h-4 mr-2" />
-                Invite Friends
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+
     </div>
   );
 }
