@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { 
   Shield, Calendar, AlertTriangle, Clock, Plus, ChevronRight, 
   Activity, FileText, Phone, MapPin, User
@@ -29,6 +30,7 @@ export default function MedicalModal({
 }: MedicalModalProps) {
   const [selectedVaccination, setSelectedVaccination] = useState<any>(null);
   const [showCareDetails, setShowCareDetails] = useState(false);
+  const [, setLocation] = useLocation();
 
   // Dog data is already provided as prop
   const isLoading = false;
@@ -236,6 +238,10 @@ export default function MedicalModal({
                   variant="outline"
                   className="h-auto p-4 flex flex-col items-center space-y-2 border-2"
                   data-testid="button-schedule-checkup"
+                  onClick={() => {
+                    onClose();
+                    setLocation('/vet-connect');
+                  }}
                 >
                   <Calendar className="w-6 h-6 text-blue-600" />
                   <span className="text-sm font-medium">Schedule Checkup</span>
@@ -245,6 +251,10 @@ export default function MedicalModal({
                   variant="outline"
                   className="h-auto p-4 flex flex-col items-center space-y-2 border-2"
                   data-testid="button-find-vet"
+                  onClick={() => {
+                    onClose();
+                    setLocation('/vet-connect');
+                  }}
                 >
                   <MapPin className="w-6 h-6 text-green-600" />
                   <span className="text-sm font-medium">Find Vet</span>
