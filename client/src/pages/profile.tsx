@@ -654,12 +654,10 @@ export default function Profile() {
       )}
 
       {/* Medical Modal - Unified Care Details & Scheduling Flow */}
-      {currentDog && (
+      {showMedicalModal && currentDog && (
         <MedicalModal
-          isOpen={showMedicalModal}
+          dog={currentDog}
           onClose={() => setShowMedicalModal(false)}
-          dogId={currentDog.id}
-          dogName={currentDog.name}
         />
       )}
     </div>

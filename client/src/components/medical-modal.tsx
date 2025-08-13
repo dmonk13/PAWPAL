@@ -33,6 +33,11 @@ export default function MedicalModal({
   // Dog data is already provided as prop
   const isLoading = false;
 
+  // Early return if dog is not provided
+  if (!dog) {
+    return null;
+  }
+
   // Use real vaccination data from medical profile or provide demo data
   const vaccinations = dog?.medicalProfile?.vaccinations || [
     {
@@ -178,11 +183,11 @@ export default function MedicalModal({
               </div>
 
               <div className="space-y-3">
-                {vaccinations.map((vaccination: any) => {
+                {vaccinations.map((vaccination: any, index: number) => {
                   const status = getVaccinationStatus(vaccination.nextDue);
                   return (
                     <Card 
-                      key={vaccination.id}
+                      key={vaccination.id || index}
                       className={`cursor-pointer transition-all hover:shadow-md ${
                         status === 'overdue' 
                           ? 'border-red-200 bg-red-50 hover:bg-red-100' 
