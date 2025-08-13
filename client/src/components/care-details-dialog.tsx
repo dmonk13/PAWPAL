@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { 
   Calendar, Clock, MapPin, Phone, Shield, AlertTriangle, Info, 
   User, Weight, Heart, CheckCircle, X, ArrowRight, Star, Crown
@@ -61,6 +62,7 @@ export default function CareDetailsDialog({
   const [showUpsell, setShowUpsell] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   // Check if user has premium subscription
   const { data: user } = useQuery({
@@ -129,11 +131,9 @@ export default function CareDetailsDialog({
       });
     }
 
-    if ((user as any)?.subscription?.plan === 'premium') {
-      setShowScheduling(true);
-    } else {
-      setShowUpsell(true);
-    }
+    // Close the dialog and navigate to vet connect
+    onClose();
+    setLocation('/vet-connect');
   };
 
   const handleMarkAsDone = () => {
