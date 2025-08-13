@@ -19,6 +19,11 @@ PupMatch is a mobile-first dog dating application that allows dog owners to conn
 - Fixed "Compare Plans" button in profile to properly navigate to premium pricing page
 - Added 44px touch targets, semantic labels, and proper ARIA attributes for accessibility
 - Implemented device/session management link and comprehensive form validation
+- Redesigned Age Range filter with improved user experience: cleaner interface, better text, tooltip for guidance
+- Removed duplicate X button from filter modal header and improved spacing between sections
+- Enhanced age selection with clear multi-select chips (Puppy 0-1y, Young 1-3y, Adult 3-7y, Senior 7y+)
+- Added custom age range bottom sheet with min/max steppers, validation, and reset functionality
+- Improved filter summary with live pill display and selected count indicators
 
 **Vaccination Care System Implementation (August 13, 2025)**:
 - Created unified vaccination care scheduling system with "Care Details & Scheduling" dialog

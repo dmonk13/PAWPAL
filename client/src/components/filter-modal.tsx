@@ -318,15 +318,9 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
                      aria-describedby="filter-description">
         <DialogHeader className="flex-shrink-0 px-6 pt-6 pb-2">
           <div className="flex items-center justify-between mb-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleReset}
-              className="text-gray-600 hover:text-gray-800 -ml-2"
-              data-testid="button-clear-all"
-            >
-              Clear All
-            </Button>
+            <DialogTitle className="text-2xl font-bold text-gray-900 text-left">
+              Filters
+            </DialogTitle>
             <Button
               variant="ghost"
               size="sm"
@@ -337,11 +331,8 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
               <X className="w-5 h-5" />
             </Button>
           </div>
-          <DialogTitle className="text-2xl font-bold text-gray-900 text-left">
-            Filters
-          </DialogTitle>
           <DialogDescription id="filter-description" className="text-gray-600 text-left">
-            Refine results to find the best match
+            Find your perfect playmate
           </DialogDescription>
         </DialogHeader>
         
@@ -429,29 +420,41 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
           
               {/* Age Range Section */}
               <div className="space-y-4">
-                <Label className="text-base font-semibold text-gray-900">Age Range</Label>
+                <div className="flex items-center justify-between">
+                  <Label className="text-base font-semibold text-gray-900">Age Preference</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="sm" className="p-1 h-auto">
+                        <Info className="w-4 h-4 text-gray-400" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs">
+                      <p className="text-sm">Age affects energy and training needs</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 
-                {/* Age Chips - Enhanced Grid */}
+                <div className="text-sm text-gray-600 mb-3">
+                  Select one or more age groups
+                </div>
+                
+                {/* Age Chips */}
                 <div className="grid grid-cols-2 gap-3">
-                  {ageChipOptions.map((option) => {
+                  {ageChipOptions.slice(0, 4).map((option) => {
                     const IconComponent = option.icon;
-                    const isSelected = option.id === 'custom' ? hasCustomAge : selectedAgeChips.includes(option.id);
-                    const isCustomChip = option.id === 'custom';
-                    
+                    const isSelected = selectedAgeChips.includes(option.id);
                     return (
                       <Button
                         key={option.id}
                         variant={isSelected ? "default" : "outline"}
                         onClick={() => toggleAgeChip(option.id)}
-                        className={`min-h-[48px] p-3 flex flex-col items-center justify-center space-y-1 border-2 transition-all duration-200 focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 ${
+                        className={`min-h-[52px] p-3 flex flex-col items-center justify-center space-y-1 border-2 transition-all duration-200 focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 ${
                           isSelected 
                             ? "bg-gradient-to-r from-pink-500 to-rose-500 text-white border-pink-500 shadow-lg" 
                             : "hover:border-pink-300 hover:bg-pink-50 border-gray-300"
-                        } ${isCustomChip ? 'border-dashed' : ''}`}
+                        }`}
                         data-testid={`chip-age-${option.id}`}
-                        aria-label={`Select ${option.label} age range: ${option.range}`}
-                        role="button"
-                        aria-pressed={isSelected}
+                        aria-label={`Select ${option.label} dogs: ${option.range}`}
                       >
                         <IconComponent className={`w-5 h-5 ${isSelected ? 'text-white' : 'text-gray-600'}`} />
                         <div className="text-center">
@@ -459,7 +462,7 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
                             {option.label}
                           </div>
                           <div className={`text-xs ${isSelected ? 'text-pink-100' : 'text-gray-500'}`}>
-                            {isCustomChip && hasCustomAge ? `${customMinAge}-${customMaxAge}y` : option.subtitle}
+                            {option.subtitle}
                           </div>
                         </div>
                       </Button>
@@ -467,36 +470,29 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
                   })}
                 </div>
                 
-                {/* Custom Age Range */}
-                <div className="space-y-3">
-                  {/* Helper text */}
-                  <div className="text-sm text-gray-600 flex items-center gap-2">
-                    Select one or more age ranges.
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="sm" className="p-1 h-auto">
-                          <Info className="w-4 h-4 text-gray-400" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="max-w-xs">
-                        <p className="text-sm">Age affects energy levels and training needs. Puppies require more attention and training.</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                  
-                  {/* Selected count and summary */}
-                  {(selectedAgeChips.length > 0 || hasCustomAge) && (
-                    <div className="flex items-center justify-between text-sm">
-                      <Badge variant="secondary" className="text-xs">
-                        {selectedAgeChips.length + (hasCustomAge ? 1 : 0)} selected
-                      </Badge>
-                      <div className="text-gray-600">
-                        {hasCustomAge ? `Custom: ${customMinAge}-${customMaxAge}y` : 
-                         selectedAgeChips.map(id => ageChipOptions.find(opt => opt.id === id)?.subtitle).join(', ')}
-                      </div>
+                {/* Custom Age Range Button */}
+                <Button
+                  variant="outline"
+                  onClick={() => setShowCustomAgeSheet(true)}
+                  className="w-full min-h-[48px] border-2 border-dashed border-gray-300 hover:border-pink-300 hover:bg-pink-50 transition-all duration-200"
+                  data-testid="button-custom-age"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  {hasCustomAge ? `Custom Range: ${customMinAge}-${customMaxAge} years` : 'Custom Age Range'}
+                </Button>
+                
+                {/* Selected Summary */}
+                {(selectedAgeChips.length > 0 || hasCustomAge) && (
+                  <div className="flex items-center justify-between text-sm bg-pink-50 p-3 rounded-lg border border-pink-200">
+                    <div className="text-pink-700 font-medium">
+                      {selectedAgeChips.length + (hasCustomAge ? 1 : 0)} age group{selectedAgeChips.length + (hasCustomAge ? 1 : 0) !== 1 ? 's' : ''} selected
                     </div>
-                  )}
-                </div>
+                    <Badge variant="secondary" className="bg-pink-100 text-pink-700">
+                      {hasCustomAge && `${customMinAge}-${customMaxAge}y`}
+                      {selectedAgeChips.length > 0 && selectedAgeChips.map(id => ageChipOptions.find(opt => opt.id === id)?.label).join(', ')}
+                    </Badge>
+                  </div>
+                )}
               </div>
           
               {/* Size Section */}
@@ -723,26 +719,14 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
         {/* Fixed Action Buttons */}
         <div className="flex-shrink-0 p-6 border-t border-gray-200 bg-white">
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Button 
-                variant="outline" 
-                className="w-full min-h-[48px] border-2" 
-                onClick={handleReset}
-                data-testid="button-clear-filters"
-              >
-                Clear
-              </Button>
-              <Button 
-                variant="ghost"
-                size="sm"
-                className="w-full text-xs text-pink-600 hover:text-pink-700"
-                onClick={handleResetToRecommended}
-                data-testid="button-reset-recommended"
-              >
-                <RotateCcw className="w-3 h-3 mr-1" />
-                Reset to Recommended
-              </Button>
-            </div>
+            <Button 
+              variant="outline" 
+              className="w-full min-h-[48px] border-2" 
+              onClick={handleReset}
+              data-testid="button-clear-filters"
+            >
+              Clear All
+            </Button>
             <Button 
               className="bg-gradient-to-r from-pink-500 to-rose-500 text-white hover:from-pink-600 hover:to-rose-600 min-h-[48px] shadow-lg" 
               onClick={handleApply}
@@ -751,13 +735,6 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
               Apply Filters
               {getActiveFilterCount() > 0 && ` (${getActiveFilterCount()})`}
             </Button>
-          </div>
-          
-          {/* Optional: Live result count placeholder */}
-          <div className="mt-3 text-center">
-            <div className="text-xs text-gray-500">
-              Live results will update as you make changes
-            </div>
           </div>
         </div>
       </DialogContent>
