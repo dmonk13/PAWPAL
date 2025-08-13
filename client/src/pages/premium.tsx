@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, X, Star, Heart, Shield, Undo2, Infinity, Percent, Crown } from "lucide-react";
+import { Check, X, Star, Heart, Shield, Undo2, Infinity, Percent, Crown, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "wouter";
 
 export default function Premium() {
   const [isUpgrading, setIsUpgrading] = useState(false);
@@ -50,6 +51,18 @@ export default function Premium() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Header with Back Button */}
+      <header className="bg-white border-b border-gray-200 px-4 py-4 sticky top-0 z-40 shadow-sm">
+        <div className="flex items-center space-x-3 max-w-4xl mx-auto">
+          <Link href="/profile">
+            <Button variant="ghost" size="sm" className="p-2">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          </Link>
+          <h1 className="text-xl font-semibold text-gray-900">Premium Plans</h1>
+        </div>
+      </header>
+
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">

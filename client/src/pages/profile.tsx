@@ -226,14 +226,16 @@ export default function Profile() {
                     </Link>
                     
                     <div className="flex items-center justify-between">
-                      <Button 
-                        variant="ghost" 
-                        className="text-[#E94B6E] hover:text-[#D73E5E] hover:bg-pink-50 dark:hover:bg-pink-900/10 font-medium h-auto p-0"
-                        data-testid="button-compare-plans"
-                        aria-label="Compare all available plans"
-                      >
-                        Compare Plans
-                      </Button>
+                      <Link href="/premium" className="block">
+                        <Button 
+                          variant="ghost" 
+                          className="text-[#E94B6E] hover:text-[#D73E5E] hover:bg-pink-50 dark:hover:bg-pink-900/10 font-medium h-auto p-0"
+                          data-testid="button-compare-plans"
+                          aria-label="Compare all available plans"
+                        >
+                          Compare Plans
+                        </Button>
+                      </Link>
                       
                       <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                         Cancel anytime
