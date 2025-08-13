@@ -39,7 +39,7 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
   
   // Age filters
   const [selectedAgeChips, setSelectedAgeChips] = useState<string[]>(initialFilters.ageChips || []);
-  const [showCustomAgeSheet, setShowCustomAgeSheet] = useState(false);
+  const [showCustomAge, setShowCustomAge] = useState(false);
   const [customMinAge, setCustomMinAge] = useState(initialFilters.minAge || 0);
   const [customMaxAge, setCustomMaxAge] = useState(initialFilters.maxAge || 15);
   const [hasCustomAge, setHasCustomAge] = useState(initialFilters.hasCustomAge || false);
@@ -439,7 +439,7 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
                 </div>
                 
                 {/* Age Chips */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2">
                   {ageChipOptions.slice(0, 4).map((option) => {
                     const IconComponent = option.icon;
                     const isSelected = selectedAgeChips.includes(option.id);
@@ -448,7 +448,7 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
                         key={option.id}
                         variant={isSelected ? "default" : "outline"}
                         onClick={() => toggleAgeChip(option.id)}
-                        className={`min-h-[52px] p-3 flex flex-col items-center justify-center space-y-1 border-2 transition-all duration-200 focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 ${
+                        className={`h-[60px] p-2 flex flex-col items-center justify-center gap-1 border-2 transition-all duration-200 focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 ${
                           isSelected 
                             ? "bg-gradient-to-r from-pink-500 to-rose-500 text-white border-pink-500 shadow-lg" 
                             : "hover:border-pink-300 hover:bg-pink-50 border-gray-300"
@@ -456,8 +456,8 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
                         data-testid={`chip-age-${option.id}`}
                         aria-label={`Select ${option.label} dogs: ${option.range}`}
                       >
-                        <IconComponent className={`w-5 h-5 ${isSelected ? 'text-white' : 'text-gray-600'}`} />
-                        <div className="text-center">
+                        <IconComponent className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-gray-600'}`} />
+                        <div className="text-center leading-tight">
                           <div className={`text-sm font-medium ${isSelected ? 'text-white' : 'text-gray-900'}`}>
                             {option.label}
                           </div>
@@ -470,16 +470,108 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
                   })}
                 </div>
                 
-                {/* Custom Age Range Button */}
-                <Button
-                  variant="outline"
-                  onClick={() => setShowCustomAgeSheet(true)}
-                  className="w-full min-h-[48px] border-2 border-dashed border-gray-300 hover:border-pink-300 hover:bg-pink-50 transition-all duration-200"
-                  data-testid="button-custom-age"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  {hasCustomAge ? `Custom Range: ${customMinAge}-${customMaxAge} years` : 'Custom Age Range'}
-                </Button>
+                {/* Custom Age Range Section */}
+                {!showCustomAge ? (
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowCustomAge(true)}
+                    className="w-full h-[48px] border-2 border-dashed border-gray-300 hover:border-pink-300 hover:bg-pink-50 transition-all duration-200"
+                    data-testid="button-custom-age"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    {hasCustomAge ? `Custom Range: ${customMinAge}-${customMaxAge} years` : 'Custom Age Range'}
+                  </Button>
+                ) : (
+                  <div className="space-y-3 p-4 border-2 border-pink-200 rounded-lg bg-pink-50">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-medium text-gray-900">Custom Age Range</Label>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowCustomAge(false)}
+                        className="h-6 w-6 p-0"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-xs text-gray-600">Min Age</Label>
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => customMinAge > 0 && handleCustomAgeChange(customMinAge - 1, customMaxAge)}
+                            disabled={customMinAge <= 0}
+                            className="w-8 h-8 p-0"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </Button>
+                          <span className="w-12 text-center text-sm font-medium">{customMinAge}y</span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => customMinAge < 20 && handleCustomAgeChange(customMinAge + 1, customMaxAge)}
+                            disabled={customMinAge >= 20}
+                            className="w-8 h-8 p-0"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label className="text-xs text-gray-600">Max Age</Label>
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => customMaxAge > customMinAge && handleCustomAgeChange(customMinAge, customMaxAge - 1)}
+                            disabled={customMaxAge <= customMinAge}
+                            className="w-8 h-8 p-0"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </Button>
+                          <span className="w-12 text-center text-sm font-medium">{customMaxAge}y</span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => customMaxAge < 20 && handleCustomAgeChange(customMinAge, customMaxAge + 1)}
+                            disabled={customMaxAge >= 20}
+                            className="w-8 h-8 p-0"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          handleCustomAgeChange(0, 20);
+                          setHasCustomAge(false);
+                        }}
+                        className="flex-1"
+                      >
+                        Reset
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setHasCustomAge(true);
+                          setShowCustomAge(false);
+                        }}
+                        className="flex-1 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600"
+                      >
+                        Apply
+                      </Button>
+                    </div>
+                  </div>
+                )}
                 
                 {/* Selected Summary */}
                 {(selectedAgeChips.length > 0 || hasCustomAge) && (
@@ -740,116 +832,6 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
           </div>
         </div>
       </DialogContent>
-      
-      {/* Custom Age Range Bottom Sheet */}
-      <Sheet open={showCustomAgeSheet} onOpenChange={setShowCustomAgeSheet}>
-        <SheetContent side="bottom" className="px-6 py-6">
-          <SheetHeader>
-            <SheetTitle>Custom Age Range</SheetTitle>
-            <SheetDescription>
-              Set a specific age range for your matches
-            </SheetDescription>
-          </SheetHeader>
-          
-          <div className="space-y-6 mt-6">
-            <div className="grid grid-cols-2 gap-4">
-              {/* Min Age Stepper */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">Minimum Age</Label>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => customMinAge > 0 && setCustomMinAge(customMinAge - 1)}
-                    disabled={customMinAge <= 0}
-                    className="w-10 h-10 p-0 min-h-[44px]"
-                    data-testid="button-min-age-minus"
-                    aria-label="Decrease minimum age"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </Button>
-                  <div className="flex-1 text-center">
-                    <div className="text-2xl font-bold text-gray-900">{customMinAge}</div>
-                    <div className="text-xs text-gray-500">years</div>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => customMinAge < 15 && setCustomMinAge(customMinAge + 1)}
-                    disabled={customMinAge >= 15}
-                    className="w-10 h-10 p-0 min-h-[44px]"
-                    data-testid="button-min-age-plus"
-                    aria-label="Increase minimum age"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-              
-              {/* Max Age Stepper */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">Maximum Age</Label>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => customMaxAge > 0 && setCustomMaxAge(customMaxAge - 1)}
-                    disabled={customMaxAge <= 0}
-                    className="w-10 h-10 p-0 min-h-[44px]"
-                    data-testid="button-max-age-minus"
-                    aria-label="Decrease maximum age"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </Button>
-                  <div className="flex-1 text-center">
-                    <div className="text-2xl font-bold text-gray-900">{customMaxAge}</div>
-                    <div className="text-xs text-gray-500">years</div>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => customMaxAge < 15 && setCustomMaxAge(customMaxAge + 1)}
-                    disabled={customMaxAge >= 15}
-                    className="w-10 h-10 p-0 min-h-[44px]"
-                    data-testid="button-max-age-plus"
-                    aria-label="Increase maximum age"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-            
-            {/* Validation Message */}
-            {customMinAge > customMaxAge && (
-              <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg border border-amber-200">
-                <AlertTriangle className="w-4 h-4 inline mr-2" />
-                Minimum age cannot be greater than maximum age. Values will be adjusted automatically.
-              </div>
-            )}
-            
-            {/* Action Buttons */}
-            <div className="grid grid-cols-2 gap-4 pt-4">
-              <Button
-                variant="outline"
-                onClick={resetToPresets}
-                className="min-h-[48px]"
-                data-testid="button-reset-to-presets"
-              >
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Reset to Presets
-              </Button>
-              <Button
-                onClick={handleCustomAgeApply}
-                className="bg-gradient-to-r from-pink-500 to-rose-500 text-white hover:from-pink-600 hover:to-rose-600 min-h-[48px]"
-                data-testid="button-apply-custom-age"
-              >
-                Apply Custom Range
-              </Button>
-            </div>
-          </div>
-        </SheetContent>
-      </Sheet>
     </Dialog>
   );
 }
