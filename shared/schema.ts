@@ -26,6 +26,7 @@ export const dogs = pgTable("dogs", {
   bio: text("bio"),
   photos: jsonb("photos").$type<string[]>().default([]),
   temperament: jsonb("temperament").$type<string[]>().default([]),
+  personalityPrompts: jsonb("personality_prompts").$type<Record<string, string>>(),
   matingPreference: boolean("mating_preference").default(false),
   distanceRadius: integer("distance_radius").default(10),
   latitude: decimal("latitude", { precision: 10, scale: 8 }),
