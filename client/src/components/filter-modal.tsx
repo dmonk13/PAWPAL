@@ -434,7 +434,7 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
                   </Tooltip>
                 </div>
                 
-                <div className="text-sm text-gray-600 mb-3">
+                <div className="text-sm text-gray-600">
                   Select one or more age groups
                 </div>
                 
@@ -483,14 +483,16 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
                 
                 {/* Selected Summary */}
                 {(selectedAgeChips.length > 0 || hasCustomAge) && (
-                  <div className="flex items-center justify-between text-sm bg-pink-50 p-3 rounded-lg border border-pink-200">
-                    <div className="text-pink-700 font-medium">
-                      {selectedAgeChips.length + (hasCustomAge ? 1 : 0)} age group{selectedAgeChips.length + (hasCustomAge ? 1 : 0) !== 1 ? 's' : ''} selected
+                  <div className="bg-pink-50 p-3 rounded-lg border border-pink-200">
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="text-pink-700 font-medium">
+                        {selectedAgeChips.length + (hasCustomAge ? 1 : 0)} age group{selectedAgeChips.length + (hasCustomAge ? 1 : 0) !== 1 ? 's' : ''} selected
+                      </div>
+                      <Badge variant="secondary" className="bg-pink-100 text-pink-700 text-xs">
+                        {hasCustomAge && `${customMinAge}-${customMaxAge}y`}
+                        {selectedAgeChips.length > 0 && selectedAgeChips.map(id => ageChipOptions.find(opt => opt.id === id)?.label).join(', ')}
+                      </Badge>
                     </div>
-                    <Badge variant="secondary" className="bg-pink-100 text-pink-700">
-                      {hasCustomAge && `${customMinAge}-${customMaxAge}y`}
-                      {selectedAgeChips.length > 0 && selectedAgeChips.map(id => ageChipOptions.find(opt => opt.id === id)?.label).join(', ')}
-                    </Badge>
                   </div>
                 )}
               </div>
