@@ -15,6 +15,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 interface FilterModalProps {
   isOpen: boolean;
@@ -31,9 +39,10 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
   
   // Age filters
   const [selectedAgeChips, setSelectedAgeChips] = useState<string[]>(initialFilters.ageChips || []);
-  const [customAgeRange, setCustomAgeRange] = useState(false);
-  const [minAge, setMinAge] = useState(initialFilters.minAge || 0);
-  const [maxAge, setMaxAge] = useState(initialFilters.maxAge || 15);
+  const [showCustomAgeSheet, setShowCustomAgeSheet] = useState(false);
+  const [customMinAge, setCustomMinAge] = useState(initialFilters.minAge || 0);
+  const [customMaxAge, setCustomMaxAge] = useState(initialFilters.maxAge || 15);
+  const [hasCustomAge, setHasCustomAge] = useState(initialFilters.hasCustomAge || false);
   
   // Size filters
   const [selectedSizes, setSelectedSizes] = useState<string[]>(initialFilters.sizes || []);
@@ -62,10 +71,11 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
   ];
   
   const ageChipOptions = [
-    { id: "puppy", label: "Puppy", subtitle: "0-1 years", icon: Baby },
-    { id: "young", label: "Young", subtitle: "1-3 years", icon: Heart },
-    { id: "adult", label: "Adult", subtitle: "3-7 years", icon: Shield },
-    { id: "senior", label: "Senior", subtitle: "7+ years", icon: MapPin }
+    { id: "puppy", label: "Puppy", subtitle: "0-1y", range: "0-1 years", icon: Baby },
+    { id: "young", label: "Young", subtitle: "1-3y", range: "1-3 years", icon: Heart },
+    { id: "adult", label: "Adult", subtitle: "3-7y", range: "3-7 years", icon: Shield },
+    { id: "senior", label: "Senior", subtitle: "7y+", range: "7+ years", icon: MapPin },
+    { id: "custom", label: "Custom", subtitle: "Set range", range: "Custom range", icon: Plus }
   ];
   
   const sizeOptions = ["Small", "Medium", "Large"];
@@ -121,11 +131,23 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
   };
   
   const toggleAgeChip = (chipId: string) => {
-    setSelectedAgeChips(prev =>
-      prev.includes(chipId)
+    if (chipId === 'custom') {
+      setShowCustomAgeSheet(true);
+      return;
+    }
+    
+    setSelectedAgeChips(prev => {
+      const newSelection = prev.includes(chipId)
         ? prev.filter(id => id !== chipId)
-        : [...prev, chipId]
-    );
+        : [...prev, chipId];
+      
+      // Remove custom if user selects preset chips
+      if (newSelection.length > 0 && hasCustomAge) {
+        setHasCustomAge(false);
+      }
+      
+      return newSelection;
+    });
     setHasChanges(true);
   };
   
@@ -162,25 +184,40 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
   };
   
   const validateAgeRange = () => {
-    if (customAgeRange && minAge > maxAge) {
-      const temp = minAge;
-      setMinAge(maxAge);
-      setMaxAge(temp);
+    if (customMinAge > customMaxAge) {
+      const temp = customMinAge;
+      setCustomMinAge(customMaxAge);
+      setCustomMaxAge(temp);
     }
+  };
+  
+  const handleCustomAgeApply = () => {
+    validateAgeRange();
+    setHasCustomAge(true);
+    setSelectedAgeChips([]); // Clear preset selections
+    setShowCustomAgeSheet(false);
+    setHasChanges(true);
+  };
+  
+  const resetToPresets = () => {
+    setHasCustomAge(false);
+    setCustomMinAge(0);
+    setCustomMaxAge(15);
+    setShowCustomAgeSheet(false);
   };
   
   // Track changes for UI feedback
   useEffect(() => {
     validateAgeRange();
-  }, [minAge, maxAge, customAgeRange]);
+  }, [customMinAge, customMaxAge]);
 
   const handleApply = () => {
     const filters = {
       maxDistance: customDistance ? customDistanceValue : distance[0],
       ageChips: selectedAgeChips,
-      customAgeRange,
-      minAge: customAgeRange ? minAge : undefined,
-      maxAge: customAgeRange ? maxAge : undefined,
+      hasCustomAge,
+      minAge: hasCustomAge ? customMinAge : undefined,
+      maxAge: hasCustomAge ? customMaxAge : undefined,
       sizes: selectedSizes,
       vaccinated,
       spayedNeutered,
@@ -203,9 +240,9 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
     setCustomDistance(false);
     setCustomDistanceValue(10);
     setSelectedAgeChips([]);
-    setCustomAgeRange(false);
-    setMinAge(0);
-    setMaxAge(15);
+    setHasCustomAge(false);
+    setCustomMinAge(0);
+    setCustomMaxAge(15);
     setSelectedSizes([]);
     setVaccinated(true);
     setSpayedNeutered(false);
@@ -225,7 +262,7 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
     setCustomDistance(false);
     setCustomDistanceValue(10);
     setSelectedAgeChips(["young", "adult"]);
-    setCustomAgeRange(false);
+    setHasCustomAge(false);
     setSelectedSizes(["Medium"]);
     setVaccinated(true);
     setSpayedNeutered(false);
@@ -240,7 +277,7 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
   // Get active filter count for summary
   const getActiveFilterCount = () => {
     let count = 0;
-    if (selectedAgeChips.length > 0 || customAgeRange) count++;
+    if (selectedAgeChips.length > 0 || hasCustomAge) count++;
     if (selectedSizes.length > 0) count++;
     if (distance[0] !== 10) count++;
     if (!vaccinated || spayedNeutered || noAllergies || vetClearance) count++;
@@ -259,6 +296,9 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
     const pills = [];
     if (selectedAgeChips.length > 0) {
       pills.push(`Ages: ${selectedAgeChips.map(id => ageChipOptions.find(opt => opt.id === id)?.label).join(', ')}`);
+    }
+    if (hasCustomAge) {
+      pills.push(`Age: ${customMinAge}-${customMaxAge}y`);
     }
     if (selectedSizes.length > 0) {
       pills.push(`Size: ${selectedSizes.join(', ')}`);
@@ -303,17 +343,6 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
           <DialogDescription id="filter-description" className="text-gray-600 text-left">
             Refine results to find the best match
           </DialogDescription>
-          
-          {/* Desktop Apply Button */}
-          <div className="hidden md:block mt-4">
-            <Button
-              onClick={handleApply}
-              className="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white hover:from-pink-600 hover:to-rose-600 min-h-[48px]"
-              data-testid="button-apply-filters-top"
-            >
-              Apply Filters {getActiveFilterCount() > 0 && `(${getActiveFilterCount()})`}
-            </Button>
-          </div>
         </DialogHeader>
         
         {/* Scrollable Content */}
@@ -355,7 +384,7 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
                     <Checkbox
                       id="custom-distance"
                       checked={customDistance}
-                      onCheckedChange={setCustomDistance}
+                      onCheckedChange={(checked) => setCustomDistance(checked === true)}
                       data-testid="checkbox-custom-distance"
                     />
                     <Label htmlFor="custom-distance" className="text-sm text-gray-700">
@@ -402,22 +431,27 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
               <div className="space-y-4">
                 <Label className="text-base font-semibold text-gray-900">Age Range</Label>
                 
-                {/* Age Chips */}
+                {/* Age Chips - Enhanced Grid */}
                 <div className="grid grid-cols-2 gap-3">
                   {ageChipOptions.map((option) => {
                     const IconComponent = option.icon;
-                    const isSelected = selectedAgeChips.includes(option.id);
+                    const isSelected = option.id === 'custom' ? hasCustomAge : selectedAgeChips.includes(option.id);
+                    const isCustomChip = option.id === 'custom';
+                    
                     return (
                       <Button
                         key={option.id}
                         variant={isSelected ? "default" : "outline"}
                         onClick={() => toggleAgeChip(option.id)}
-                        className={`min-h-[56px] p-3 flex flex-col items-center justify-center space-y-1 border-2 transition-all duration-200 ${
+                        className={`min-h-[48px] p-3 flex flex-col items-center justify-center space-y-1 border-2 transition-all duration-200 focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 ${
                           isSelected 
                             ? "bg-gradient-to-r from-pink-500 to-rose-500 text-white border-pink-500 shadow-lg" 
-                            : "hover:border-pink-300 hover:bg-pink-50"
-                        }`}
+                            : "hover:border-pink-300 hover:bg-pink-50 border-gray-300"
+                        } ${isCustomChip ? 'border-dashed' : ''}`}
                         data-testid={`chip-age-${option.id}`}
+                        aria-label={`Select ${option.label} age range: ${option.range}`}
+                        role="button"
+                        aria-pressed={isSelected}
                       >
                         <IconComponent className={`w-5 h-5 ${isSelected ? 'text-white' : 'text-gray-600'}`} />
                         <div className="text-center">
@@ -425,7 +459,7 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
                             {option.label}
                           </div>
                           <div className={`text-xs ${isSelected ? 'text-pink-100' : 'text-gray-500'}`}>
-                            {option.subtitle}
+                            {isCustomChip && hasCustomAge ? `${customMinAge}-${customMaxAge}y` : option.subtitle}
                           </div>
                         </div>
                       </Button>
@@ -435,45 +469,30 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
                 
                 {/* Custom Age Range */}
                 <div className="space-y-3">
-                  <div className="flex items-center space-x-3">
-                    <Checkbox
-                      id="custom-age"
-                      checked={customAgeRange}
-                      onCheckedChange={setCustomAgeRange}
-                      data-testid="checkbox-custom-age"
-                    />
-                    <Label htmlFor="custom-age" className="text-sm text-gray-700">
-                      Custom age range
-                    </Label>
+                  {/* Helper text */}
+                  <div className="text-sm text-gray-600 flex items-center gap-2">
+                    Select one or more age ranges.
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="sm" className="p-1 h-auto">
+                          <Info className="w-4 h-4 text-gray-400" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-xs">
+                        <p className="text-sm">Age affects energy levels and training needs. Puppies require more attention and training.</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                   
-                  {customAgeRange && (
-                    <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
-                      <div>
-                        <Label className="text-sm text-gray-600 mb-2 block">Min Age</Label>
-                        <Select value={minAge.toString()} onValueChange={(v) => setMinAge(parseInt(v))}>
-                          <SelectTrigger data-testid="select-min-age">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Array.from({length: 16}, (_, i) => (
-                              <SelectItem key={i} value={i.toString()}>{i} years</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label className="text-sm text-gray-600 mb-2 block">Max Age</Label>
-                        <Select value={maxAge.toString()} onValueChange={(v) => setMaxAge(parseInt(v))}>
-                          <SelectTrigger data-testid="select-max-age">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Array.from({length: 16}, (_, i) => (
-                              <SelectItem key={i} value={i.toString()}>{i} years</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                  {/* Selected count and summary */}
+                  {(selectedAgeChips.length > 0 || hasCustomAge) && (
+                    <div className="flex items-center justify-between text-sm">
+                      <Badge variant="secondary" className="text-xs">
+                        {selectedAgeChips.length + (hasCustomAge ? 1 : 0)} selected
+                      </Badge>
+                      <div className="text-gray-600">
+                        {hasCustomAge ? `Custom: ${customMinAge}-${customMaxAge}y` : 
+                         selectedAgeChips.map(id => ageChipOptions.find(opt => opt.id === id)?.subtitle).join(', ')}
                       </div>
                     </div>
                   )}
@@ -679,8 +698,8 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
                 )}
               </div>
               
-              {/* Bottom spacing */}
-              <div className="h-20"></div>
+              {/* Bottom spacing - reduced gap */}
+              <div className="h-4"></div>
             </div>
           </div>
         </TooltipProvider>
@@ -742,6 +761,116 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
           </div>
         </div>
       </DialogContent>
+      
+      {/* Custom Age Range Bottom Sheet */}
+      <Sheet open={showCustomAgeSheet} onOpenChange={setShowCustomAgeSheet}>
+        <SheetContent side="bottom" className="px-6 py-6">
+          <SheetHeader>
+            <SheetTitle>Custom Age Range</SheetTitle>
+            <SheetDescription>
+              Set a specific age range for your matches
+            </SheetDescription>
+          </SheetHeader>
+          
+          <div className="space-y-6 mt-6">
+            <div className="grid grid-cols-2 gap-4">
+              {/* Min Age Stepper */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">Minimum Age</Label>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => customMinAge > 0 && setCustomMinAge(customMinAge - 1)}
+                    disabled={customMinAge <= 0}
+                    className="w-10 h-10 p-0 min-h-[44px]"
+                    data-testid="button-min-age-minus"
+                    aria-label="Decrease minimum age"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </Button>
+                  <div className="flex-1 text-center">
+                    <div className="text-2xl font-bold text-gray-900">{customMinAge}</div>
+                    <div className="text-xs text-gray-500">years</div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => customMinAge < 15 && setCustomMinAge(customMinAge + 1)}
+                    disabled={customMinAge >= 15}
+                    className="w-10 h-10 p-0 min-h-[44px]"
+                    data-testid="button-min-age-plus"
+                    aria-label="Increase minimum age"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Max Age Stepper */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">Maximum Age</Label>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => customMaxAge > 0 && setCustomMaxAge(customMaxAge - 1)}
+                    disabled={customMaxAge <= 0}
+                    className="w-10 h-10 p-0 min-h-[44px]"
+                    data-testid="button-max-age-minus"
+                    aria-label="Decrease maximum age"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </Button>
+                  <div className="flex-1 text-center">
+                    <div className="text-2xl font-bold text-gray-900">{customMaxAge}</div>
+                    <div className="text-xs text-gray-500">years</div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => customMaxAge < 15 && setCustomMaxAge(customMaxAge + 1)}
+                    disabled={customMaxAge >= 15}
+                    className="w-10 h-10 p-0 min-h-[44px]"
+                    data-testid="button-max-age-plus"
+                    aria-label="Increase maximum age"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Validation Message */}
+            {customMinAge > customMaxAge && (
+              <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg border border-amber-200">
+                <AlertTriangle className="w-4 h-4 inline mr-2" />
+                Minimum age cannot be greater than maximum age. Values will be adjusted automatically.
+              </div>
+            )}
+            
+            {/* Action Buttons */}
+            <div className="grid grid-cols-2 gap-4 pt-4">
+              <Button
+                variant="outline"
+                onClick={resetToPresets}
+                className="min-h-[48px]"
+                data-testid="button-reset-to-presets"
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Reset to Presets
+              </Button>
+              <Button
+                onClick={handleCustomAgeApply}
+                className="bg-gradient-to-r from-pink-500 to-rose-500 text-white hover:from-pink-600 hover:to-rose-600 min-h-[48px]"
+                data-testid="button-apply-custom-age"
+              >
+                Apply Custom Range
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </Dialog>
   );
 }
