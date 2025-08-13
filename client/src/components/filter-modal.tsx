@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, CheckCircle, Users, Heart, Shield, Baby, Scissors, MapPin, AlertTriangle, Info, RotateCcw, Plus, Minus, Sparkles } from "lucide-react";
+import { X, CheckCircle, Users, Heart, Shield, Baby, Scissors, MapPin, AlertTriangle, Info, RotateCcw, Plus, Minus, Sparkles, Zap, Star, Crown, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
@@ -71,11 +71,11 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
   ];
   
   const ageChipOptions = [
-    { id: "puppy", label: "Puppy", subtitle: "0-1y", range: "0-1 years", icon: Baby },
-    { id: "young", label: "Young", subtitle: "1-3y", range: "1-3 years", icon: Heart },
-    { id: "adult", label: "Adult", subtitle: "3-7y", range: "3-7 years", icon: Shield },
-    { id: "senior", label: "Senior", subtitle: "7y+", range: "7+ years", icon: MapPin },
-    { id: "custom", label: "Custom", subtitle: "Set range", range: "Custom range", icon: Plus }
+    { id: "puppy", label: "Puppy", subtitle: "0-1y", range: "0-1 years", icon: Sparkles },
+    { id: "young", label: "Young", subtitle: "1-3y", range: "1-3 years", icon: Zap },
+    { id: "adult", label: "Adult", subtitle: "3-7y", range: "3-7 years", icon: Star },
+    { id: "senior", label: "Senior", subtitle: "7y+", range: "7+ years", icon: Crown },
+    { id: "custom", label: "Custom", subtitle: "Set range", range: "Custom range", icon: Settings }
   ];
   
   const sizeOptions = ["Small", "Medium", "Large"];
@@ -132,7 +132,7 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
   
   const toggleAgeChip = (chipId: string) => {
     if (chipId === 'custom') {
-      setShowCustomAgeSheet(true);
+      setShowCustomAge(true);
       return;
     }
     
@@ -182,6 +182,12 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
       setHasChanges(true);
     }
   };
+
+  const handleCustomAgeChange = (minAge: number, maxAge: number) => {
+    setCustomMinAge(minAge);
+    setCustomMaxAge(maxAge);
+    setHasChanges(true);
+  };
   
   const validateAgeRange = () => {
     if (customMinAge > customMaxAge) {
@@ -195,7 +201,7 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
     validateAgeRange();
     setHasCustomAge(true);
     setSelectedAgeChips([]); // Clear preset selections
-    setShowCustomAgeSheet(false);
+    setShowCustomAge(false);
     setHasChanges(true);
   };
   
@@ -203,7 +209,7 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
     setHasCustomAge(false);
     setCustomMinAge(0);
     setCustomMaxAge(15);
-    setShowCustomAgeSheet(false);
+    setShowCustomAge(false);
   };
   
   // Track changes for UI feedback
@@ -448,20 +454,20 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
                         key={option.id}
                         variant={isSelected ? "default" : "outline"}
                         onClick={() => toggleAgeChip(option.id)}
-                        className={`h-[60px] p-2 flex flex-col items-center justify-center gap-1 border-2 transition-all duration-200 focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 ${
+                        className={`h-[68px] p-3 flex flex-col items-center justify-center gap-1.5 border-2 transition-all duration-300 focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 rounded-xl ${
                           isSelected 
-                            ? "bg-gradient-to-r from-pink-500 to-rose-500 text-white border-pink-500 shadow-lg" 
-                            : "hover:border-pink-300 hover:bg-pink-50 border-gray-300"
+                            ? "bg-gradient-to-br from-pink-500 via-rose-500 to-purple-600 text-white border-pink-500 shadow-lg transform scale-105" 
+                            : "hover:border-pink-300 hover:bg-gradient-to-br hover:from-pink-50 hover:to-purple-50 border-gray-300 hover:shadow-md"
                         }`}
                         data-testid={`chip-age-${option.id}`}
                         aria-label={`Select ${option.label} dogs: ${option.range}`}
                       >
-                        <IconComponent className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-gray-600'}`} />
+                        <IconComponent className={`w-5 h-5 ${isSelected ? 'text-white drop-shadow-sm' : 'text-pink-500'}`} />
                         <div className="text-center leading-tight">
-                          <div className={`text-sm font-medium ${isSelected ? 'text-white' : 'text-gray-900'}`}>
+                          <div className={`text-sm font-semibold ${isSelected ? 'text-white drop-shadow-sm' : 'text-gray-900'}`}>
                             {option.label}
                           </div>
-                          <div className={`text-xs ${isSelected ? 'text-pink-100' : 'text-gray-500'}`}>
+                          <div className={`text-xs font-medium ${isSelected ? 'text-pink-100' : 'text-gray-600'}`}>
                             {option.subtitle}
                           </div>
                         </div>
