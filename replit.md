@@ -61,6 +61,15 @@ PupMatch is a mobile-first dog dating application that allows dog owners to conn
 - Implemented proper error handling, offline support, and accessibility features
 - System supports overdue badge clicking, schedule button actions, and premium/non-premium user flows
 
+**Medical Profile Functionality Fix (August 13, 2025)**:
+- Fixed critical bug preventing users from adding allergies and medical conditions to dog profiles
+- Resolved API route mismatch between frontend PATCH calls and backend endpoint structure
+- Added missing `updateMedicalProfileById` method to both DatabaseStorage and MemStorage classes
+- Improved form data flow to properly handle medical profile creation for new and existing dogs
+- Enhanced input validation with trimming to ensure clean data entry for allergies and conditions
+- Changed medical information icon from heart to shield for better visual relevance
+- Verified functionality: users can now successfully add items like "wheat, eggs" allergies and medical conditions
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.

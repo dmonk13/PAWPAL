@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { X, Upload, CheckCircle, Heart, AlertTriangle, Shield, Camera, Plus, Trash2, Eye, Sparkles } from "lucide-react";
+import { X, Upload, CheckCircle, Heart, AlertTriangle, Shield, Camera, Plus, Trash2, Eye, Sparkles, AlertCircle } from "lucide-react";
 import { insertDogSchema, insertMedicalProfileSchema, type Dog, type MedicalProfile } from "@shared/schema";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -195,7 +195,7 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
       const trimmedAllergy = newAllergy.trim();
       setAllergies([...allergies, trimmedAllergy]);
       setNewAllergy("");
-      console.log('Added allergy:', trimmedAllergy, 'Current allergies:', [...allergies, trimmedAllergy]);
+
     }
   };
 
@@ -208,7 +208,7 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
       const trimmedCondition = newCondition.trim();
       setConditions([...conditions, trimmedCondition]);
       setNewCondition("");
-      console.log('Added condition:', trimmedCondition, 'Current conditions:', [...conditions, trimmedCondition]);
+
     }
   };
 
@@ -643,7 +643,7 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
                   <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <Heart className="w-5 h-5 mr-2 text-red-500" />
+                    <Shield className="w-5 h-5 mr-2 text-blue-600" />
                     Medical Information
                   </CardTitle>
                 </CardHeader>
