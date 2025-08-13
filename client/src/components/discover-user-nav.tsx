@@ -69,7 +69,7 @@ export function DiscoverUserNav() {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-lg"
+          className="p-2 hover:bg-gray-100 rounded-full"
           data-testid="discover-profile-menu"
         >
           <Avatar className="h-8 w-8">
@@ -77,7 +77,6 @@ export function DiscoverUserNav() {
               {initials}
             </AvatarFallback>
           </Avatar>
-          <span className="text-sm font-medium text-gray-900">{user.username}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
