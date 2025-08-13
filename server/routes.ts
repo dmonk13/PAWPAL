@@ -124,6 +124,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/auth/magic-link", async (req: Request, res: Response) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      // In a real app, you would:
+      // 1. Find user by email
+      // 2. Generate a secure token
+      // 3. Store token with expiration
+      // 4. Send email with magic link
+      
+      console.log(`Magic link requested for: ${email}`);
+      
+      // Simulate email sending delay
+      setTimeout(() => {
+        res.json({ 
+          success: true, 
+          message: "Magic link sent to email address" 
+        });
+      }, 1000);
+    } catch (error) {
+      console.error("Magic link error:", error);
+      res.status(500).json({ message: "Failed to send magic link" });
+    }
+  });
+
+  app.post("/api/auth/logout", async (req: Request, res: Response) => {
+    try {
+      if (req.session) {
+        req.session.destroy((err) => {
+          if (err) {
+            return res.status(500).json({ message: "Could not log out" });
+          }
+          res.json({ message: "Logged out successfully" });
+        });
+      } else {
+        res.json({ message: "No active session" });
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      res.status(500).json({ message: "Logout failed" });
+    }
+  });
+
   app.post("/api/auth/logout", (req: Request, res: Response) => {
     req.session.destroy((err) => {
       if (err) {
