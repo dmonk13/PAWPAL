@@ -314,7 +314,7 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-full max-w-md mx-auto h-full max-h-screen overflow-hidden p-0 gap-0" 
+      <DialogContent className="w-full max-w-md mx-auto h-full max-h-screen overflow-hidden p-0 gap-0 [&>button]:hidden" 
                      aria-describedby="filter-description">
         <DialogHeader className="flex-shrink-0 px-6 pt-6 pb-2">
           <div className="flex items-center justify-between mb-2">
