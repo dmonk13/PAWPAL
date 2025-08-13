@@ -6,12 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import BottomNav from "@/components/bottom-nav";
 import ChatWindow from "@/components/chat-window";
+import MatchesStrip from "@/components/matches-strip";
 
 export default function Messages() {
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
   
   // First get the current user
-  const { data: currentUser } = useQuery({
+  const { data: currentUser } = useQuery<{ id: string; username: string; email: string }>({
     queryKey: ["/api/auth/user"],
   });
 
@@ -71,6 +72,20 @@ export default function Messages() {
     };
   });
 
+  // Transform matches for the strip component
+  const stripMatches = matches.map((match: any, index: number) => ({
+    id: match.id,
+    dogName: match.otherDog?.name || "Unknown Dog",
+    dogPhoto: match.otherDog?.photos?.[0] || "https://images.unsplash.com/photo-1605568427561-40dd23c2acea?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100",
+    ownerName: match.otherDog?.ownerId ? "Owner" : "Unknown Owner",
+    isOnline: index < 2, // First 2 matches are online
+    isVerified: index === 0, // First match is verified
+    unreadCount: index === 0 ? 3 : index === 1 ? 1 : 0, // Mock unread counts
+    lastActivity: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)), // Decreasing activity
+    isPinned: index === 1, // Second match is pinned
+    isMuted: index === 3, // Fourth match is muted
+  }));
+
   const selectedConversation = conversations.find((c: any) => c.id === selectedChat);
 
   if (selectedChat && selectedConversation) {
@@ -85,12 +100,30 @@ export default function Messages() {
     );
   }
 
+  const handleMatchAction = (matchId: string, action: 'mute' | 'pin' | 'remove') => {
+    // Handle match actions here - would typically update backend
+    console.log(`Action: ${action} on match: ${matchId}`);
+  };
+
+  const handleAddMatch = () => {
+    // Handle adding new matches - navigate to discover or search
+    console.log('Add new match requested');
+  };
+
   return (
     <div className="flex flex-col h-full">
       <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 p-4 sticky top-0 z-40 shadow-sm">
         <h1 className="text-2xl font-bold dark-gray">Messages</h1>
         <p className="medium-gray">Chat with your matches</p>
       </header>
+      
+      {/* Matches Strip */}
+      <MatchesStrip 
+        matches={stripMatches}
+        onMatchSelect={setSelectedChat}
+        onMatchAction={handleMatchAction}
+        onAddMatch={handleAddMatch}
+      />
       
       <div className="flex-1 overflow-auto p-4">
         
