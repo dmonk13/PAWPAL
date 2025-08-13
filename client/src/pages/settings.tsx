@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -8,12 +9,24 @@ import BottomNav from "@/components/bottom-nav";
 import { Link } from "wouter";
 
 export default function Settings() {
+  const [returnPath, setReturnPath] = useState("/profile");
+
+  useEffect(() => {
+    // Check if we came from discover page
+    const storedReturnPath = localStorage.getItem('settingsReturnPath');
+    if (storedReturnPath) {
+      setReturnPath(storedReturnPath);
+      // Clear the stored path after using it
+      localStorage.removeItem('settingsReturnPath');
+    }
+  }, []);
+
   return (
     <div className="flex flex-col h-full">
       <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 p-4 sticky top-0 z-40 shadow-sm">
         <div className="flex items-center space-x-3">
-          <Link href="/profile">
-            <Button variant="ghost" size="sm" className="p-2">
+          <Link href={returnPath}>
+            <Button variant="ghost" size="sm" className="p-2" data-testid="settings-back-button">
               <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>

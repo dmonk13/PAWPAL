@@ -5,6 +5,7 @@ import SwipeArea from "@/components/swipe-area";
 import FilterModal from "@/components/filter-modal";
 import BottomNav from "@/components/bottom-nav";
 import { UserNav } from "@/components/user-nav";
+import { DiscoverUserNav } from "@/components/discover-user-nav";
 
 export default function Discover() {
   const [showFilters, setShowFilters] = useState(false);
@@ -36,7 +37,7 @@ export default function Discover() {
           >
             <Sliders className="w-5 h-5" />
           </Button>
-          <UserNav />
+          <DiscoverUserNav />
         </div>
       </header>
 
