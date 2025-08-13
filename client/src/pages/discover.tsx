@@ -49,12 +49,11 @@ export default function Discover() {
       <BottomNav />
 
       {/* Filter modal */}
-      {showFilters && (
-        <FilterModal
-          onClose={() => setShowFilters(false)}
-          onApplyFilters={handleApplyFilters}
-        />
-      )}
+      <FilterModal
+        isOpen={showFilters}
+        onClose={() => setShowFilters(false)}
+        onApplyFilters={handleApplyFilters}
+      />
     </div>
   );
 }
