@@ -191,9 +191,11 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
   };
 
   const addAllergy = () => {
-    if (newAllergy && !allergies.includes(newAllergy)) {
-      setAllergies([...allergies, newAllergy]);
+    if (newAllergy.trim() && !allergies.includes(newAllergy.trim())) {
+      const trimmedAllergy = newAllergy.trim();
+      setAllergies([...allergies, trimmedAllergy]);
       setNewAllergy("");
+      console.log('Added allergy:', trimmedAllergy, 'Current allergies:', [...allergies, trimmedAllergy]);
     }
   };
 
@@ -202,9 +204,11 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
   };
 
   const addCondition = () => {
-    if (newCondition && !conditions.includes(newCondition)) {
-      setConditions([...conditions, newCondition]);
+    if (newCondition.trim() && !conditions.includes(newCondition.trim())) {
+      const trimmedCondition = newCondition.trim();
+      setConditions([...conditions, trimmedCondition]);
       setNewCondition("");
+      console.log('Added condition:', trimmedCondition, 'Current conditions:', [...conditions, trimmedCondition]);
     }
   };
 
