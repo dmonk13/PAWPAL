@@ -344,8 +344,8 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
         
         {/* Scrollable Content */}
         <TooltipProvider>
-          <div className="flex-1 overflow-y-auto px-6 pb-6">
-            <div className="space-y-8 py-4">
+          <div className="flex-1 overflow-y-auto px-4 pb-4">
+            <div className="space-y-5 py-3">
               
               {/* Distance Section */}
               <div className="space-y-4">
@@ -794,18 +794,18 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
                 )}
               </div>
               
-              {/* Bottom spacing - reduced gap */}
-              <div className="h-4"></div>
+              {/* Bottom spacing - minimal gap */}
+              <div className="h-2"></div>
             </div>
           </div>
         </TooltipProvider>
         
         {/* Sticky Summary Bar */}
         {getActiveFilterCount() > 0 && (
-          <div className="flex-shrink-0 px-6 py-4 border-t border-gray-200 bg-white">
-            <div className="mb-3">
-              <div className="text-sm font-medium text-gray-700 mb-2">Active Filters:</div>
-              <div className="flex flex-wrap gap-2">
+          <div className="flex-shrink-0 px-4 py-3 border-t border-gray-200 bg-white">
+            <div className="mb-2">
+              <div className="text-xs font-medium text-gray-700 mb-1">Active Filters:</div>
+              <div className="flex flex-wrap gap-1">
                 {getFilterSummary().map((pill, index) => (
                   <Badge key={index} variant="secondary" className="text-xs">
                     {pill}
@@ -817,8 +817,8 @@ export default function FilterModal({ isOpen, onClose, onApplyFilters, initialFi
         )}
         
         {/* Fixed Action Buttons */}
-        <div className="flex-shrink-0 p-6 border-t border-gray-200 bg-white">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="flex-shrink-0 p-4 border-t border-gray-200 bg-white">
+          <div className="grid grid-cols-2 gap-3">
             <Button 
               variant="outline" 
               className="w-full min-h-[48px] border-2" 
