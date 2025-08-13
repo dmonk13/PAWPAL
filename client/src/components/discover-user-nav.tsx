@@ -65,60 +65,52 @@ export function DiscoverUserNav() {
     .slice(0, 2);
 
   return (
-    <div className="flex items-center space-x-3">
-      {/* Profile Picture and Name - clickable to go to profile */}
-      <Button
-        variant="ghost"
-        onClick={handleProfileClick}
-        className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-lg"
-        data-testid="discover-profile-button"
-      >
-        <Avatar className="h-8 w-8">
-          <AvatarFallback className="bg-gradient-to-r from-pink-500 to-red-500 text-white font-medium text-sm">
-            {initials}
-          </AvatarFallback>
-        </Avatar>
-        <span className="text-sm font-medium text-gray-900">{user.username}</span>
-      </Button>
-
-      {/* Settings Dropdown */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="relative h-10 w-10 rounded-full"
-            data-testid="discover-settings-menu"
-          >
-            <Settings className="h-5 w-5 text-gray-600" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56" align="end" forceMount>
-          <div className="flex items-center justify-start gap-2 p-2">
-            <div className="flex flex-col space-y-1 leading-none">
-              <p className="font-medium text-sm">{user.username}</p>
-              <p className="text-xs leading-none text-muted-foreground">
-                {user.email}
-              </p>
-            </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-lg"
+          data-testid="discover-profile-menu"
+        >
+          <Avatar className="h-8 w-8">
+            <AvatarFallback className="bg-gradient-to-r from-pink-500 to-red-500 text-white font-medium text-sm">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <span className="text-sm font-medium text-gray-900">{user.username}</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56" align="end" forceMount>
+        <div className="flex items-center justify-start gap-2 p-2" onClick={handleProfileClick}>
+          <Avatar className="h-10 w-10">
+            <AvatarFallback className="bg-gradient-to-r from-pink-500 to-red-500 text-white font-medium">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col space-y-1 leading-none cursor-pointer">
+            <p className="font-medium text-sm">{user.username}</p>
+            <p className="text-xs leading-none text-muted-foreground">
+              {user.email}
+            </p>
           </div>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleSettingsClick}>
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
+        </div>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleSettingsClick}>
+          <Settings className="mr-2 h-4 w-4" />
+          <span>Settings</span>
+        </DropdownMenuItem>
+        {user.isPro && (
+          <DropdownMenuItem>
+            <Crown className="mr-2 h-4 w-4 text-yellow-500" />
+            <span className="text-yellow-600">Pro Account</span>
           </DropdownMenuItem>
-          {user.isPro && (
-            <DropdownMenuItem>
-              <Crown className="mr-2 h-4 w-4 text-yellow-500" />
-              <span className="text-yellow-600">Pro Account</span>
-            </DropdownMenuItem>
-          )}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogout} disabled={logoutMutation.isPending}>
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>{logoutMutation.isPending ? "Logging out..." : "Log out"}</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+        )}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleLogout} disabled={logoutMutation.isPending}>
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>{logoutMutation.isPending ? "Logging out..." : "Log out"}</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

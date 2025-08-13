@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import SwipeArea from "@/components/swipe-area";
 import FilterModal from "@/components/filter-modal";
 import BottomNav from "@/components/bottom-nav";
-import { UserNav } from "@/components/user-nav";
 import { DiscoverUserNav } from "@/components/discover-user-nav";
 
 export default function Discover() {
