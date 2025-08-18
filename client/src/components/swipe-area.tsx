@@ -301,11 +301,10 @@ export default function SwipeArea() {
           />
         </div>
 
-        {/* Enhanced interaction hints */}
+        {/* Simplified interaction hints */}
         <div className="absolute bottom-2 left-0 right-0 z-20">
-          <div className="text-center text-xs text-gray-400 space-y-1">
-            <div>Swipe or use ← → keys</div>
-            <div>Tap photo for medical info</div>
+          <div className="text-center text-xs text-gray-400">
+            Swipe or use ← → keys
           </div>
         </div>
       </main>
