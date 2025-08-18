@@ -240,7 +240,7 @@ export default function SwipeArea() {
 
   return (
     <>
-      <main className="relative h-[calc(100vh-8rem)] overflow-hidden bg-gray-50">
+      <main className="relative h-[calc(100vh-8rem)] overflow-hidden bg-gradient-to-br from-rose-50 via-white to-pink-50">
         {/* Progress indicator */}
         {progress > 0 && (
           <div className="absolute top-0 left-0 right-0 z-30">
@@ -263,8 +263,8 @@ export default function SwipeArea() {
           </div>
         )}
 
-        {/* Card Stack Container */}
-        <div className="absolute inset-4">
+        {/* Card Stack Container - More immersive full-screen feel */}
+        <div className="absolute inset-2 md:inset-6">
           {/* Next card (behind, slightly scaled) */}
           {nextDog && (
             <SwipeableCard
@@ -291,21 +291,21 @@ export default function SwipeArea() {
           )}
         </div>
 
-        {/* Swipe Controls */}
-        <div className="absolute bottom-8 left-0 right-0 z-30">
+        {/* Swipe Controls - Enhanced immersive design */}
+        <div className="absolute bottom-6 left-0 right-0 z-30">
           <SwipeControls
             onPass={() => swipe('left', 'button')}
             onLike={() => swipe('right', 'button')}
-            onInfo={() => currentDog && setSelectedDog(currentDog)}
             disabled={!canSwipe || isSwipeLoading}
             isLoading={isSwipeLoading}
           />
         </div>
 
-        {/* Keyboard shortcuts hint */}
+        {/* Enhanced interaction hints */}
         <div className="absolute bottom-2 left-0 right-0 z-20">
-          <div className="text-center text-xs text-gray-500">
-            Use ← → arrow keys or X/L to swipe • Enter for details
+          <div className="text-center text-xs text-gray-400 space-y-1">
+            <div>Swipe or use ← → keys</div>
+            <div>Tap photo for medical info</div>
           </div>
         </div>
       </main>

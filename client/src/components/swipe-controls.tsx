@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { X, Heart, RotateCcw, Info, Zap } from 'lucide-react';
+import { X, Heart, RotateCcw, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface SwipeControlsProps {
@@ -7,7 +7,6 @@ interface SwipeControlsProps {
   onLike: () => void;
   onSuperLike?: () => void;
   onUndo?: () => void;
-  onInfo?: () => void;
   disabled?: boolean;
   isLoading?: boolean;
   className?: string;
@@ -18,7 +17,6 @@ export default function SwipeControls({
   onLike,
   onSuperLike,
   onUndo,
-  onInfo,
   disabled = false,
   isLoading = false,
   className = ''
@@ -37,7 +35,7 @@ export default function SwipeControls({
   };
 
   return (
-    <div className={`flex items-center justify-center space-x-4 ${className}`}>
+    <div className={`flex items-center justify-center space-x-6 px-8 ${className}`}>
       {/* Undo Button (optional) */}
       {onUndo && (
         <motion.div
@@ -71,7 +69,7 @@ export default function SwipeControls({
         <Button
           variant="destructive"
           size="lg"
-          className="w-14 h-14 rounded-full bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-lg border-4 border-red-400/30 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-16 h-16 rounded-full bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-xl border-4 border-red-400/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
           onClick={onPass}
           disabled={disabled || isLoading}
           aria-label="Pass on this profile (Left Arrow)"
@@ -115,7 +113,7 @@ export default function SwipeControls({
         <Button
           variant="default"
           size="lg"
-          className="w-14 h-14 rounded-full bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg border-4 border-green-400/30 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-xl border-4 border-green-400/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
           onClick={onLike}
           disabled={disabled || isLoading}
           aria-label="Like this profile (Right Arrow)"
@@ -126,28 +124,7 @@ export default function SwipeControls({
         </Button>
       </motion.div>
 
-      {/* Info Button (optional) */}
-      {onInfo && (
-        <motion.div
-          variants={buttonVariants}
-          initial="initial"
-          whileTap="tap"
-          animate={disabled ? "disabled" : "initial"}
-        >
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={onInfo}
-            disabled={disabled || isLoading}
-            aria-label="View profile details"
-          >
-            <motion.div variants={iconVariants} whileHover="hover" whileTap="tap">
-              <Info className="w-4 h-4" />
-            </motion.div>
-          </Button>
-        </motion.div>
-      )}
+
     </div>
   );
 }

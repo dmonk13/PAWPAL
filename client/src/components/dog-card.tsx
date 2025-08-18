@@ -59,13 +59,35 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
       aria-labelledby={`dog-${dog.id}-name`}
       aria-describedby={`dog-${dog.id}-details`}
     >
-      {/* Hero Photo Section - Clean, no overlays */}
-      <div className="relative h-2/5 flex-shrink-0">
+      {/* Hero Photo Section - Clean, clickable to view medical */}
+      <div 
+        className="relative h-2/5 flex-shrink-0 cursor-pointer group"
+        onClick={onMedicalClick}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onMedicalClick();
+          }
+        }}
+        aria-label={`Tap to view ${dog.name}'s medical information`}
+      >
         <img 
           src={dog.photos?.[0] || "/placeholder-dog.jpg"}
           alt={`${dog.name}, ${dog.breed} dog`}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
+        
+        {/* Subtle overlay hint for tap interaction */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        
+        {/* Small tap indicator */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
+            <Shield className="w-5 h-5 text-rose-500" />
+          </div>
+        </div>
         
         {/* Simple Distance Badge - Top Right */}
         {dog.distance && (
@@ -219,18 +241,23 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
               </div>
             )}
 
-            {/* Action Section - Inside Scroll Area */}
-            <div className="pt-4 border-t border-gray-200">
-              {/* Medical Profile - Single Button Only */}
+            {/* Action Section - Enhanced medical info access */}
+            <div className="pt-4 border-t border-gray-100">
+              {/* Medical Profile - Enhanced design */}
               <Button
                 onClick={onMedicalClick}
-                className="w-full flex items-center justify-center space-x-3 bg-rose-500 hover:bg-rose-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 min-h-[48px] touch-manipulation"
+                className="w-full flex items-center justify-center space-x-3 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-bold py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 min-h-[52px] touch-manipulation"
                 data-testid="button-medical-profile"
                 aria-label={`View medical profile for ${dog.name}`}
               >
                 <Shield className="w-5 h-5" />
-                <span className="text-base">View Medical Profile</span>
+                <span className="text-base font-semibold">Medical Profile</span>
               </Button>
+              
+              {/* Tap hint for mobile users */}
+              <p className="text-center text-xs text-gray-400 mt-2 px-2">
+                Tap anywhere on the photo to view medical details
+              </p>
             </div>
           </div>
         </div>
