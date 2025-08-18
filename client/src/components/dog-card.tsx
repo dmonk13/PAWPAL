@@ -220,78 +220,17 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
             )}
 
             {/* Action Section - Inside Scroll Area */}
-            <div className="pt-4 border-t border-gray-200 space-y-3">
-              {/* Medical Profile - Prominent Action */}
+            <div className="pt-4 border-t border-gray-200">
+              {/* Medical Profile - Single Button Only */}
               <Button
                 onClick={onMedicalClick}
                 className="w-full flex items-center justify-center space-x-3 bg-rose-500 hover:bg-rose-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 min-h-[48px] touch-manipulation"
                 data-testid="button-medical-profile"
                 aria-label={`View medical profile for ${dog.name}`}
               >
-                <Info className="w-5 h-5" />
+                <Shield className="w-5 h-5" />
                 <span className="text-base">View Medical Profile</span>
               </Button>
-
-              {/* Action Row: Like, Pass, Overflow Menu */}
-              <div className="flex items-center space-x-3">
-                {/* Pass Button */}
-                <Button
-                  size="lg"
-                  className="flex-1 h-12 bg-gray-100 text-gray-600 hover:bg-gray-200 font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 min-h-[44px] touch-manipulation"
-                  onClick={() => onSwipe?.('left')}
-                  data-testid="button-pass"
-                  aria-label={`Pass on ${dog.name}`}
-                >
-                  <X className="w-5 h-5 mr-2" />
-                  Pass
-                </Button>
-                
-                {/* Like Button */}
-                <Button
-                  size="lg"
-                  className="flex-1 h-12 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 min-h-[44px] touch-manipulation"
-                  onClick={() => onSwipe?.('right')}
-                  data-testid="button-like"
-                  aria-label={`Like ${dog.name}`}
-                >
-                  <Heart className="w-5 h-5 mr-2 fill-current" />
-                  Like
-                </Button>
-
-                {/* Overflow Menu */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="w-12 h-12 p-0 rounded-xl border-2 border-gray-200 hover:bg-gray-100 shadow-md hover:shadow-lg transition-all duration-200 min-h-[44px] min-w-[44px] touch-manipulation"
-                      data-testid="button-more-options"
-                      aria-label={`More options for ${dog.name}`}
-                    >
-                      <MoreHorizontal className="w-5 h-5 text-gray-600" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent 
-                    align="end" 
-                    className="w-48 bg-white border border-gray-200 shadow-xl rounded-xl"
-                  >
-                    <DropdownMenuItem 
-                      className="flex items-center space-x-2 px-4 py-3 text-gray-900 hover:bg-gray-100 rounded-lg cursor-pointer"
-                      aria-label={`Share ${dog.name}'s profile`}
-                    >
-                      <Share2 className="w-4 h-4" />
-                      <span>Share</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      className="flex items-center space-x-2 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg cursor-pointer"
-                      aria-label={`Report ${dog.name}'s profile`}
-                    >
-                      <Flag className="w-4 h-4" />
-                      <span>Report</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
             </div>
           </div>
         </div>

@@ -1256,7 +1256,29 @@ export class MemStorage implements IStorage {
       }
     ];
 
-    matches.forEach(match => this.matches.set(match.id, match));
+    // Add sample matches for testing
+    const sampleMatches = [
+      {
+        id: "match-1",
+        dog1Id: "dog-1", // Buddy (current user's dog)
+        dog2Id: "dog-3", // Milo - matched with Buddy
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 days ago
+      },
+      {
+        id: "match-2", 
+        dog1Id: "dog-1", // Buddy (current user's dog)
+        dog2Id: "dog-5", // Charlie - matched with Buddy
+        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) // 1 day ago
+      },
+      {
+        id: "match-3",
+        dog1Id: "dog-2", // Rex
+        dog2Id: "dog-4", // Luna - matched with Rex
+        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) // 3 days ago
+      }
+    ];
+
+    sampleMatches.forEach(match => this.matches.set(match.id, match));
 
     // Create sample messages between matched dogs
     const messages: Message[] = [
