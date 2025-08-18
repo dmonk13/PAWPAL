@@ -1,0 +1,120 @@
+Goal
+Implement swipe-like interactions on profile cards in the Discovery section:
+
+Pass: card sways/slides left and is removed from the stack.
+
+Like: card sways/slides right and is removed from the stack.
+
+If both users like each other, create a Match and surface it in:
+
+Matches section (discover/matches tab)
+
+Chat -> Matches line item, and enable starting a conversation.
+
+Requirements
+
+UI/Animation
+
+On Pass button click: animate current top card with a leftward translation + slight counter-clockwise rotation, fade out; then load next card.
+
+On Like button click: animate current top card with a rightward translation + slight clockwise rotation, fade out; then load next card.
+
+Duration ~250–350 ms; use easing (ease-out).
+
+Support drag gesture: user can drag card; on release, decide like/pass based on horizontal velocity/threshold; snap back if below threshold.
+
+Show transient badges during drag: “Pass” on left, “Like” on right with opacity proportional to drag distance.
+
+State and Data
+
+Card entity: {profileId, name, age, photos[], bio, …}
+
+Local stack of candidate profiles; preload next N (e.g., 10).
+
+Interaction record: {viewerId, targetId, action: 'like'|'pass', timestamp, source: 'discovery'}
+
+Optimistic updates: remove card immediately; sync with backend; rollback on error.
+
+Match logic
+
+After ‘like’, call backend to upsert viewer’s like.
+
+Backend checks reciprocal like:
+
+If target previously liked viewer, create Match: {matchId, userAId, userBId, createdAt}
+
+Emit event MatchCreated(viewerId, targetId, matchId)
+
+Client listens for MatchCreated:
+
+Add to Matches section list
+
+Create/open chat thread entry under Chats -> Matches line
+
+Show modal/toast “It’s a match!” with both avatars and CTA: “Send a message” or “Keep browsing”.
+
+Navigation/Surfacing
+
+Matches section shows latest match on top; unread badge if new.
+
+Chat section has “Matches” row pinned above conversations; tapping opens match threads.
+
+Edge cases
+
+Duplicate actions: disable buttons during animation/api call.
+
+Rate limiting and daily like caps; show upsell if exceeded.
+
+Blocked or reported users: remove from stack; do not allow match creation.
+
+Profile depleted: show end-of-deck state with refresh CTA.
+
+Offline: queue actions and replay when online.
+
+Telemetry
+
+Log impressions, swipes, button clicks, animation durations, errors, match conversions.
+
+Accessibility
+
+Buttons have labels and keyboard shortcuts: Left Arrow = Pass, Right Arrow = Like; Enter to open profile details.
+
+Reduced motion setting: replace slide with quick fade.
+
+Tech notes (example web/React)
+
+Use Framer Motion for animations (variants: idle, like, pass; drag="x"; dragConstraints; velocity-based onDragEnd).
+
+API endpoints:
+
+GET /discovery?cursor=…
+
+POST /interactions {targetId, action}
+
+GET /matches?cursor=…
+
+WS/SSE: MatchCreated events
+
+Data cache with React Query; optimistic mutation for interactions; invalidate matches on event.
+
+Acceptance criteria
+
+Clicking Pass animates left and removes card; next card becomes active.
+
+Clicking Like animates right and removes card; next card becomes active.
+
+Drag gestures mirror button behavior.
+
+Reciprocal like produces a visible entry in Matches and in Chat’s Matches line within 2 seconds and shows a match modal.
+
+All above covered by unit tests for reducers and integration tests for UI flows.
+
+Deliverables
+
+UI components: DiscoveryCard, CardStack, LikePassControls, MatchModal.
+
+Hooks/services: useDiscoveryDeck, useInteractions, useMatches, useMatchEvents.
+
+Backend stubs or integration notes for like/pass and match creation.
+
+Test plan and analytics events.
