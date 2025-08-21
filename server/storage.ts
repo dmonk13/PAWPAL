@@ -1,4 +1,4 @@
-import { users, dogs, medicalProfiles, swipes, matches, messages, veterinarians, appointments, type User, type InsertUser, type Dog, type InsertDog, type MedicalProfile, type InsertMedicalProfile, type Swipe, type InsertSwipe, type Match, type InsertMatch, type Message, type InsertMessage, type Veterinarian, type InsertVeterinarian, type Appointment, type InsertAppointment, type DogWithMedical, type VeterinarianWithDistance } from "@shared/schema";
+import { users, dogs, medicalProfiles, swipes, matches, messages, veterinarians, appointments, userPreferences, spotlightState, likes, type User, type InsertUser, type Dog, type InsertDog, type MedicalProfile, type InsertMedicalProfile, type Swipe, type InsertSwipe, type Match, type InsertMatch, type Message, type InsertMessage, type Veterinarian, type InsertVeterinarian, type Appointment, type InsertAppointment, type DogWithMedical, type VeterinarianWithDistance, type UserPreferences, type InsertUserPreferences, type SpotlightState, type InsertSpotlightState, type Like, type InsertLike, type SpotlightCandidate, type WoofStatus } from "@shared/schema";
 import { eq, and, sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
@@ -51,6 +51,21 @@ export interface IStorage {
   // Appointment methods
   createAppointment(appointment: InsertAppointment): Promise<Appointment>;
   getAppointmentsByUser(userId: string): Promise<Appointment[]>;
+
+  // Spotlight methods
+  getSpotlightCandidates(userId: string): Promise<SpotlightCandidate[]>;
+  getUserPreferences(userId: string): Promise<UserPreferences | undefined>;
+  createUserPreferences(prefs: InsertUserPreferences): Promise<UserPreferences>;
+  updateUserPreferences(userId: string, updates: Partial<UserPreferences>): Promise<UserPreferences | undefined>;
+  
+  // Spotlight state methods
+  getSpotlightState(userId: string, dayStamp: string): Promise<SpotlightState | undefined>;
+  createSpotlightState(state: InsertSpotlightState): Promise<SpotlightState>;
+  updateSpotlightState(userId: string, dayStamp: string, updates: Partial<SpotlightState>): Promise<SpotlightState | undefined>;
+  
+  // Like methods
+  createLike(like: InsertLike): Promise<Like>;
+  getWoofStatus(userId: string): Promise<WoofStatus>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1691,6 +1706,123 @@ export class MemStorage implements IStorage {
     return Array.from(this.appointments.values())
       .filter(appointment => appointment.userId === userId)
       .sort((a, b) => new Date(a.appointmentDate).getTime() - new Date(b.appointmentDate).getTime());
+  }
+
+  // Spotlight methods
+  async getSpotlightCandidates(userId: string): Promise<SpotlightCandidate[]> {
+    // Get user's dogs to find location
+    const userDogs = await this.getDogsByOwner(userId);
+    const currentDog = userDogs[0]; // Use first dog for location
+    if (!currentDog?.latitude || !currentDog?.longitude) {
+      return [];
+    }
+
+    // Get all potential candidates
+    const allDogs = await this.getDogsForMatching(
+      currentDog.id,
+      parseFloat(currentDog.latitude),
+      parseFloat(currentDog.longitude),
+      25 // Default 25km radius
+    );
+
+    // Score and rank candidates
+    const scoredCandidates = allDogs.map(dog => {
+      const compatibilityScore = this.calculateCompatibilityScore(dog);
+      const badges = this.generateBadges(dog);
+      
+      return {
+        ...dog,
+        compatibilityScore,
+        badges
+      } as SpotlightCandidate;
+    });
+
+    // Sort by compatibility score and return top 5
+    return scoredCandidates
+      .sort((a, b) => b.compatibilityScore - a.compatibilityScore)
+      .slice(0, 5);
+  }
+
+  private calculateCompatibilityScore(candidate: DogWithMedical): number {
+    let score = 50; // Base score
+    
+    // Distance bonus (closer is better)
+    if (candidate.distance) {
+      score += Math.max(0, 20 - candidate.distance * 2);
+    }
+    
+    // Age bonus for young adults
+    if (candidate.age >= 1 && candidate.age <= 5) {
+      score += 10;
+    }
+    
+    // Vet verified bonus
+    if (candidate.vetVerified) score += 10;
+    if (candidate.vaccinationStatus === "Up to date") score += 10;
+    
+    return Math.min(100, Math.round(score));
+  }
+
+  private generateBadges(dog: DogWithMedical): string[] {
+    const badges = [];
+    if (dog.vetVerified) badges.push("Vet Verified");
+    if (dog.vaccinationStatus === "Up to date") badges.push("Vaccinated");
+    if (dog.medicalProfile?.isSpayedNeutered) badges.push("Spayed/Neutered");
+    return badges;
+  }
+
+  async getUserPreferences(userId: string): Promise<UserPreferences | undefined> {
+    return undefined;
+  }
+
+  async createUserPreferences(prefs: InsertUserPreferences): Promise<UserPreferences> {
+    const id = randomUUID();
+    const userPrefs: UserPreferences = { 
+      ...prefs, 
+      id, 
+      createdAt: new Date(), 
+      updatedAt: new Date() 
+    };
+    return userPrefs;
+  }
+
+  async updateUserPreferences(userId: string, updates: Partial<UserPreferences>): Promise<UserPreferences | undefined> {
+    return undefined;
+  }
+  
+  async getSpotlightState(userId: string, dayStamp: string): Promise<SpotlightState | undefined> {
+    return undefined;
+  }
+
+  async createSpotlightState(state: InsertSpotlightState): Promise<SpotlightState> {
+    const id = randomUUID();
+    const spotState: SpotlightState = { 
+      ...state, 
+      id, 
+      createdAt: new Date() 
+    };
+    return spotState;
+  }
+
+  async updateSpotlightState(userId: string, dayStamp: string, updates: Partial<SpotlightState>): Promise<SpotlightState | undefined> {
+    return undefined;
+  }
+  
+  async createLike(like: InsertLike): Promise<Like> {
+    const id = randomUUID();
+    const likeRecord: Like = { ...like, id, createdAt: new Date() };
+    return likeRecord;
+  }
+
+  async getWoofStatus(userId: string): Promise<WoofStatus> {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    
+    return {
+      woofRemaining: 1,
+      resetTime: tomorrow.toISOString()
+    };
   }
 }
 

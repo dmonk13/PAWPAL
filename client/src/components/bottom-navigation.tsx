@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Search, Heart, MessageCircle, User } from "lucide-react";
+import { Search, Sparkles, MessageCircle, User } from "lucide-react";
 
 export default function BottomNavigation() {
   const [location] = useLocation();
@@ -13,10 +13,10 @@ export default function BottomNavigation() {
       altPaths: ["/discover"]
     },
     { 
-      id: "matches", 
-      label: "Matches", 
-      icon: Heart, 
-      path: "/matches" 
+      id: "spotlight", 
+      label: "Spotlight", 
+      icon: Sparkles, 
+      path: "/spotlight" 
     },
     { 
       id: "messages", 

@@ -7,7 +7,7 @@ import AuthWrapper from "@/pages/auth-wrapper";
 import NotFound from "@/pages/not-found";
 
 import Discover from "@/pages/discover";
-import Matches from "@/pages/matches";
+import Spotlight from "@/pages/spotlight";
 import Messages from "@/pages/messages";
 import Profile from "@/pages/profile";
 import Settings from "@/pages/settings";
@@ -22,7 +22,7 @@ function Router() {
 
       <Route path="/" component={Discover} />
       <Route path="/discover" component={Discover} />
-      <Route path="/matches" component={Matches} />
+      <Route path="/spotlight" component={Spotlight} />
       <Route path="/messages" component={Messages} />
       <Route path="/profile" component={Profile} />
       <Route path="/settings" component={Settings} />

@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
-import { insertSwipeSchema, insertDogSchema, insertMedicalProfileSchema, insertAppointmentSchema, insertUserSchema } from "@shared/schema";
+import { insertSwipeSchema, insertDogSchema, insertMedicalProfileSchema, insertAppointmentSchema, insertUserSchema, insertLikeSchema } from "@shared/schema";
 import { z } from "zod";
 
 // Define session type extension
@@ -34,6 +34,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
   }));
+
+  // Helper functions
+  const calculateCompatibility = (userPrefs: any, candidate: any) => {
+    let score = 0;
+    
+    // Distance scoring (20 points)
+    if (candidate.distance && userPrefs.distanceKm) {
+      const distanceScore = candidate.distance <= userPrefs.distanceKm 
+        ? Math.max(0, 20 - (candidate.distance / userPrefs.distanceKm) * 15)
+        : 0;
+      score += distanceScore;
+    } else {
+      score += 10; // Default if no distance data
+    }
+    
+    // Age compatibility (10 points)
+    if (userPrefs.ageRange && candidate.age >= userPrefs.ageRange.min && candidate.age <= userPrefs.ageRange.max) {
+      score += 10;
+    }
+    
+    // Breed preference (10 points)
+    if (userPrefs.preferredBreeds && userPrefs.preferredBreeds.length > 0) {
+      if (userPrefs.preferredBreeds.includes(candidate.breed)) {
+        score += 7;
+      }
+    } else {
+      score += 5; // Neutral if no breed preference
+    }
+    
+    // Size preference (3 points)
+    if (userPrefs.preferredSizes && userPrefs.preferredSizes.length > 0) {
+      if (userPrefs.preferredSizes.includes(candidate.size)) {
+        score += 3;
+      }
+    } else {
+      score += 2;
+    }
+    
+    // Temperament overlap (25 points)
+    if (userPrefs.temperamentPrefs && candidate.temperament) {
+      const overlap = userPrefs.temperamentPrefs.filter((t: string) => candidate.temperament.includes(t));
+      score += Math.min(25, overlap.length * 8);
+    } else {
+      score += 10; // Neutral
+    }
+    
+    // Activity level (10 points)
+    if (userPrefs.activityLevelPrefs && userPrefs.activityLevelPrefs.includes(candidate.activityLevel)) {
+      score += 10;
+    } else {
+      score += 5; // Neutral
+    }
+    
+    // Medical compatibility (15 points)
+    if (userPrefs.medicalCompat) {
+      let medScore = 0;
+      if (!candidate.medicalProfile?.allergies?.length || userPrefs.medicalCompat.allowAllergies) {
+        medScore += 5;
+      }
+      if (!candidate.medicalProfile?.conditions?.length || userPrefs.medicalCompat.allowChronic) {
+        medScore += 5;
+      }
+      medScore += 5; // Base medical score
+      score += medScore;
+    } else {
+      score += 12; // Default
+    }
+    
+    // Vet verified and vaccination status (10 points)
+    if (candidate.vetVerified) score += 5;
+    if (candidate.vaccinationStatus === "Up to date") score += 5;
+    
+    return Math.min(100, Math.round(score));
+  };
 
   // Authentication Routes
   app.post("/api/auth/login", async (req: Request, res: Response) => {
@@ -545,6 +619,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         message: "Error creating subscription: " + error.message 
       });
+    }
+  });
+
+  // Spotlight Routes
+  
+  // Get Spotlight candidates
+  app.get("/api/spotlight", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const candidates = await storage.getSpotlightCandidates(userId);
+      res.json(candidates);
+    } catch (error) {
+      console.error("Get spotlight candidates error:", error);
+      res.status(500).json({ message: "Failed to get Spotlight candidates" });
+    }
+  });
+
+  // Create like with note (includes woof)
+  app.post("/api/likes", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const validatedLike = insertLikeSchema.parse({
+        ...req.body,
+        fromUserId: userId
+      });
+
+      // Check woof limit if type is "woof"
+      if (validatedLike.type === "woof") {
+        const woofStatus = await storage.getWoofStatus(userId);
+        if (woofStatus.woofRemaining < 1) {
+          return res.status(429).json({ 
+            message: "No Woofs remaining for today",
+            woofStatus
+          });
+        }
+      }
+
+      const like = await storage.createLike(validatedLike);
+      res.status(201).json({ like });
+    } catch (error) {
+      console.error("Create like error:", error);
+      res.status(400).json({ message: "Failed to create like" });
+    }
+  });
+
+  // Get woof status
+  app.get("/api/woof/status", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const woofStatus = await storage.getWoofStatus(userId);
+      res.json(woofStatus);
+    } catch (error) {
+      console.error("Get woof status error:", error);
+      res.status(500).json({ message: "Failed to get woof status" });
     }
   });
 

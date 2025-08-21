@@ -15,6 +15,36 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// User preferences for Spotlight matching
+export const userPreferences = pgTable("user_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  distanceKm: integer("distance_km").default(25),
+  preferredBreeds: jsonb("preferred_breeds").$type<string[]>().default([]),
+  preferredSizes: jsonb("preferred_sizes").$type<string[]>().default([]), // Small, Medium, Large
+  ageRange: jsonb("age_range").$type<{ min: number; max: number }>().default({ min: 0, max: 15 }),
+  temperamentPrefs: jsonb("temperament_prefs").$type<string[]>().default([]),
+  activityLevelPrefs: jsonb("activity_level_prefs").$type<string[]>().default([]),
+  medicalCompat: jsonb("medical_compat").$type<{
+    allowAllergies: boolean;
+    allowChronic: boolean;
+    notes: string;
+  }>().default({ allowAllergies: true, allowChronic: true, notes: "" }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Spotlight state for daily recommendations
+export const spotlightState = pgTable("spotlight_state", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  dayStamp: text("day_stamp").notNull(), // YYYY-MM-DD format
+  candidateIds: jsonb("candidate_ids").$type<string[]>().default([]), // top 5 dog IDs
+  woofRemaining: integer("woof_remaining").default(1), // 0 or 1 per day
+  lastReset: timestamp("last_reset").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const dogs = pgTable("dogs", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   ownerId: varchar("owner_id").notNull().references(() => users.id),
@@ -32,6 +62,10 @@ export const dogs = pgTable("dogs", {
   latitude: decimal("latitude", { precision: 10, scale: 8 }),
   longitude: decimal("longitude", { precision: 11, scale: 8 }),
   isActive: boolean("is_active").default(true),
+  // New Spotlight fields
+  activityLevel: text("activity_level").default("Medium"), // "Low"|"Medium"|"High"
+  vetVerified: boolean("vet_verified").default(false),
+  vaccinationStatus: text("vaccination_status").default("Up to date"), // "Up to date"|"Overdue"
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -72,6 +106,16 @@ export const swipes = pgTable("swipes", {
   swiperDogId: varchar("swiper_dog_id").notNull().references(() => dogs.id),
   swipedDogId: varchar("swiped_dog_id").notNull().references(() => dogs.id),
   isLike: boolean("is_like").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Enhanced likes for Spotlight with notes and woof
+export const likes = pgTable("likes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  fromUserId: varchar("from_user_id").notNull().references(() => users.id),
+  toDogId: varchar("to_dog_id").notNull().references(() => dogs.id),
+  note: text("note").default(""), // optional message with like
+  type: text("type").notNull().default("like"), // "like" or "woof"
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -121,6 +165,22 @@ export const insertMessageSchema = createInsertSchema(messages).omit({
   createdAt: true,
 });
 
+export const insertUserPreferencesSchema = createInsertSchema(userPreferences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSpotlightStateSchema = createInsertSchema(spotlightState).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertLikeSchema = createInsertSchema(likes).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -140,6 +200,15 @@ export type InsertMatch = z.infer<typeof insertMatchSchema>;
 export type Message = typeof messages.$inferSelect;
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
 
+export type UserPreferences = typeof userPreferences.$inferSelect;
+export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;
+
+export type SpotlightState = typeof spotlightState.$inferSelect;
+export type InsertSpotlightState = z.infer<typeof insertSpotlightStateSchema>;
+
+export type Like = typeof likes.$inferSelect;
+export type InsertLike = z.infer<typeof insertLikeSchema>;
+
 // Extended types for API responses
 export type DogWithMedical = Dog & {
   medicalProfile?: MedicalProfile;
@@ -149,6 +218,19 @@ export type DogWithMedical = Dog & {
 export type MatchWithDogs = Match & {
   dog1: Dog;
   dog2: Dog;
+};
+
+// Spotlight-specific types
+export type SpotlightCandidate = Dog & {
+  medicalProfile?: MedicalProfile;
+  distance?: number;
+  compatibilityScore: number;
+  badges: string[]; // e.g., ["Vaccinated", "Spayed/Neutered", "Vet Verified"]
+};
+
+export type WoofStatus = {
+  woofRemaining: number;
+  resetTime: string; // ISO timestamp for next reset
 };
 
 // Veterinarian schema

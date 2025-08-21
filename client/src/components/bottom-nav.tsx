@@ -1,12 +1,12 @@
 import { Link, useLocation } from "wouter";
-import { Search, Heart, MessageCircle, User, Stethoscope } from "lucide-react";
+import { Search, Sparkles, MessageCircle, User, Stethoscope } from "lucide-react";
 
 export default function BottomNav() {
   const [location] = useLocation();
 
   const tabs = [
     { id: "discover", label: "Discover", icon: Search, path: "/" },
-    { id: "matches", label: "Matches", icon: Heart, path: "/matches" },
+    { id: "spotlight", label: "Spotlight", icon: Sparkles, path: "/spotlight" },
     { id: "messages", label: "Messages", icon: MessageCircle, path: "/messages" },
     { id: "vet-connect", label: "Vet Connect", icon: Stethoscope, path: "/vet-connect" },
     { id: "profile", label: "Profile", icon: User, path: "/profile" },

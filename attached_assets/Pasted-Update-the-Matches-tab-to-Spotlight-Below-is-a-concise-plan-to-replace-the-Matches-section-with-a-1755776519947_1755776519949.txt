@@ -1,0 +1,240 @@
+Update the Matches tab to “Spotlight”
+Below is a concise plan to replace the Matches section with a Spotlight experience that surfaces the 5 most compatible profiles, lets users attach a short message with a Like, and adds a 1-per-day Superlike called “Woof.”
+
+UX changes
+Rename bottom tab: Matches → Spotlight.
+
+Spotlight screen layout:
+
+Header: “Today’s Spotlight”
+
+Subheader: “Top 5 picks based on your filters”
+
+Horizontal carousel or stacked cards (5 items).
+
+Each card: photo, name, age, breed/size, key badges (Vaccinated, Spayed/Neutered), compatibility score or tag (e.g., “92% match”), distance.
+
+Actions:
+
+Like + “Add a note” text field (placeholder: “Say hi or share why it’s a match”).
+
+Woof (Superlike) button with counter badge “1” and tooltip: “1 Woof/day resets at midnight.”
+
+Empty state: “Adjust filters to see Spotlight picks.”
+
+Matching logic
+Compute a compatibility score for candidates that pass user-selected filters (distance, age, breed preferences, temperament, medical compatibility, mating preference, etc.).
+
+Example scoring weights (normalize to 100):
+
+Distance bucket: 20
+
+Age compatibility: 10
+
+Breed preference or size compatibility: 10
+
+Temperament/personality overlap: 25
+
+Activity level/playstyle: 10
+
+Medical compatibility flags: 15
+
+Vet-verified/vaccination status: 10
+
+Sort by score desc, take top 5 for Spotlight. Recompute on filter change or daily at refresh.
+
+Data model changes
+Extend your existing schema:
+
+DogProfile
+
+existing fields…
+
+temperament: string[]
+
+activityLevel: "Low"|"Medium"|"High"
+
+vetVerified: boolean
+
+vaccinationStatus: "Up to date"|"Overdue"
+
+matingPreference: "Yes"|"No"|"Maybe"
+
+UserPreferences
+
+distanceKm: number
+
+preferredBreeds: string[]
+
+size: string[] // e.g., Small, Medium, Large
+
+ages: [min,max]
+
+temperament: string[]
+
+activityLevel: string[]
+
+medicalCompat: { allowAllergies: boolean, allowChronic: boolean, notes: string }
+
+SpotlightState
+
+dayStamp: YYYY-MM-DD
+
+candidateIds: string[] // top 5 for the day
+
+woofRemaining: number // 0 or 1 per day
+
+Like entity
+
+fromUserId
+
+toDogId
+
+note: string // the “additional text”
+
+type: "like"|"woof"
+
+createdAt
+
+API endpoints (suggested)
+GET /spotlight
+
+Returns top 5 profiles + compatibility score for current user.
+
+POST /likes
+
+Body: { toDogId, note, type } // type: "like" or "woof"
+
+Validates woofRemaining > 0 for "woof".
+
+GET /me/woof
+
+Returns remaining woofs and reset time.
+
+POST /filters
+
+Saves current filter set; triggers Spotlight recompute.
+
+Rate limits and rules
+Woof:
+
+1 per user per rolling 24h or reset at local midnight.
+
+Woof sends priority notification and adds “Woof” badge on receiver’s side.
+
+Notes on Like:
+
+Limit 140–200 chars.
+
+Optional; prefill with smart suggestions like “Loved that Zeus enjoys swimming!”
+
+UI implementation (React/React Native/Flutter concept)
+Pseudocode for Spotlight card actions:
+
+tsx
+function SpotlightCard({profile, onLike, onWoof}) {
+  const [note, setNote] = useState("");
+  const maxChars = 180;
+
+  return (
+    <View className="card">
+      <Image source={{uri: profile.photo}} />
+      <Text>{profile.name} • {profile.age} yrs</Text>
+      <Text>{profile.breed} • {profile.size}</Text>
+      <Badge text={`${profile.compatibility}% match`} />
+      <View className="actions">
+        <TextInput
+          value={note}
+          onChangeText={t => setNote(t.slice(0, maxChars))}
+          placeholder="Add a note (optional)"
+        />
+        <Button title="Like" onPress={() => onLike(profile.id, note)} />
+        <WoofButton onPress={() => onWoof(profile.id, note)} />
+      </View>
+    </View>
+  );
+}
+Woof button behavior:
+
+ts
+async function handleWoof(toDogId: string, note: string) {
+  const { woofRemaining } = await api.get('/me/woof');
+  if (woofRemaining < 1) return toast("Woof used for today");
+  await api.post('/likes', { toDogId, note, type: 'woof' });
+  toast("Woof sent! You’re top of their queue.");
+}
+Backend scoring example (Node/TS)
+ts
+function scoreCandidate(userPrefs, candidate) {
+  let score = 0;
+
+  // Distance (20)
+  const d = kmDistance(userPrefs.location, candidate.location);
+  score += d <= userPrefs.distanceKm ? lerp(20, 5, d / userPrefs.distanceKm) : 0;
+
+  // Age (10)
+  score += inRange(candidate.age, userPrefs.ages) ? 10 : 0;
+
+  // Breed/Size (10)
+  if (userPrefs.preferredBreeds?.includes(candidate.breed)) score += 7;
+  if (userPrefs.size?.includes(candidate.size)) score += 3;
+
+  // Temperament overlap (25)
+  score += overlap(userPrefs.temperament, candidate.temperament) * 25;
+
+  // Activity level (10)
+  score += userPrefs.activityLevel?.includes(candidate.activityLevel) ? 10 : 0;
+
+  // Medical compatibility (15)
+  score += medicalCompatible(userPrefs.medicalCompat, candidate.medicalConditions) ? 15 : 0;
+
+  // Vet/vaccine status (10)
+  if (candidate.vetVerified) score += 5;
+  if (candidate.vaccinationStatus === "Up to date") score += 5;
+
+  return Math.round(score);
+}
+Return top 5:
+
+ts
+app.get('/spotlight', async (req, res) => {
+  const user = await getUser(req.auth.id);
+  const candidates = await queryByFilters(user.preferences); // server-side filter
+  const scored = candidates.map(c => ({...c, compatibility: scoreCandidate(user.preferences, c)}));
+  scored.sort((a,b) => b.compatibility - a.compatibility);
+  res.json(scored.slice(0,5));
+});
+Notifications and prominence
+On receiver side, Woof surfaces:
+
+Push notification with “Woof” label.
+
+Pinned at top of their Discover queue for 24h.
+
+Special visual (glow badge, confetti pulse) on the card.
+
+Likes with note:
+
+Display note preview in the inbox; encourage reply.
+
+Analytics to track
+Spotlight open rate and dwell time.
+
+Like-with-note conversion vs like without note.
+
+Woof response rate and time-to-first-reply.
+
+Filter changes leading to improved matches.
+
+Migration steps from “Matches” to “Spotlight”
+Rename tab and route; keep Messages as the chat hub.
+
+Implement /spotlight endpoint and scoring service.
+
+Add Like-with-note and Woof flows; update notifications.
+
+Remove old Matches list UI; surface prior matches in Messages only.
+
+Add daily reset job for Woof counts and Spotlight cache.
+
+If you share your current stack (React Native/Flutter/Web) and data models, I can provide drop-in code snippets for the UI components and the minimal backend endpoints to get Spotlight live quickly
