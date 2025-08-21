@@ -772,7 +772,11 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
                   <Button
                     type="button"
                     variant="ghost"
-                    onClick={prevStep}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      prevStep();
+                    }}
                     disabled={currentStep === 'basic'}
                     className="flex items-center gap-2"
                   >
@@ -784,7 +788,11 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
                     {currentStep !== 'medical' ? (
                       <Button
                         type="button"
-                        onClick={nextStep}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          nextStep();
+                        }}
                         className="bg-[#FF6B6B] hover:bg-[#FF6B6B]/90 text-white flex items-center gap-2 min-h-[44px] px-6"
                       >
                         Next
