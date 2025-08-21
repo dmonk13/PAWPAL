@@ -302,8 +302,8 @@ export default function Spotlight() {
                     )}
 
                     {/* Traits */}
-                    <div className="traits mt-1.5 text-sm text-gray-700 space-y-0.5">
-                      <div className="trait">
+                    <div className="traits mt-1.5 text-sm text-gray-700">
+                      <div className="trait mb-1">
                         <span className="font-semibold text-gray-900">Activity:</span> {dog.activityLevel}
                       </div>
                       <div className="trait">
@@ -312,7 +312,7 @@ export default function Spotlight() {
                     </div>
 
                     {/* Note Input */}
-                    <label className="note block relative mt-2">
+                    <label className="note block relative mt-3">
                       <textarea
                         value={note}
                         onChange={(e) => handleNoteChange(dog.id, e.target.value)}

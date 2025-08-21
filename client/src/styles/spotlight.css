@@ -97,9 +97,7 @@
 .traits { 
   margin-top: 6px; 
   font-size: 13px; 
-  color: #374151; 
-  display: grid; 
-  gap: 2px; 
+  color: #374151;
 }
 
 .traits strong { 
@@ -107,9 +105,18 @@
   font-weight: 600; 
 }
 
+.trait {
+  line-height: 1.4;
+  margin-bottom: 2px;
+}
+
+.trait:last-child {
+  margin-bottom: 0;
+}
+
 .note { 
   position: relative; 
-  margin-top: 8px; 
+  margin-top: 12px; 
   display: block; 
 }
 
