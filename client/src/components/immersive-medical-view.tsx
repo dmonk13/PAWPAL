@@ -78,7 +78,7 @@ export default function ImmersiveMedicalView({
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto">
-          <div className="px-4 pt-3 pb-8 space-y-4">
+          <div className="px-4 pt-3 pb-16 space-y-4">
             {/* Quick Stats */}
             <div className="grid grid-cols-2 gap-3">
               <Card className="bg-blue-50 border-blue-200">
