@@ -437,18 +437,45 @@ export default function VetConnect() {
                           )}
                         </div>
 
-                        {/* Row 4: Specialties + Time Estimate */}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-1 overflow-x-auto">
-                            {vet.specialties.slice(0, 2).map((specialty, idx) => (
-                              <Badge key={idx} className="bg-blue-100 text-blue-800 px-2 py-1 text-xs rounded-full whitespace-nowrap flex-shrink-0">
-                                {specialty}
-                              </Badge>
-                            ))}
-                          </div>
-                          <div className="flex items-center space-x-1 text-xs text-gray-500 ml-2">
-                            <Timer className="w-2.5 h-2.5" />
-                            <span>~15 min</span>
+                        {/* Row 4: Immersive Specialties Strip */}
+                        <div className="immersive-meta bg-slate-50/85 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-white/60" style={{
+                          background: 'rgba(248, 250, 255, 0.85)',
+                          backdropFilter: 'blur(6px)',
+                          boxShadow: 'inset 0 1px 0 0 rgba(255,255,255,0.6), 0 1px 3px 0 rgba(0,0,0,0.1)'
+                        }}>
+                          <div className="flex items-center justify-between gap-3">
+                            {/* Left: Meta Chips */}
+                            <div className="meta-chips flex flex-wrap items-center gap-2 flex-1">
+                              {vet.specialties.slice(0, 2).map((specialty, idx) => (
+                                <button 
+                                  key={idx}
+                                  className="chip bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 text-blue-800 px-3 py-1.5 text-xs font-bold rounded-full border border-blue-200/50 transition-all duration-200 hover:scale-105 active:scale-95 whitespace-nowrap touch-manipulation"
+                                  style={{
+                                    background: 'linear-gradient(135deg, #EEF5FF 0%, #E6F0FF 100%)',
+                                    minHeight: '32px'
+                                  }}
+                                  tabIndex={0}
+                                  role="button"
+                                  aria-label={`Specialty: ${specialty}`}
+                                >
+                                  {specialty}
+                                </button>
+                              ))}
+                            </div>
+                            
+                            {/* Right: ETA Pill */}
+                            <div 
+                              className="eta-pill flex items-center space-x-1.5 px-3 py-1.5 rounded-full border border-amber-300/50 shadow-sm flex-shrink-0"
+                              style={{
+                                background: 'radial-gradient(ellipse at center, #FEF3C7 0%, #FDE68A 100%)',
+                                boxShadow: '0 0 8px rgba(245, 158, 11, 0.2), inset 0 1px 0 rgba(255,255,255,0.3)'
+                              }}
+                              role="status"
+                              aria-label="Estimated time ~15 minutes"
+                            >
+                              <span className="icon text-amber-700" role="img" aria-label="Clock">🕒</span>
+                              <span className="eta-text text-xs font-bold text-amber-800">~15 min</span>
+                            </div>
                           </div>
                         </div>
 
