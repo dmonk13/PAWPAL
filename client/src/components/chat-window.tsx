@@ -34,7 +34,8 @@ import {
   Users,
   DollarSign,
   CheckSquare,
-  AlertCircle
+  AlertCircle,
+  Pin
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -215,8 +216,8 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
     }
   }, []);
 
-  // Smart suggestion chips
-  const suggestionChips: SuggestionChip[] = [
+  // Pin button options
+  const pinOptions: SuggestionChip[] = [
     {
       id: "location",
       label: "Share Location",
@@ -240,6 +241,12 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
       label: "Share Dog Profile",
       icon: Heart,
       action: () => handleSuggestionAction("profile")
+    },
+    {
+      id: "attachment",
+      label: "Attach File",
+      icon: Paperclip,
+      action: () => fileInputRef.current?.click()
     }
   ];
 
@@ -815,19 +822,10 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem onClick={() => setIsMuted(!isMuted)}>
-                  {isMuted ? <Volume2 className="w-4 h-4 mr-2" /> : <VolumeX className="w-4 h-4 mr-2" />}
-                  {isMuted ? "Unmute" : "Mute"} Notifications
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <Eye className="w-4 h-4 mr-2" />
                   Read Receipts
                   <Switch className="ml-auto" defaultChecked />
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Shield className="w-4 h-4 mr-2" />
-                  Disappearing Messages
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
@@ -844,7 +842,7 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
                   onClick={() => setShowRemoveModal(true)}
                 >
                   <UserMinus className="w-4 h-4 mr-2" />
-                  Block
+                  Unmatch
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -1057,25 +1055,6 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
         </div>
       )}
 
-      {/* Smart Suggestion Chips */}
-      {showSuggestions && (
-        <div className="border-t border-gray-200 bg-gray-50 px-4 py-2">
-          <div className="flex flex-wrap gap-2">
-            {suggestionChips.map((chip) => (
-              <Button
-                key={chip.id}
-                variant="outline"
-                size="sm"
-                className="bg-white hover:bg-gray-100 text-gray-700 text-xs h-8 px-3"
-                onClick={chip.action}
-              >
-                <chip.icon className="w-3 h-3 mr-1.5" />
-                {chip.label}
-              </Button>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Enhanced Input Area */}
       <div className="bg-white border-t border-gray-200">
@@ -1108,22 +1087,28 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
               className="hidden"
             />
             
-            <Tooltip>
-              <TooltipTrigger asChild>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                  data-testid="button-attach"
+                  data-testid="button-pin"
                 >
-                  <Paperclip className="w-5 h-5 text-gray-500" />
+                  <Pin className="w-5 h-5 text-gray-500" />
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent>Attach File</TooltipContent>
-            </Tooltip>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                {pinOptions.map((option) => (
+                  <DropdownMenuItem key={option.id} onClick={option.action}>
+                    <option.icon className="w-4 h-4 mr-2" />
+                    {option.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
             
-            <Tooltip>
-              <TooltipTrigger asChild>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -1131,9 +1116,18 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
                 >
                   <ImageIcon className="w-5 h-5 text-gray-500" />
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent>Send Photo</TooltipContent>
-            </Tooltip>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-36">
+                <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                  <ImageIcon className="w-4 h-4 mr-2" />
+                  Photo
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                  <Paperclip className="w-4 h-4 mr-2" />
+                  File
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             
             <div className="flex-1 relative">
               <Textarea
