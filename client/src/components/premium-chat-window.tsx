@@ -8,6 +8,7 @@ import {
   Send, 
   Plus, 
   Smile,
+  Image as ImageIcon,
   MapPin,
   Calendar,
   Users,
@@ -540,35 +541,30 @@ export default function PremiumChatWindow({
         </div>
 
         {/* Input Dock */}
-        <div className="flex items-end space-x-3">
-          {/* Attachments Sheet */}
-          <Sheet open={showAttachments} onOpenChange={setShowAttachments}>
-            <SheetTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+        <div className="flex items-end space-x-2">
+          {/* Photo/Video Button */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="p-2"
+                data-testid="button-photo"
               >
-                <Plus className="w-5 h-5" />
+                <ImageIcon className="w-5 h-5 text-gray-500" />
               </Button>
-            </SheetTrigger>
-            <SheetContent side="bottom" className="h-[300px]">
-              <div className="grid grid-cols-3 gap-4 p-4">
-                <Button variant="outline" className="h-20 flex-col space-y-2">
-                  <MapPin className="w-6 h-6" />
-                  <span className="text-xs">Location</span>
-                </Button>
-                <Button variant="outline" className="h-20 flex-col space-y-2">
-                  <Calendar className="w-6 h-6" />
-                  <span className="text-xs">Vet Proposal</span>
-                </Button>
-                <Button variant="outline" className="h-20 flex-col space-y-2">
-                  <Users className="w-6 h-6" />
-                  <span className="text-xs">Contact</span>
-                </Button>
-              </div>
-            </SheetContent>
-          </Sheet>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-36">
+              <DropdownMenuItem>
+                <ImageIcon className="w-4 h-4 mr-2" />
+                Photo
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Video className="w-4 h-4 mr-2" />
+                Video
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Message Input */}
           <div className="flex-1 relative">
