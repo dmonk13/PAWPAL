@@ -88,13 +88,14 @@ export default function SwipeControls({
 
   return (
     <motion.div
-      className={`fixed bottom-0 left-0 right-0 z-[60] ${className}`}
+      className={`fixed left-0 right-0 z-[60] ${className}`}
+      style={{
+        bottom: '4rem', // Leave space for navigation bar
+        paddingBottom: 'env(safe-area-inset-bottom, 0)'
+      }}
       variants={containerVariants}
       initial="hidden"
       animate={isVisible ? "visible" : "hidden"}
-      style={{
-        paddingBottom: 'env(safe-area-inset-bottom, 1rem)'
-      }}
     >
       {/* Backdrop with blur and opacity */}
       <div className="absolute inset-0 backdrop-blur-md bg-white/90 dark:bg-gray-900/90 border-t border-gray-200/50 dark:border-gray-700/50 rounded-t-2xl shadow-2xl" />
