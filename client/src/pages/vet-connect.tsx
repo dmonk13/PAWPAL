@@ -446,10 +446,10 @@ export default function VetConnect() {
                               </Badge>
                             ))}
                           </div>
-                          <Badge className="bg-gradient-to-r from-emerald-500 to-green-500 text-white px-3 py-1 text-xs font-bold rounded-full shadow-sm flex items-center space-x-1 ml-2 flex-shrink-0">
-                            <Timer className="w-3 h-3" />
+                          <div className="flex items-center space-x-1 text-xs text-gray-500 ml-2">
+                            <Timer className="w-2.5 h-2.5" />
                             <span>~15 min</span>
-                          </Badge>
+                          </div>
                         </div>
 
                         {/* Row 5: Experience */}
