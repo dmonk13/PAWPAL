@@ -228,6 +228,16 @@ export default function PremiumChatWindow({
     }
   };
 
+  const handleUnmatch = () => {
+    // Remove match and go back to matches list
+    toast({ 
+      title: "Unmatched successfully", 
+      description: "This profile has been removed from your matches." 
+    });
+    // Call onBack to return to matches list since profile is now removed
+    onBack();
+  };
+
   const addReaction = (messageId: string, emoji: string) => {
     // In real app, this would call an API
     toast({ title: `Added ${emoji} reaction` });
@@ -374,9 +384,13 @@ export default function PremiumChatWindow({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>View Profile</DropdownMenuItem>
-                <DropdownMenuItem>Mute Notifications</DropdownMenuItem>
-                <DropdownMenuItem>Block User</DropdownMenuItem>
+                <DropdownMenuItem 
+                  className="text-red-600" 
+                  onClick={handleUnmatch}
+                  data-testid="menu-unmatch"
+                >
+                  Unmatch
+                </DropdownMenuItem>
                 <DropdownMenuItem className="text-red-600">Report</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
