@@ -195,6 +195,38 @@ export default function PremiumChatWindow({
     }
   };
 
+  const handleVoiceRecording = async () => {
+    if (!isRecording) {
+      try {
+        // Request microphone permission
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        setIsRecording(true);
+        toast({ title: "🎙️ Recording started..." });
+        
+        // Start recording logic would go here
+        // For now, simulate recording for 3 seconds
+        setTimeout(() => {
+          setIsRecording(false);
+          stream.getTracks().forEach(track => track.stop());
+          onSendMessage("🎵 Voice message", "audio");
+          toast({ title: "Voice message sent!" });
+        }, 3000);
+        
+      } catch (error) {
+        console.error("Microphone access denied:", error);
+        toast({ 
+          title: "Microphone access required", 
+          description: "Please allow microphone access to record voice messages.",
+          variant: "destructive"
+        });
+      }
+    } else {
+      // Stop recording
+      setIsRecording(false);
+      toast({ title: "Recording stopped" });
+    }
+  };
+
   const addReaction = (messageId: string, emoji: string) => {
     // In real app, this would call an API
     toast({ title: `Added ${emoji} reaction` });
@@ -513,14 +545,16 @@ export default function PremiumChatWindow({
 
       {/* Premium Composer */}
       <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 space-y-3">
-        {/* Pin Actions */}
-        <div className="flex items-center">
+
+        {/* Input Dock */}
+        <div className="flex items-center space-x-2">
+          {/* Pin Button */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
-                className="p-2"
+                className="p-2 h-10 w-10"
                 data-testid="button-pin"
               >
                 <Pin className="w-5 h-5 text-gray-500" />
@@ -538,17 +572,14 @@ export default function PremiumChatWindow({
               })}
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
-
-        {/* Input Dock */}
-        <div className="flex items-end space-x-2">
+          
           {/* Photo/Video Button */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
-                className="p-2"
+                className="p-2 h-10 w-10"
                 data-testid="button-photo"
               >
                 <ImageIcon className="w-5 h-5 text-gray-500" />
@@ -580,15 +611,38 @@ export default function PremiumChatWindow({
             
             {/* Input Actions */}
             <div className="absolute right-2 bottom-2 flex items-center space-x-1">
-              <Button variant="ghost" size="sm" className="p-2">
-                <Smile className="w-4 h-4 text-gray-500" />
-              </Button>
+              {/* Emoji Picker */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="p-2 h-8 w-8">
+                    <Smile className="w-4 h-4 text-gray-500" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-64 p-2">
+                  <div className="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
+                    {['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😚', '😙', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄', '😬', '🤥', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '🥵', '🥶', '🥴', '😵', '🤯', '🤠', '🥳', '😎', '🤓', '🧐', '😕', '😟', '🙁', '😮', '😯', '😲'].map((emoji) => (
+                      <button
+                        key={emoji}
+                        onClick={() => setMessageText(prev => prev + emoji)}
+                        className="p-1 hover:bg-gray-100 rounded text-lg"
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="border-t mt-2 pt-2">
+                    <Button variant="outline" size="sm" className="w-full">
+                      🎬 GIF
+                    </Button>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
               
               {messageText.trim() ? (
                 <Button 
                   onClick={handleSend}
                   size="sm" 
-                  className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full"
+                  className="p-2 h-8 w-8 bg-blue-600 hover:bg-blue-700 text-white rounded-full"
                 >
                   <Send className="w-4 h-4" />
                 </Button>
@@ -596,10 +650,8 @@ export default function PremiumChatWindow({
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  onMouseDown={() => setIsRecording(true)}
-                  onMouseUp={() => setIsRecording(false)}
-                  onMouseLeave={() => setIsRecording(false)}
-                  className={`p-2 ${isRecording ? 'bg-red-100 text-red-600' : 'text-gray-500'}`}
+                  onClick={handleVoiceRecording}
+                  className={`p-2 h-8 w-8 ${isRecording ? 'bg-red-100 text-red-600' : 'text-gray-500'}`}
                 >
                   <Mic className="w-4 h-4" />
                 </Button>
