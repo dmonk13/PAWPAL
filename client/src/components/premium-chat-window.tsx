@@ -132,7 +132,6 @@ export default function PremiumChatWindow({
   const [shouldShowScroll, setShouldShowScroll] = useState(false);
   const [readReceipts, setReadReceipts] = useState(true);
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -344,7 +343,7 @@ export default function PremiumChatWindow({
   return (
     <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900">
       {/* Premium App Bar - Fixed Header */}
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 relative flex-shrink-0">
+<header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 sticky top-0 z-20 flex-shrink-0">
         {/* Online gradient underline */}
         {conversation.isOnline && (
           <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-green-400 via-blue-500 to-green-400 animate-pulse" />
