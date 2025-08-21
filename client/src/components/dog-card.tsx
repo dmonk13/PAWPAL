@@ -222,7 +222,7 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
             )}
             
             {/* Share Profile and Report Profile Icons */}
-            <div className="flex justify-center gap-6 mb-4">
+            <div className="flex justify-center gap-4 mb-4">
               <Button
                 onClick={() => {
                   if (navigator.share) {
@@ -260,12 +260,12 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
                   }
                 }}
                 variant="ghost"
-                size="lg"
-                className="w-14 h-14 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-700 shadow-md hover:shadow-lg transition-all duration-200 touch-manipulation p-0"
+                size="sm"
+                className="w-10 h-10 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-700 shadow-sm hover:shadow-md transition-all duration-200 touch-manipulation p-0"
                 data-testid="button-share-profile"
                 aria-label={`Share ${dog.name}'s profile`}
               >
-                <Share2 className="w-6 h-6" />
+                <Share2 className="w-4 h-4" />
               </Button>
               
               <Button
@@ -279,12 +279,12 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
                   // await reportProfile({ dogId: dog.id, reason: 'inappropriate_content' });
                 }}
                 variant="ghost"
-                size="lg"
-                className="w-14 h-14 rounded-full bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 shadow-md hover:shadow-lg transition-all duration-200 touch-manipulation p-0"
+                size="sm"
+                className="w-10 h-10 rounded-full bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 shadow-sm hover:shadow-md transition-all duration-200 touch-manipulation p-0"
                 data-testid="button-report-profile"
                 aria-label={`Report ${dog.name}'s profile`}
               >
-                <Flag className="w-6 h-6" />
+                <Flag className="w-4 h-4" />
               </Button>
             </div>
 
