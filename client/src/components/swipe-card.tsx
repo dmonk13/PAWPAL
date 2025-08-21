@@ -214,6 +214,21 @@ export default function SwipeCard({ dog, onMedicalClick, className = "", style }
             <Shield className="w-5 h-5" />
             <span>View Health Profile</span>
           </Button>
+
+          {/* Swipe instruction text */}
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <p className="text-center text-xs text-gray-500 leading-relaxed">
+              <span className="inline-flex items-center mx-1">
+                <span className="w-2 h-2 bg-red-400 rounded-full mr-1"></span>
+                Swipe left to pass
+              </span>
+              <span className="mx-2 text-gray-300">•</span>
+              <span className="inline-flex items-center mx-1">
+                <span className="w-2 h-2 bg-green-400 rounded-full mr-1"></span>
+                Swipe right to like
+              </span>
+            </p>
+          </div>
         </div>
       </div>
     </div>

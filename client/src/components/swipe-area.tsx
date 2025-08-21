@@ -291,21 +291,13 @@ export default function SwipeArea() {
           )}
         </div>
 
-        {/* Simplified interaction hints - positioned above docked controls */}
-        <div className="absolute bottom-24 left-0 right-0 z-20">
+        {/* Simplified interaction hints */}
+        <div className="absolute bottom-6 left-0 right-0 z-20">
           <div className="text-center text-xs text-gray-400">
-            Swipe or use ← → keys
+            Use ← → keys for quick navigation
           </div>
         </div>
       </main>
-
-      {/* Docked Swipe Controls - self-positioning */}
-      <SwipeControls
-        onPass={() => swipe('left', 'button')}
-        onLike={() => swipe('right', 'button')}
-        disabled={!canSwipe || isSwipeLoading}
-        isLoading={isSwipeLoading}
-      />
 
       {/* Immersive Medical View for Discover */}
       <ImmersiveMedicalView
