@@ -132,15 +132,25 @@ export default function PremiumChatWindow({
   const [shouldShowScroll, setShouldShowScroll] = useState(false);
   const [readReceipts, setReadReceipts] = useState(true);
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to bottom when new messages arrive (but not on initial load)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (isInitialLoad) {
+      // On initial load, scroll to top to show header
+      if (messagesContainerRef.current) {
+        messagesContainerRef.current.scrollTop = 0;
+      }
+      setIsInitialLoad(false);
+    } else {
+      // For new messages, scroll to bottom
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, isInitialLoad]);
 
   // Auto-resize textarea
   useEffect(() => {
