@@ -121,11 +121,11 @@ export default function Settings() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label htmlFor="auto-match" className="flex flex-col space-y-1">
-                  <span>Auto-Match</span>
-                  <span className="text-sm text-gray-500">Automatically match with compatible dogs</span>
+                <Label htmlFor="breed-match" className="flex flex-col space-y-1">
+                  <span>Match by Breed</span>
+                  <span className="text-sm text-gray-500">Only show dogs of the same breed</span>
                 </Label>
-                <Switch id="auto-match" />
+                <Switch id="breed-match" />
               </div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="show-distance" className="flex flex-col space-y-1">
