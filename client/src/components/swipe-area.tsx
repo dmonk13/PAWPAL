@@ -10,6 +10,8 @@ import SwipeableCard from "./swipeable-card";
 import SwipeControls from "./swipe-controls";
 import ImmersiveMedicalView from "./immersive-medical-view";
 import EnhancedMatchModal from "./enhanced-match-modal";
+import SwipeCoachmark from "./swipe-coachmark";
+import { useSwipeCoachmark } from "@/hooks/use-swipe-coachmark";
 
 const CURRENT_DOG_ID = "dog-1"; // Buddy's ID from sample data
 
@@ -21,6 +23,13 @@ export default function SwipeArea() {
   
   const { latitude, longitude, error: locationError } = useGeolocation();
   const { toast } = useToast();
+  
+  // Initialize coachmark for swipe guidance
+  const { 
+    isCoachmarkVisible, 
+    dismissCoachmark, 
+    onSwipeAction: triggerCoachmarkConversion 
+  } = useSwipeCoachmark();
   
   // Use fallback Bangalore coordinates if geolocation fails
   const effectiveLatitude = latitude || 12.9716;
@@ -94,9 +103,24 @@ export default function SwipeArea() {
     currentDogId: CURRENT_DOG_ID,
     onMatch: (dog) => setMatchedDog(dog),
     onSwipeComplete: () => {
-      // Optional: Add analytics or additional side effects
+      // Trigger coachmark conversion on any swipe action
+      triggerCoachmarkConversion();
     }
   });
+
+  // Enhanced swipe handler that includes coachmark conversion
+  const handleSwipe = (direction: 'left' | 'right', source: 'gesture' | 'button' | 'keyboard') => {
+    // Trigger coachmark conversion before swipe
+    triggerCoachmarkConversion();
+    
+    // Perform the actual swipe
+    swipe(direction, source);
+  };
+
+  // Wrapper for gesture swipes from SwipeableCard (matches expected signature)
+  const handleGestureSwipe = (direction: 'left' | 'right') => {
+    handleSwipe(direction, 'gesture');
+  };
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -108,13 +132,13 @@ export default function SwipeArea() {
         case 'x':
         case 'X':
           event.preventDefault();
-          swipe('left', 'keyboard');
+          handleSwipe('left', 'keyboard');
           break;
         case 'ArrowRight':
         case 'l':
         case 'L':
           event.preventDefault();
-          swipe('right', 'keyboard');
+          handleSwipe('right', 'keyboard');
           break;
         case 'Enter':
           event.preventDefault();
@@ -281,7 +305,7 @@ export default function SwipeArea() {
             <SwipeableCard
               dog={currentDog}
               isTop={true}
-              onSwipe={swipe}
+              onSwipe={handleGestureSwipe}
               onMedicalClick={() => setSelectedDog(currentDog)}
               isAnimating={state.isAnimating}
               swipeDirection={state.swipeDirection}
@@ -291,12 +315,15 @@ export default function SwipeArea() {
           )}
         </div>
 
-        {/* Simplified interaction hints */}
-        <div className="absolute bottom-6 left-0 right-0 z-20">
-          <div className="text-center text-xs text-gray-400">
-            Use ← → keys for quick navigation
-          </div>
-        </div>
+        {/* Contextual Swipe Coachmark */}
+        {currentDog && (
+          <SwipeCoachmark
+            isVisible={isCoachmarkVisible && canSwipe && !isSwipeLoading}
+            onDismiss={dismissCoachmark}
+            onConverted={triggerCoachmarkConversion}
+          />
+        )}
+
       </main>
 
       {/* Immersive Medical View for Discover */}
