@@ -37,6 +37,55 @@
   background: rgb(156 163 175);
 }
 
+/* Premium chat styles */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Chat message animations */
+.message-bubble {
+  transition: all 120ms ease-out;
+}
+
+.message-bubble:hover {
+  transform: translateY(-1px);
+}
+
+/* Typing indicator animation */
+@keyframes typing-dots {
+  0%, 60%, 100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-10px);
+  }
+}
+
+.typing-dot {
+  animation: typing-dots 1.4s ease-in-out infinite;
+}
+
+/* Premium gradient animations */
+@keyframes gradient-shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.online-gradient {
+  background: linear-gradient(90deg, #10b981, #3b82f6, #10b981);
+  background-size: 200% 100%;
+  animation: gradient-shimmer 2s ease-in-out infinite;
+}
+
 /* Touch and scroll behavior improvements */
 .touch-pan-y {
   -webkit-overflow-scrolling: touch;

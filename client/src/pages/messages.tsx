@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import BottomNav from "@/components/bottom-nav";
-import ChatWindow from "@/components/chat-window";
+import PremiumChatWindow from "@/components/premium-chat-window";
 import MatchesStrip from "@/components/matches-strip";
 
 export default function Messages() {
@@ -89,13 +89,87 @@ export default function Messages() {
   const selectedConversation = conversations.find((c: any) => c.id === selectedChat);
 
   if (selectedChat && selectedConversation) {
+    // Mock messages for the premium chat
+    const mockMessages = [
+      {
+        id: "1",
+        senderId: "other-user",
+        senderName: selectedConversation.ownerName,
+        content: "Hi! Our dogs matched! Would love to set up a playdate 🐕",
+        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+        type: "text" as const,
+        isRead: true,
+        reactions: [{ emoji: "❤️", count: 1 }]
+      },
+      {
+        id: "2",
+        senderId: currentUser?.id || "current-user",
+        senderName: "You",
+        content: "That sounds great! What area of Bangalore are you in?",
+        timestamp: new Date(Date.now() - 90 * 60 * 1000), // 90 mins ago
+        type: "text" as const,
+        isRead: true,
+      },
+      {
+        id: "3",
+        senderId: "other-user",
+        senderName: selectedConversation.ownerName,
+        content: "We're near Koramangala. There's a nice dog park there. How about this weekend?",
+        timestamp: new Date(Date.now() - 70 * 60 * 1000), // 70 mins ago
+        type: "text" as const,
+        isRead: true,
+      },
+      {
+        id: "4",
+        senderId: currentUser?.id || "current-user",
+        senderName: "You",
+        content: "Perfect! Saturday morning works for us. Looking forward to it!",
+        timestamp: new Date(Date.now() - 30 * 60 * 1000), // 30 mins ago
+        type: "text" as const,
+        isRead: false,
+      },
+      {
+        id: "5",
+        senderId: "other-user",
+        senderName: selectedConversation.ownerName,
+        content: "",
+        timestamp: new Date(),
+        type: "playdate" as const,
+        isRead: false,
+        metadata: {
+          playdate: {
+            title: "Dog Park Playdate",
+            date: "2025-08-16",
+            time: "10:00 AM",
+            location: "Koramangala Dog Park, Bangalore",
+            status: "proposed" as const,
+            note: "Bring water bowls and some toys! Luna loves playing fetch."
+          }
+        }
+      }
+    ];
+
+    const conversation = {
+      id: selectedChat,
+      participantName: selectedConversation.dogName,
+      participantAvatar: selectedConversation.dogPhoto,
+      ownerName: selectedConversation.ownerName,
+      isOnline: stripMatches.find(m => m.id === selectedChat)?.isOnline || false,
+      isTyping: false,
+    };
+
     return (
-      <ChatWindow
-        matchId={selectedChat}
-        dogName={selectedConversation.dogName}
-        dogPhoto={selectedConversation.dogPhoto}
-        ownerName={selectedConversation.ownerName}
+      <PremiumChatWindow
+        conversation={conversation}
+        messages={mockMessages}
+        currentUserId={currentUser?.id || "current-user"}
         onBack={() => setSelectedChat(null)}
+        onSendMessage={(content, type, metadata) => {
+          console.log("Sending message:", { content, type, metadata });
+          // In real app, this would send to backend
+        }}
+        onCall={() => console.log("Starting voice call...")}
+        onVideoCall={() => console.log("Starting video call...")}
       />
     );
   }
