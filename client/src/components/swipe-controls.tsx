@@ -88,7 +88,7 @@ export default function SwipeControls({
 
   return (
     <motion.div
-      className={`fixed bottom-0 left-0 right-0 z-50 ${className}`}
+      className={`fixed bottom-0 left-0 right-0 z-[60] ${className}`}
       variants={containerVariants}
       initial="hidden"
       animate={isVisible ? "visible" : "hidden"}
