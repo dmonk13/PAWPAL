@@ -41,7 +41,7 @@ export default function ImmersiveMedicalView({
       
       {/* Bottom Sheet */}
       <div 
-        className={`relative mt-auto bg-white rounded-t-3xl shadow-2xl transition-transform duration-500 ease-out max-h-[70vh] overflow-hidden ${
+        className={`relative mt-auto bg-white rounded-t-3xl shadow-2xl transition-transform duration-500 ease-out max-h-[85vh] flex flex-col ${
           isVisible ? 'translate-y-0' : 'translate-y-full'
         }`}
       >
@@ -77,7 +77,7 @@ export default function ImmersiveMedicalView({
         </div>
 
         {/* Scrollable Content */}
-        <div className="overflow-y-auto px-4 pb-4">
+        <div className="flex-1 overflow-y-auto px-4 pb-6">
           <div className="space-y-4 pt-3">
             {/* Quick Stats */}
             <div className="grid grid-cols-2 gap-3">
@@ -201,24 +201,24 @@ export default function ImmersiveMedicalView({
               </Card>
             )}
 
-            {/* Disclaimer */}
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
-              <p className="text-xs text-gray-600 text-center leading-relaxed">
-                <span className="font-medium">Important:</span> This information is provided by the pet owner for compatibility purposes. 
-                Always verify medical information with a qualified veterinarian before making any health-related decisions.
-              </p>
-            </div>
-
             {/* Action Buttons */}
-            <div className="space-y-2 pt-1">
+            <div className="space-y-3 pt-2">
               <Button
-                className="w-full bg-pink-500 hover:bg-pink-600 text-white font-medium py-2.5 rounded-xl text-sm"
+                className="w-full bg-pink-500 hover:bg-pink-600 text-white font-medium py-3 rounded-xl text-sm"
                 onClick={onClose}
                 data-testid="button-continue-swiping"
               >
                 <ChevronDown className="w-4 h-4 mr-2" />
                 Continue Swiping
               </Button>
+              
+              {/* Disclaimer */}
+              <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-2">
+                <p className="text-xs text-gray-600 text-center leading-relaxed">
+                  <span className="font-medium">Important:</span> This information is provided by the pet owner for compatibility purposes. 
+                  Always verify medical information with a qualified veterinarian before making any health-related decisions.
+                </p>
+              </div>
             </div>
           </div>
         </div>
