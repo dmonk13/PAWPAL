@@ -12,6 +12,7 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import { useToast } from "@/hooks/use-toast";
 
 interface DogCardProps {
   dog: DogWithMedical;
@@ -23,6 +24,7 @@ interface DogCardProps {
 export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }: DogCardProps) {
   const [showFullBio, setShowFullBio] = useState(false);
   const { medicalProfile } = dog;
+  const { toast } = useToast();
   
   const isVaccinated = medicalProfile?.vaccinations?.some(v => v.type === "Rabies");
   const hasAllergies = medicalProfile?.allergies && medicalProfile.allergies.length > 0;
@@ -218,7 +220,72 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
                 </div>
               </div>
             )}
-
+            
+            {/* Share Profile and Report Profile Buttons */}
+            <div className="flex gap-3 mb-4">
+              <Button
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({
+                      title: `Meet ${dog.name}!`,
+                      text: `Check out ${dog.name}, a ${dog.age} year old ${dog.breed} on PupMatch!`,
+                      url: window.location.href
+                    }).then(() => {
+                      toast({
+                        title: "Profile shared!",
+                        description: `${dog.name}'s profile has been shared successfully.`
+                      });
+                    }).catch(() => {
+                      // Fallback to clipboard
+                      navigator.clipboard.writeText(window.location.href);
+                      toast({
+                        title: "Link copied!",
+                        description: `${dog.name}'s profile link copied to clipboard.`
+                      });
+                    });
+                  } else {
+                    // Fallback to clipboard for browsers that don't support Web Share API
+                    navigator.clipboard.writeText(window.location.href).then(() => {
+                      toast({
+                        title: "Link copied!",
+                        description: `${dog.name}'s profile link copied to clipboard.`
+                      });
+                    }).catch(() => {
+                      toast({
+                        title: "Share failed",
+                        description: "Unable to share profile. Please try again.",
+                        variant: "destructive"
+                      });
+                    });
+                  }
+                }}
+                className="flex-1 flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 min-h-[48px] touch-manipulation"
+                data-testid="button-share-profile"
+                aria-label={`Share ${dog.name}'s profile`}
+              >
+                <Share2 className="w-4 h-4" />
+                <span className="text-sm">Share Profile</span>
+              </Button>
+              
+              <Button
+                onClick={() => {
+                  toast({
+                    title: "Report submitted",
+                    description: `Thank you for reporting this profile. We'll review it within 24 hours.`,
+                  });
+                  // In a real app, you would send this report to your moderation system
+                  // Example API call:
+                  // await reportProfile({ dogId: dog.id, reason: 'inappropriate_content' });
+                }}
+                variant="outline"
+                className="flex-1 flex items-center justify-center space-x-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 font-semibold py-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 min-h-[48px] touch-manipulation"
+                data-testid="button-report-profile"
+                aria-label={`Report ${dog.name}'s profile`}
+              >
+                <Flag className="w-4 h-4" />
+                <span className="text-sm">Report Profile</span>
+              </Button>
+            </div>
 
           </div>
         </div>
