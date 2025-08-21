@@ -18,6 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import CareDetailsDialog from "@/components/care-details-dialog";
+import AddVaccinationDialog from "@/components/add-vaccination-dialog";
 
 interface MedicalModalProps {
   dog: DogWithMedical;
@@ -30,6 +31,7 @@ export default function MedicalModal({
 }: MedicalModalProps) {
   const [selectedVaccination, setSelectedVaccination] = useState<any>(null);
   const [showCareDetails, setShowCareDetails] = useState(false);
+  const [showAddRecord, setShowAddRecord] = useState(false);
   const [, setLocation] = useLocation();
 
   // Dog data is already provided as prop
@@ -176,6 +178,7 @@ export default function MedicalModal({
                 <Button
                   size="sm"
                   variant="outline"
+                  onClick={() => setShowAddRecord(true)}
                   className="text-blue-600 border-blue-200 hover:bg-blue-50"
                   data-testid="button-add-vaccination"
                 >
@@ -287,7 +290,7 @@ export default function MedicalModal({
                   {dog.medicalProfile.vetOnFile && (
                     <div>
                       <span className="font-medium text-gray-700">Primary Vet: </span>
-                      <span className="text-gray-600">{dog.medicalProfile.vetOnFile.name}</span>
+                      <span className="text-gray-600">{(dog.medicalProfile.vetOnFile as any).name}</span>
                     </div>
                   )}
                 </CardContent>
@@ -311,12 +314,26 @@ export default function MedicalModal({
             name: dog.name,
             breed: dog?.breed || '',
             age: dog?.age || 0,
-            weight: dog?.weight,
-            medicalProfile: dog?.medicalProfile
+            weight: (dog as any)?.weight,
+            medicalProfile: dog?.medicalProfile ? {
+              allergies: dog.medicalProfile.allergies || [],
+              vetOnFile: (dog.medicalProfile as any).vetOnFile
+            } : undefined
           }}
           status={selectedVaccination.status}
         />
       )}
+
+      {/* Add Vaccination Dialog */}
+      <AddVaccinationDialog
+        isOpen={showAddRecord}
+        onClose={() => setShowAddRecord(false)}
+        dogId={dog.id}
+        onSuccess={() => {
+          setShowAddRecord(false);
+          // Refresh data would happen here if needed
+        }}
+      />
     </>
   );
 }
