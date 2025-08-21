@@ -82,7 +82,6 @@ const quickActions = [
   { id: 'location', icon: MapPin, label: 'Share location' },
   { id: 'schedule', icon: Calendar, label: 'Schedule' },
   { id: 'vet', icon: UserPlus, label: 'Vet connect' },
-  { id: 'profile', icon: Users, label: 'Send profile' },
 ];
 
 const reactionEmojis = ['❤️', '👍', '😂', '😮', '😢', '😡'];
