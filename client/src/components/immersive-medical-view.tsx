@@ -77,8 +77,8 @@ export default function ImmersiveMedicalView({
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto px-4 pb-6">
-          <div className="space-y-4 pt-3">
+        <div className="flex-1 overflow-y-auto">
+          <div className="px-4 pt-3 pb-8 space-y-4">
             {/* Quick Stats */}
             <div className="grid grid-cols-2 gap-3">
               <Card className="bg-blue-50 border-blue-200">
@@ -201,8 +201,8 @@ export default function ImmersiveMedicalView({
               </Card>
             )}
 
-            {/* Action Buttons */}
-            <div className="space-y-3 pt-2">
+            {/* Action Button */}
+            <div className="pt-2">
               <Button
                 className="w-full bg-pink-500 hover:bg-pink-600 text-white font-medium py-3 rounded-xl text-sm"
                 onClick={onClose}
@@ -211,14 +211,14 @@ export default function ImmersiveMedicalView({
                 <ChevronDown className="w-4 h-4 mr-2" />
                 Continue Swiping
               </Button>
-              
-              {/* Disclaimer */}
-              <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-2">
-                <p className="text-xs text-gray-600 text-center leading-relaxed">
-                  <span className="font-medium">Important:</span> This information is provided by the pet owner for compatibility purposes. 
-                  Always verify medical information with a qualified veterinarian before making any health-related decisions.
-                </p>
-              </div>
+            </div>
+            
+            {/* Disclaimer - Always at the bottom with proper spacing */}
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+              <p className="text-xs text-gray-600 text-center leading-relaxed">
+                <span className="font-medium">Important:</span> This information is provided by the pet owner for compatibility purposes. 
+                Always verify medical information with a qualified veterinarian before making any health-related decisions.
+              </p>
             </div>
           </div>
         </div>
