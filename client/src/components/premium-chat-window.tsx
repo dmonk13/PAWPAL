@@ -323,9 +323,9 @@ export default function PremiumChatWindow({
   }, []);
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900">
-      {/* Premium App Bar */}
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 relative">
+    <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Premium App Bar - Fixed Header */}
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 relative flex-shrink-0">
         {/* Online gradient underline */}
         {conversation.isOnline && (
           <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-green-400 via-blue-500 to-green-400 animate-pulse" />
@@ -558,8 +558,8 @@ export default function PremiumChatWindow({
         <div ref={messagesEndRef} />
       </main>
 
-      {/* Premium Composer */}
-      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 space-y-3">
+      {/* Premium Composer - Fixed Footer */}
+      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 space-y-3 flex-shrink-0">
 
         {/* Input Dock */}
         <div className="flex items-center space-x-2">
