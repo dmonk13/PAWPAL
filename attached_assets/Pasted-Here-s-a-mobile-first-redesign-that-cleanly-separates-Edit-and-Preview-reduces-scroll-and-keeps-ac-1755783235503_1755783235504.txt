@@ -1,0 +1,88 @@
+Here’s a mobile-first redesign that cleanly separates Edit and Preview, reduces scroll, and keeps actions obvious.
+
+Structure
+
+Top segmented control: Edit | Preview
+
+Sticky at top; large, thumb-friendly.
+
+Persist last-selected tab.
+
+Edit tab (wizard-style)
+
+Step chips across top: Basic, Photos, Personality, Medical.
+
+Each step is a compact card with:
+
+Title + short hint.
+
+2–4 fields max per screen.
+
+“Next” primary button; “Skip” secondary.
+
+Floating Save bar:
+
+Left: Autosave status.
+
+Right: Save Draft | Update Profile (disabled until valid).
+
+Smart inputs:
+
+Age: stepper + numeric.
+
+Breed: searchable dropdown.
+
+Gender/Size: segmented pills.
+
+Personality: multi-select chips with count badge.
+
+Medical: toggles + text areas with character counters.
+
+Photo manager:
+
+2×2 grid, add button as last tile, reorder via long-press.
+
+Preview tab
+
+Live, tappable card preview:
+
+Shows main photo, name/age, breed/size, badges.
+
+Swipe through photos.
+
+“What others see” mode:
+
+Toggles public/private medical fields.
+
+Device frames (optional): iOS/Android card styles.
+
+CTA row: Simulate Like/Woof to check truncation/overflow.
+
+Navigation and states
+
+Unsaved changes guard on tab switch.
+
+Inline validation per field with concise helper text.
+
+Progress bar under step chips.
+
+Visual style
+
+Cards with 16px radius, 12–16px spacing rhythm.
+
+Neutral background (#F7F8FB), white cards, subtle shadow.
+
+Primary accent coral for actions; teal for success.
+
+Typography: 16px base, 14px helpers, 18px section titles.
+
+Example markup (framework-agnostic)
+
+<header class="segmented"> <button class="seg on">Edit</button> <button class="seg">Preview</button> </header> <section class="edit"> <nav class="steps"> <button class="step on">Basic</button> <button class="step">Photos</button> <button class="step">Personality</button> <button class="step">Medical</button> </nav> <div class="card"> <h3>Basic Information</h3> <label>Name <input type="text" /></label> <label>Age (years) <div class="stepper">- <input type="number" /> +</div></label> <label>Breed <input type="search" placeholder="Search breed" /></label> <div class="seg-pills"> <button class="pill on">Male</button> <button class="pill">Female</button> </div> <button class="btn next">Next</button> </div> </section> <section class="preview hidden"> <div class="toggle-row"> <span>Show medical info</span> <input type="checkbox" /> </div> <article class="profile-card"> <!-- live preview content --> </article> </section> <footer class="savebar"> <span class="status">Saved - just now</span> <div class="actions"> <button class="btn ghost">Save Draft</button> <button class="btn primary">Update Profile</button> </div> </footer>
+Key interactions
+
+Live preview updates in background even when on Edit; switching to Preview shows latest.
+
+Haptics on step completion; confetti micro-animation after full profile update.
+
+Keyboard-aware scroll; Save bar avoids overlap.

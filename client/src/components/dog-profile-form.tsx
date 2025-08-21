@@ -1,8 +1,8 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { X, Upload, CheckCircle, Heart, AlertTriangle, Shield, Camera, Plus, Trash2, Eye, Sparkles, AlertCircle } from "lucide-react";
+import { X, Upload, CheckCircle, Heart, AlertTriangle, Shield, Camera, Plus, Trash2, Eye, Sparkles, AlertCircle, ChevronRight, ChevronLeft, Search, Minus } from "lucide-react";
 import { insertDogSchema, insertMedicalProfileSchema, type Dog, type MedicalProfile } from "@shared/schema";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -66,7 +66,22 @@ const medicalSchema = insertMedicalProfileSchema.extend({
   vetDocumentUrl: z.string().optional(),
 });
 
+const steps = ['basic', 'photos', 'personality', 'medical'] as const;
+type Step = typeof steps[number];
+
+const stepLabels = {
+  basic: 'Basic',
+  photos: 'Photos', 
+  personality: 'Personality',
+  medical: 'Medical'
+};
+
 export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
+  // Main view state
+  const [currentView, setCurrentView] = useState<'edit' | 'preview'>('edit');
+  const [currentStep, setCurrentStep] = useState<Step>('basic');
+  
+  // Form state
   const [selectedTemperaments, setSelectedTemperaments] = useState<string[]>(
     dog?.temperament || []
   );
@@ -93,11 +108,26 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
   const [personalityAnswers, setPersonalityAnswers] = useState<Record<string, string>>(
     dog?.personalityPrompts || {}
   );
-  const [showPreview, setShowPreview] = useState(false);
-  const [activeTab, setActiveTab] = useState<'basic' | 'photos' | 'personality' | 'medical'>('basic');
+  
+  // Progress and save state
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved');
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   const { toast } = useToast();
+
+  // Load persisted tab preference
+  useEffect(() => {
+    const savedTab = localStorage.getItem('profileFormLastTab') as 'edit' | 'preview';
+    if (savedTab) {
+      setCurrentView(savedTab);
+    }
+  }, []);
+
+  // Persist tab selection
+  useEffect(() => {
+    localStorage.setItem('profileFormLastTab', currentView);
+  }, [currentView]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -122,13 +152,14 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
 
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (files) {
-      Array.from(files).forEach(file => {
+    if (files && photos.length < 6) {
+      Array.from(files).slice(0, 6 - photos.length).forEach(file => {
         const reader = new FileReader();
         reader.onload = (e) => {
           const newPhoto = e.target?.result as string;
           setPhotos(prev => [...prev, newPhoto]);
           form.setValue("photos", [...photos, newPhoto]);
+          setHasUnsavedChanges(true);
         };
         reader.readAsDataURL(file);
       });
@@ -139,12 +170,50 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
     const newPhotos = photos.filter((_, i) => i !== index);
     setPhotos(newPhotos);
     form.setValue("photos", newPhotos);
+    setHasUnsavedChanges(true);
   };
 
   const handlePersonalityChange = (promptId: string, answer: string) => {
     const newAnswers = { ...personalityAnswers, [promptId]: answer };
     setPersonalityAnswers(newAnswers);
     form.setValue("personalityPrompts", newAnswers);
+    setHasUnsavedChanges(true);
+  };
+
+  // Step navigation
+  const nextStep = () => {
+    const currentIndex = steps.indexOf(currentStep);
+    if (currentIndex < steps.length - 1) {
+      setCurrentStep(steps[currentIndex + 1]);
+    }
+  };
+
+  const prevStep = () => {
+    const currentIndex = steps.indexOf(currentStep);
+    if (currentIndex > 0) {
+      setCurrentStep(steps[currentIndex - 1]);
+    }
+  };
+
+  const goToStep = (step: Step) => {
+    setCurrentStep(step);
+  };
+
+  // Age stepper handlers
+  const incrementAge = () => {
+    const currentAge = form.getValues('age');
+    if (currentAge < 20) {
+      form.setValue('age', currentAge + 1);
+      setHasUnsavedChanges(true);
+    }
+  };
+
+  const decrementAge = () => {
+    const currentAge = form.getValues('age');
+    if (currentAge > 0) {
+      form.setValue('age', currentAge - 1);
+      setHasUnsavedChanges(true);
+    }
   };
 
   const saveDogMutation = useMutation({
@@ -188,6 +257,7 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
         ? prev.filter(t => t !== temperament)
         : [...prev, temperament]
     );
+    setHasUnsavedChanges(true);
   };
 
   const addAllergy = () => {
@@ -195,12 +265,13 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
       const trimmedAllergy = newAllergy.trim();
       setAllergies([...allergies, trimmedAllergy]);
       setNewAllergy("");
-
+      setHasUnsavedChanges(true);
     }
   };
 
   const removeAllergy = (allergy: string) => {
     setAllergies(allergies.filter(a => a !== allergy));
+    setHasUnsavedChanges(true);
   };
 
   const addCondition = () => {
@@ -208,12 +279,13 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
       const trimmedCondition = newCondition.trim();
       setConditions([...conditions, trimmedCondition]);
       setNewCondition("");
-
+      setHasUnsavedChanges(true);
     }
   };
 
   const removeCondition = (condition: string) => {
     setConditions(conditions.filter(c => c !== condition));
+    setHasUnsavedChanges(true);
   };
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
@@ -264,674 +336,551 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
     distanceRadius: distanceRadius[0],
   };
 
-  const TabButton = ({ tab, label, icon: Icon, isActive }: { tab: string; label: string; icon: any; isActive: boolean }) => (
-    <Button
+  const StepChip = ({ step, label, isActive, isCompleted }: { 
+    step: Step; 
+    label: string; 
+    isActive: boolean; 
+    isCompleted: boolean;
+  }) => (
+    <button
       type="button"
-      variant={isActive ? "default" : "outline"}
-      size="sm"
-      onClick={() => setActiveTab(tab as any)}
-      className={`flex items-center gap-2 ${isActive ? "bg-primary text-white" : "text-gray-600"}`}
+      onClick={() => goToStep(step)}
+      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+        isActive
+          ? 'bg-[#FF6B6B] text-white shadow-sm'
+          : isCompleted 
+          ? 'bg-[#4ECDC4] text-white'
+          : 'bg-white text-gray-600 border border-gray-300 hover:border-gray-400'
+      }`}
     >
-      <Icon className="w-4 h-4" />
       {label}
-    </Button>
+    </button>
   );
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex flex-col">
-      <div className="bg-white rounded-t-3xl mt-8 flex-1 flex flex-col max-h-[calc(100vh-2rem)]">
-        {/* Enhanced Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100 flex-shrink-0">
-          <div className="flex items-center gap-4">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">
-                {dog?.id ? "Edit Dog Profile" : "Add Dog Profile"}
-              </h2>
-              <p className="text-sm text-gray-500 mt-1">
-                Create an engaging profile to help your pup find their perfect match
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowPreview(!showPreview)}
-              className="flex items-center gap-2"
-            >
-              <Eye className="w-4 h-4" />
-              {showPreview ? "Hide Preview" : "Preview"}
-            </Button>
-            <Button variant="ghost" size="sm" onClick={onClose} className="touch-manipulation min-h-[44px] min-w-[44px]">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-0 md:p-4">
+      <div className="bg-[#F7F8FB] w-full h-full md:rounded-xl md:max-w-4xl md:h-[90vh] flex flex-col overflow-hidden">
+        {/* Fixed Header with Segmented Control */}
+        <div className="flex-shrink-0 bg-white border-b border-gray-200 p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">
+              {dog?.id ? "Edit Profile" : "Create Dog Profile"}
+            </h2>
+            <Button variant="ghost" size="sm" onClick={onClose} className="p-2">
               <X className="w-5 h-5" />
             </Button>
           </div>
-        </div>
-
-        {/* Tab Navigation */}
-        <div className="p-4 border-b border-gray-100 flex-shrink-0">
-          <div className="flex gap-2 flex-wrap">
-            <TabButton tab="basic" label="Basic Info" icon={Heart} isActive={activeTab === 'basic'} />
-            <TabButton tab="photos" label="Photos" icon={Camera} isActive={activeTab === 'photos'} />
-            <TabButton tab="personality" label="Personality" icon={Sparkles} isActive={activeTab === 'personality'} />
-            <TabButton tab="medical" label="Medical" icon={Shield} isActive={activeTab === 'medical'} />
+          
+          {/* Segmented Control */}
+          <div className="bg-gray-100 p-1 rounded-xl flex">
+            <button
+              onClick={() => setCurrentView('edit')}
+              className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+                currentView === 'edit'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Edit
+            </button>
+            <button
+              onClick={() => setCurrentView('preview')}
+              className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+                currentView === 'preview'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Preview
+            </button>
           </div>
         </div>
 
-        {/* Content with Split View */}
-        <div className="flex-1 flex overflow-hidden">
-          {/* Form Section */}
-          <div className={`${showPreview ? "w-1/2 border-r border-gray-200" : "w-full"} overflow-y-auto overscroll-contain`}>
-            <Form {...form}>
-              <form id="dog-profile-form" onSubmit={form.handleSubmit(onSubmit)} className="p-8 space-y-8">
-                {/* Photos Tab */}
-                {activeTab === 'photos' && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Camera className="w-5 h-5" />
-                        Profile Photos
-                      </CardTitle>
-                      <p className="text-sm text-gray-500">
-                        Add up to 6 photos to showcase your dog's personality
-                      </p>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {/* Photo Grid */}
-                      <div className="grid grid-cols-3 gap-4">
-                        {photos.map((photo, index) => (
-                          <div key={index} className="relative aspect-square">
-                            <img
-                              src={photo}
-                              alt={`Dog photo ${index + 1}`}
-                              className="w-full h-full object-cover rounded-lg border-2 border-gray-200"
+        {/* Content Area */}
+        <div className="flex-1 overflow-hidden">
+          {currentView === 'edit' ? (
+            <div className="h-full flex flex-col">
+              {/* Step Navigation */}
+              <div className="flex-shrink-0 bg-white border-b border-gray-200 p-4">
+                <div className="flex items-center justify-between gap-2 overflow-x-auto">
+                  {steps.map((step, index) => (
+                    <StepChip
+                      key={step}
+                      step={step}
+                      label={stepLabels[step]}
+                      isActive={currentStep === step}
+                      isCompleted={steps.indexOf(currentStep) > index}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Step Content */}
+              <div className="flex-1 overflow-y-auto p-4">
+                <Form {...form}>
+                  <form id="dog-profile-form" onSubmit={form.handleSubmit(onSubmit)}>
+                    {/* Basic Step */}
+                    {currentStep === 'basic' && (
+                      <Card className="border-0 bg-white rounded-2xl shadow-sm">
+                        <CardHeader className="pb-4">
+                          <CardTitle className="flex items-center gap-2 text-lg">
+                            <Heart className="w-5 h-5 text-[#FF6B6B]" />
+                            Basic Information
+                          </CardTitle>
+                          <p className="text-sm text-gray-500">Essential details about your pup</p>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                          {/* Name & Age Row */}
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                              control={form.control}
+                              name="name"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-sm font-medium text-gray-700">Name</FormLabel>
+                                  <FormControl>
+                                    <Input 
+                                      placeholder="e.g., Buddy" 
+                                      {...field} 
+                                      onChange={(e) => {
+                                        field.onChange(e);
+                                        setHasUnsavedChanges(true);
+                                      }}
+                                      className="rounded-lg border-gray-300 focus:border-[#FF6B6B] focus:ring-[#FF6B6B]"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
                             />
-                            <Button
-                              type="button"
-                              variant="destructive"
-                              size="sm"
-                              className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
-                              onClick={() => removePhoto(index)}
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </Button>
+                            
+                            <FormField
+                              control={form.control}
+                              name="age"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-sm font-medium text-gray-700">Age (years)</FormLabel>
+                                  <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={decrementAge}
+                                      disabled={field.value <= 0}
+                                      className="h-8 w-8 p-0 hover:bg-gray-200"
+                                    >
+                                      <Minus className="w-4 h-4" />
+                                    </Button>
+                                    <Input
+                                      type="number"
+                                      {...field}
+                                      onChange={(e) => {
+                                        const value = parseInt(e.target.value) || 0;
+                                        field.onChange(value);
+                                        setHasUnsavedChanges(true);
+                                      }}
+                                      className="flex-1 text-center border-0 bg-transparent focus:ring-0 font-medium"
+                                      min={0}
+                                      max={20}
+                                    />
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={incrementAge}
+                                      disabled={field.value >= 20}
+                                      className="h-8 w-8 p-0 hover:bg-gray-200"
+                                    >
+                                      <Plus className="w-4 h-4" />
+                                    </Button>
+                                  </div>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
-                        ))}
-                        
-                        {photos.length < 6 && (
-                          <div
-                            className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors"
-                            onClick={() => fileInputRef.current?.click()}
-                          >
-                            <Plus className="w-8 h-8 text-gray-400 mb-2" />
-                            <span className="text-sm text-gray-500">Add Photo</span>
-                          </div>
-                        )}
-                      </div>
-                      
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        accept="image/*"
-                        multiple
-                        onChange={handlePhotoUpload}
-                        className="hidden"
-                      />
-                      
-                      <p className="text-xs text-gray-400">
-                        First photo will be your main profile picture. Drag to reorder.
-                      </p>
-                    </CardContent>
-                  </Card>
-                )}
 
-                {/* Personality Prompts Tab */}
-                {activeTab === 'personality' && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Sparkles className="w-5 h-5" />
-                        Personality & Fun Facts
-                      </CardTitle>
-                      <p className="text-sm text-gray-500">
-                        Help others get to know your dog's unique personality
-                      </p>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                      {personalityPrompts.map((prompt) => (
-                        <div key={prompt.id} className="space-y-3">
-                          <Label className="text-sm font-medium text-gray-700">
-                            {prompt.question}
-                          </Label>
-                          <Textarea
-                            value={personalityAnswers[prompt.id] || ""}
-                            onChange={(e) => handlePersonalityChange(prompt.id, e.target.value)}
-                            placeholder={prompt.placeholder}
-                            className="min-h-[80px] resize-none"
-                            rows={3}
-                          />
-                        </div>
-                      ))}
-                      
-                      <div className="bg-blue-50 p-4 rounded-lg">
-                        <div className="flex items-start gap-3">
-                          <Sparkles className="w-5 h-5 text-blue-600 mt-0.5" />
-                          <div>
-                            <h4 className="text-sm font-medium text-blue-900 mb-1">
-                              Pro Tip: Be Creative!
-                            </h4>
-                            <p className="text-sm text-blue-700">
-                              Fun, detailed answers help you stand out and find better matches. 
-                              Show off your dog's unique personality!
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Basic Info Tab */}
-                {activeTab === 'basic' && (
-                  <>
-                    <Card className="border-gray-200 shadow-sm">
-                      <CardHeader className="pb-6">
-                        <CardTitle className="text-xl font-semibold text-gray-900 mb-2">Basic Information</CardTitle>
-                        <p className="text-sm text-gray-500">Essential details about your dog</p>
-                      </CardHeader>
-                      <CardContent className="space-y-6">
-                        <div className="grid grid-cols-2 gap-6">
-                          <FormField
-                            control={form.control}
-                            name="name"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Name</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Dog's name" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={form.control}
-                            name="age"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Age (years)</FormLabel>
-                                <FormControl>
-                                  <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-6">
+                          {/* Breed with Search */}
                           <FormField
                             control={form.control}
                             name="breed"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Breed</FormLabel>
+                                <FormLabel className="text-sm font-medium text-gray-700">Breed</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="e.g., Golden Retriever" {...field} />
+                                  <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                                    <Input 
+                                      placeholder="e.g., Golden Retriever" 
+                                      {...field}
+                                      onChange={(e) => {
+                                        field.onChange(e);
+                                        setHasUnsavedChanges(true);
+                                      }}
+                                      className="pl-10 rounded-lg border-gray-300 focus:border-[#FF6B6B] focus:ring-[#FF6B6B]"
+                                    />
+                                  </div>
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
                             )}
                           />
-                          <FormField
-                            control={form.control}
-                            name="gender"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Gender</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                  <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Select gender" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="Male">Male</SelectItem>
-                                    <SelectItem value="Female">Female</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
 
-                        <FormField
-                          control={form.control}
-                          name="size"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Size</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select size" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="Small">Small</SelectItem>
-                                  <SelectItem value="Medium">Medium</SelectItem>
-                                  <SelectItem value="Large">Large</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="bio"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Bio</FormLabel>
-                              <FormControl>
-                                <Textarea 
-                                  placeholder="Tell us about your dog's personality and what they love..."
-                                  className="resize-none touch-manipulation min-h-[100px]"
-                                  value={field.value || ""}
-                                  onChange={field.onChange}
-                                  onBlur={field.onBlur}
-                                  name={field.name}
-                                  ref={field.ref}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </CardContent>
-                    </Card>
-
-                    {/* Temperament */}
-                    <Card className="border-gray-200 shadow-sm">
-                      <CardHeader className="pb-6">
-                        <CardTitle className="text-xl font-semibold text-gray-900 mb-2">Temperament</CardTitle>
-                        <p className="text-sm text-gray-500">Select traits that best describe your dog's personality</p>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <Label className="text-sm font-medium text-gray-700">
-                            Choose up to 6 traits that best describe your dog
-                          </Label>
+                          {/* Gender & Size Pills */}
                           <div className="grid grid-cols-2 gap-4">
-                          {temperamentOptions.map((temperament) => (
-                            <Button
-                              key={temperament}
-                              type="button"
-                              variant={selectedTemperaments.includes(temperament) ? "default" : "outline"}
-                              onClick={() => toggleTemperament(temperament)}
-                              disabled={!selectedTemperaments.includes(temperament) && selectedTemperaments.length >= 6}
-                              className={`touch-manipulation min-h-[48px] text-sm font-medium ${
-                                selectedTemperaments.includes(temperament) 
-                                  ? "bg-coral text-white border-coral" 
-                                  : "border-2 hover:border-coral hover:text-coral"
-                              }`}
-                            >
-                              {temperament}
-                            </Button>
-                          ))}
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                            <FormField
+                              control={form.control}
+                              name="gender"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-sm font-medium text-gray-700">Gender</FormLabel>
+                                  <div className="flex gap-2">
+                                    {['Male', 'Female'].map((gender) => (
+                                      <button
+                                        key={gender}
+                                        type="button"
+                                        onClick={() => {
+                                          field.onChange(gender);
+                                          setHasUnsavedChanges(true);
+                                        }}
+                                        className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                                          field.value === gender
+                                            ? 'bg-[#FF6B6B] text-white'
+                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                        }`}
+                                      >
+                                        {gender}
+                                      </button>
+                                    ))}
+                                  </div>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
 
-                    {/* Matching Preferences */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Matching Preferences</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div>
-                          <Label className="text-sm font-medium mb-3 block">
-                            Search Distance ({distanceRadius[0]} miles)
-                          </Label>
-                          <Slider
-                            value={distanceRadius}
-                            onValueChange={setDistanceRadius}
-                            max={100}
-                            min={1}
-                            step={1}
-                            className="w-full"
-                          />
-                          <div className="flex justify-between text-xs medium-gray mt-1">
-                            <span>1 mi</span>
-                            <span>50 mi</span>
-                            <span>100 mi</span>
+                            <FormField
+                              control={form.control}
+                              name="size"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-sm font-medium text-gray-700">Size</FormLabel>
+                                  <Select value={field.value} onValueChange={(value) => {
+                                    field.onChange(value);
+                                    setHasUnsavedChanges(true);
+                                  }}>
+                                    <SelectTrigger className="rounded-lg border-gray-300 focus:border-[#FF6B6B] focus:ring-[#FF6B6B]">
+                                      <SelectValue placeholder="Select size" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="Small">Small</SelectItem>
+                                      <SelectItem value="Medium">Medium</SelectItem>
+                                      <SelectItem value="Large">Large</SelectItem>
+                                      <SelectItem value="Extra Large">Extra Large</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
-                        </div>
+                        </CardContent>
+                      </Card>
+                    )}
 
-                        <FormField
-                          control={form.control}
-                          name="matingPreference"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                              <div className="space-y-0.5">
-                                <FormLabel className="text-base">
-                                  Interested in Mating
-                                </FormLabel>
-                                <div className="text-sm text-muted-foreground">
-                                  Show your dog to others looking for mating partners
-                                </div>
-                              </div>
-                              <FormControl>
-                                <Switch
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
+                    {/* Photos Step */}
+                    {currentStep === 'photos' && (
+                      <Card className="border-0 bg-white rounded-2xl shadow-sm">
+                        <CardHeader className="pb-4">
+                          <CardTitle className="flex items-center gap-2 text-lg">
+                            <Camera className="w-5 h-5 text-[#FF6B6B]" />
+                            Profile Photos
+                          </CardTitle>
+                          <p className="text-sm text-gray-500">Add up to 6 photos to showcase personality</p>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-2 gap-3">
+                            {photos.map((photo, index) => (
+                              <div key={index} className="relative aspect-square">
+                                <img
+                                  src={photo}
+                                  alt={`Dog photo ${index + 1}`}
+                                  className="w-full h-full object-cover rounded-xl border-2 border-gray-200"
                                 />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                      </CardContent>
-                    </Card>
-                  </>
-                )}
-
-                {/* Medical Tab */}
-                {activeTab === 'medical' && (
-                  <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <AlertCircle className="w-5 h-5 mr-2 text-red-500" />
-                    Medical Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label className="text-sm font-medium mb-2 block">Allergies</Label>
-                    <div className="flex gap-2 mb-2">
-                      <Input
-                        placeholder="Add an allergy"
-                        value={newAllergy}
-                        onChange={(e) => setNewAllergy(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addAllergy())}
-                      />
-                      <Button type="button" onClick={addAllergy} size="sm">Add</Button>
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {allergies.map((allergy, index) => (
-                        <Badge
-                          key={index}
-                          variant="secondary"
-                          className="cursor-pointer"
-                          onClick={() => removeAllergy(allergy)}
-                        >
-                          {allergy} ✕
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label className="text-sm font-medium mb-2 block">Medical Conditions</Label>
-                    <div className="flex gap-2 mb-2">
-                      <Input
-                        placeholder="Add a condition"
-                        value={newCondition}
-                        onChange={(e) => setNewCondition(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCondition())}
-                      />
-                      <Button type="button" onClick={addCondition} size="sm">Add</Button>
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {conditions.map((condition, index) => (
-                        <Badge
-                          key={index}
-                          variant="secondary"
-                          className="cursor-pointer"
-                          onClick={() => removeCondition(condition)}
-                        >
-                          {condition} ✕
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Pet Insurance Section */}
-                  <div className="bg-blue-50 p-4 rounded-lg space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <Shield className="w-4 h-4 mr-2 text-blue-600" />
-                        <Label className="text-sm font-medium">Pet Insurance</Label>
-                      </div>
-                      <Switch
-                        checked={hasInsurance}
-                        onCheckedChange={setHasInsurance}
-                      />
-                    </div>
-                    
-                    {hasInsurance && (
-                      <div className="space-y-3">
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <Label className="text-xs text-gray-600">Insurance Provider</Label>
-                            <Input
-                              placeholder="e.g., Trupanion, Healthy Paws"
-                              value={insurance.provider}
-                              onChange={(e) => setInsurance({...insurance, provider: e.target.value})}
-                              className="text-sm"
-                            />
+                                <Button
+                                  type="button"
+                                  variant="destructive"
+                                  size="sm"
+                                  className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                                  onClick={() => removePhoto(index)}
+                                >
+                                  <X className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            ))}
+                            
+                            {photos.length < 6 && (
+                              <div
+                                className="aspect-square border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-[#FF6B6B] hover:bg-red-50 transition-colors"
+                                onClick={() => fileInputRef.current?.click()}
+                              >
+                                <Plus className="w-8 h-8 text-gray-400 mb-2" />
+                                <span className="text-sm text-gray-500 font-medium">Add Photo</span>
+                              </div>
+                            )}
                           </div>
-                          <div>
-                            <Label className="text-xs text-gray-600">Policy Number</Label>
-                            <Input
-                              placeholder="Policy number"
-                              value={insurance.policyNumber}
-                              onChange={(e) => setInsurance({...insurance, policyNumber: e.target.value})}
-                              className="text-sm"
-                            />
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <Label className="text-xs text-gray-600">Coverage Type</Label>
-                            <Select value={insurance.coverageType} onValueChange={(value) => setInsurance({...insurance, coverageType: value})}>
-                              <SelectTrigger className="text-sm">
-                                <SelectValue placeholder="Select coverage" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="accident-only">Accident Only</SelectItem>
-                                <SelectItem value="accident-illness">Accident & Illness</SelectItem>
-                                <SelectItem value="comprehensive">Comprehensive</SelectItem>
-                                <SelectItem value="wellness">Wellness</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <Label className="text-xs text-gray-600">Coverage Limit</Label>
-                            <Input
-                              placeholder="e.g., $10,000/year"
-                              value={insurance.coverageLimit}
-                              onChange={(e) => setInsurance({...insurance, coverageLimit: e.target.value})}
-                              className="text-sm"
-                            />
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <Label className="text-xs text-gray-600">Deductible</Label>
-                            <Input
-                              placeholder="e.g., $250"
-                              value={insurance.deductible}
-                              onChange={(e) => setInsurance({...insurance, deductible: e.target.value})}
-                              className="text-sm"
-                            />
-                          </div>
-                          <div>
-                            <Label className="text-xs text-gray-600">Expiration Date</Label>
-                            <Input
-                              type="date"
-                              value={insurance.expirationDate}
-                              onChange={(e) => setInsurance({...insurance, expirationDate: e.target.value})}
-                              className="text-sm"
-                            />
-                          </div>
-                        </div>
-                        
-                        <div>
-                          <Label className="text-xs text-gray-600">Contact Number</Label>
-                          <Input
-                            placeholder="Insurance contact number"
-                            value={insurance.contactNumber}
-                            onChange={(e) => setInsurance({...insurance, contactNumber: e.target.value})}
-                            className="text-sm"
+                          
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={handlePhotoUpload}
+                            className="hidden"
                           />
-                        </div>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Personality Step */}
+                    {currentStep === 'personality' && (
+                      <Card className="border-0 bg-white rounded-2xl shadow-sm">
+                        <CardHeader className="pb-4">
+                          <CardTitle className="flex items-center gap-2 text-lg">
+                            <Sparkles className="w-5 h-5 text-[#FF6B6B]" />
+                            Personality Traits
+                          </CardTitle>
+                          <p className="text-sm text-gray-500">Select traits that best describe your pup</p>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="flex flex-wrap gap-2">
+                            {temperamentOptions.slice(0, 12).map((trait) => (
+                              <button
+                                key={trait}
+                                type="button"
+                                onClick={() => toggleTemperament(trait)}
+                                className={`px-3 py-2 rounded-full text-sm font-medium transition-all ${
+                                  selectedTemperaments.includes(trait)
+                                    ? 'bg-[#FF6B6B] text-white'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                }`}
+                              >
+                                {trait}
+                                {selectedTemperaments.includes(trait) && (
+                                  <span className="ml-1 bg-white/20 rounded-full px-1 text-xs">
+                                    {selectedTemperaments.indexOf(trait) + 1}
+                                  </span>
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                          
+                          {selectedTemperaments.length > 0 && (
+                            <div className="bg-red-50 p-3 rounded-lg">
+                              <p className="text-sm text-red-700">
+                                <span className="font-medium">{selectedTemperaments.length}</span> traits selected
+                              </p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Medical Step */}
+                    {currentStep === 'medical' && (
+                      <Card className="border-0 bg-white rounded-2xl shadow-sm">
+                        <CardHeader className="pb-4">
+                          <CardTitle className="flex items-center gap-2 text-lg">
+                            <Shield className="w-5 h-5 text-[#FF6B6B]" />
+                            Medical Information
+                          </CardTitle>
+                          <p className="text-sm text-gray-500">Optional health details for safety</p>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          {/* Allergies */}
+                          <div>
+                            <Label className="text-sm font-medium mb-2 block">Known Allergies</Label>
+                            <div className="flex gap-2 mb-2">
+                              <Input
+                                placeholder="Add allergies (comma-separated)"
+                                value={newAllergy}
+                                onChange={(e) => setNewAllergy(e.target.value)}
+                                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addAllergy())}
+                                className="rounded-lg border-gray-300 focus:border-[#FF6B6B] focus:ring-[#FF6B6B]"
+                              />
+                              <Button type="button" onClick={addAllergy} size="sm" className="bg-[#4ECDC4] hover:bg-[#4ECDC4]/90">
+                                Add
+                              </Button>
+                            </div>
+                            <div className="flex flex-wrap gap-1">
+                              {allergies.map((allergy, index) => (
+                                <Badge
+                                  key={index}
+                                  variant="secondary"
+                                  className="cursor-pointer bg-red-100 text-red-800 hover:bg-red-200"
+                                  onClick={() => removeAllergy(allergy)}
+                                >
+                                  {allergy} ✕
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Medical Conditions */}
+                          <div>
+                            <Label className="text-sm font-medium mb-2 block">Medical Conditions</Label>
+                            <div className="flex gap-2 mb-2">
+                              <Input
+                                placeholder="Add conditions (comma-separated)"
+                                value={newCondition}
+                                onChange={(e) => setNewCondition(e.target.value)}
+                                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCondition())}
+                                className="rounded-lg border-gray-300 focus:border-[#FF6B6B] focus:ring-[#FF6B6B]"
+                              />
+                              <Button type="button" onClick={addCondition} size="sm" className="bg-[#4ECDC4] hover:bg-[#4ECDC4]/90">
+                                Add
+                              </Button>
+                            </div>
+                            <div className="flex flex-wrap gap-1">
+                              {conditions.map((condition, index) => (
+                                <Badge
+                                  key={index}
+                                  variant="secondary"
+                                  className="cursor-pointer bg-blue-100 text-blue-800 hover:bg-blue-200"
+                                  onClick={() => removeCondition(condition)}
+                                >
+                                  {condition} ✕
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </form>
+                </Form>
+              </div>
+
+              {/* Step Navigation Footer */}
+              <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4">
+                <div className="flex items-center justify-between">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={prevStep}
+                    disabled={currentStep === 'basic'}
+                    className="flex items-center gap-2"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Previous
+                  </Button>
+
+                  <div className="flex items-center gap-3">
+                    {currentStep !== 'medical' ? (
+                      <Button
+                        type="button"
+                        onClick={nextStep}
+                        className="bg-[#FF6B6B] hover:bg-[#FF6B6B]/90 text-white flex items-center gap-2 min-h-[44px] px-6"
+                      >
+                        Next
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    ) : (
+                      <Button 
+                        type="submit" 
+                        form="dog-profile-form"
+                        className="bg-[#4ECDC4] hover:bg-[#4ECDC4]/90 text-white min-h-[44px] px-6"
+                        disabled={saveDogMutation.isPending}
+                      >
+                        {saveDogMutation.isPending ? "Saving..." : dog?.id ? "Update Profile" : "Create Profile"}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Floating Save Status */}
+              <div className="absolute top-20 left-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-sm border">
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${
+                    autoSaveStatus === 'saved' ? 'bg-green-500' : 
+                    autoSaveStatus === 'saving' ? 'bg-yellow-500' : 'bg-red-500'
+                  }`} />
+                  <span className="text-xs text-gray-600">
+                    {autoSaveStatus === 'saved' ? 'Saved' : 
+                     autoSaveStatus === 'saving' ? 'Saving...' : 'Error'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Preview View */
+            <div className="h-full bg-[#F7F8FB] flex items-center justify-center p-4">
+              <div className="max-w-sm w-full">
+                <div className="mb-6 text-center">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Live Preview</h3>
+                  <p className="text-sm text-gray-500">See how your profile will look to other users</p>
+                </div>
+                
+                {/* Dog Card Preview */}
+                <div className="bg-white rounded-2xl shadow-lg border border-gray-200">
+                  {/* Photos */}
+                  <div className="aspect-square relative overflow-hidden rounded-t-2xl bg-gray-200">
+                    {previewDog.photos.length > 0 ? (
+                      <img
+                        src={previewDog.photos[0]}
+                        alt={previewDog.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Camera className="w-12 h-12 text-gray-400" />
+                      </div>
+                    )}
+                    
+                    {previewDog.photos.length > 1 && (
+                      <div className="absolute bottom-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
+                        +{previewDog.photos.length - 1} more
                       </div>
                     )}
                   </div>
 
-                  <div className="bg-mint bg-opacity-10 p-4 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center">
-                        <CheckCircle className="w-4 h-4 mr-2 text-green-500" />
-                        <Label className="text-sm font-medium">Vet Clearance</Label>
-                      </div>
-                      <Switch
-                        checked={dog?.medicalProfile?.vetClearance || false}
-                        onCheckedChange={() => {}}
-                      />
-                    </div>
-                    <p className="text-xs medium-gray mb-3">
-                      Upload veterinary documents to verify your dog's health status
-                    </p>
-                    <Button type="button" variant="outline" size="sm" className="w-full">
-                      <Upload className="w-4 h-4 mr-2" />
-                      Upload Vet Documents
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-                )}
-
-                {/* Bottom spacing for mobile */}
-                <div className="h-20"></div>
-              </form>
-            </Form>
-          </div>
-
-          {/* Preview Panel */}
-          {showPreview && (
-            <div className="w-1/2 overflow-y-auto bg-gray-50 p-8">
-              <div className="mb-8">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Live Preview</h3>
-                <p className="text-sm text-gray-500">See how your profile will look to other users</p>
-              </div>
-              
-              {/* Dog Card Preview */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 max-w-sm mx-auto">
-                {/* Photos */}
-                <div className="aspect-square relative overflow-hidden rounded-t-lg bg-gray-200">
-                  {previewDog.photos.length > 0 ? (
-                    <img
-                      src={previewDog.photos[0]}
-                      alt={previewDog.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Camera className="w-12 h-12 text-gray-400" />
-                    </div>
-                  )}
-                  
-                  {previewDog.photos.length > 1 && (
-                    <div className="absolute bottom-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
-                      +{previewDog.photos.length - 1} more
-                    </div>
-                  )}
-                </div>
-
-                {/* Info */}
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
+                  {/* Info */}
+                  <div className="p-6">
+                    <div className="mb-4">
                       <h3 className="text-xl font-bold text-gray-900">{previewDog.name}</h3>
                       <p className="text-sm text-gray-600 mt-1">
                         {previewDog.breed} • {previewDog.age} {previewDog.age === 1 ? 'year' : 'years'} old
                       </p>
                       <p className="text-sm text-gray-500 mt-0.5">{previewDog.gender} • {previewDog.size}</p>
                     </div>
+
+                    {previewDog.bio && (
+                      <p className="text-sm text-gray-700 mb-4 line-clamp-3">{previewDog.bio}</p>
+                    )}
+
+                    {/* Temperament Tags */}
+                    {previewDog.temperament.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {previewDog.temperament.slice(0, 3).map((trait) => (
+                          <span
+                            key={trait}
+                            className="px-3 py-1 bg-red-50 text-[#FF6B6B] text-xs font-medium rounded-full"
+                          >
+                            {trait}
+                          </span>
+                        ))}
+                        {previewDog.temperament.length > 3 && (
+                          <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
+                            +{previewDog.temperament.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
-
-                  {previewDog.bio && (
-                    <p className="text-sm text-gray-700 mb-4 line-clamp-3">{previewDog.bio}</p>
-                  )}
-
-                  {/* Temperament Tags */}
-                  {previewDog.temperament.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {previewDog.temperament.slice(0, 3).map((trait) => (
-                        <span
-                          key={trait}
-                          className="px-3 py-1 bg-coral/10 text-coral text-xs font-medium rounded-full"
-                        >
-                          {trait}
-                        </span>
-                      ))}
-                      {previewDog.temperament.length > 3 && (
-                        <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
-                          +{previewDog.temperament.length - 3} more
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Personality Prompts Preview */}
-                  {Object.keys(previewDog.personalityPrompts).length > 0 && (
-                    <div className="space-y-3">
-                      {Object.entries(previewDog.personalityPrompts)
-                        .slice(0, 2)
-                        .map(([promptId, answer]) => {
-                          const prompt = personalityPrompts.find(p => p.id === promptId);
-                          if (!prompt || !answer) return null;
-                          return (
-                            <div key={promptId} className="bg-gray-50 p-3 rounded-lg">
-                              <p className="text-xs font-medium text-gray-700 mb-1">{prompt.question}</p>
-                              <p className="text-xs text-gray-600 line-clamp-2">{answer}</p>
-                            </div>
-                          );
-                        })}
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
           )}
-        </div>
-
-        {/* Fixed Action Buttons */}
-        <div className="flex-shrink-0 p-8 border-t border-gray-200 bg-white">
-          <div className="flex gap-6">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={onClose} 
-              className="flex-1 touch-manipulation min-h-[48px] border-2 hover:border-gray-300"
-            >
-              Cancel
-            </Button>
-            <Button 
-              type="submit" 
-              form="dog-profile-form"
-              className="flex-1 bg-coral text-white hover:bg-coral/90 touch-manipulation min-h-[48px] font-medium"
-              disabled={saveDogMutation.isPending}
-            >
-              {saveDogMutation.isPending ? "Saving..." : dog?.id ? "Update Profile" : "Create Profile"}
-            </Button>
-          </div>
         </div>
       </div>
     </div>
