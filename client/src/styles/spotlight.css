@@ -209,3 +209,36 @@
 .btn:disabled:active {
   transform: none;
 }
+
+/* Inline Match Badge Styles */
+.match-pill-inline {
+  background: linear-gradient(135deg, #FFE8ED 0%, #FFD7E0 100%);
+  color: #9B1C42;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 105, 135, 0.2);
+  box-shadow: 0 2px 8px rgba(255, 105, 135, 0.15);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Enhanced Photo Hover Effect */
+.spotlight-media:hover {
+  filter: brightness(1.05);
+}
+
+.spotlight-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: linear-gradient(45deg, rgba(255, 107, 107, 0.1), rgba(255, 182, 193, 0.1));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.spotlight-media:hover::after {
+  opacity: 1;
+}

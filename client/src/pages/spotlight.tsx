@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import BottomNav from "@/components/bottom-nav";
+import MatchedDogProfileModal from "@/components/matched-dog-profile-modal";
 import { SpotlightCandidate, WoofStatus } from "@shared/schema";
 import "../styles/spotlight.css";
 
@@ -15,6 +16,7 @@ const CURRENT_USER_ID = "user-1"; // Sarah's user ID from sample data
 
 export default function Spotlight() {
   const [selectedDog, setSelectedDog] = useState<SpotlightCandidate | null>(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [likeNotes, setLikeNotes] = useState<Record<string, string>>({});
   const [isSubmittingLike, setIsSubmittingLike] = useState(false);
   const [isSubmittingWoof, setIsSubmittingWoof] = useState(false);
@@ -137,6 +139,40 @@ export default function Spotlight() {
     return badges;
   };
 
+  const handlePhotoClick = (dog: SpotlightCandidate) => {
+    setSelectedDog(dog);
+    setShowProfileModal(true);
+  };
+
+  // Convert SpotlightCandidate to MatchedDog format for modal
+  const convertToMatchedDog = (dog: SpotlightCandidate) => {
+    return {
+      id: dog.id,
+      name: dog.name,
+      age: dog.age,
+      breed: dog.breed,
+      size: dog.size,
+      photos: dog.photos || ["/api/placeholder/400/400"],
+      temperament: dog.temperament || [],
+      vaccinations: {
+        rabies: { status: 'up-to-date' as const, date: '2024-06-01' },
+        dhpp: { status: 'up-to-date' as const, date: '2024-06-01' }
+      },
+      allergies: dog.medicalProfile?.allergies || [],
+      owner: {
+        name: "Dog Owner",
+        verified: dog.vetVerified || false,
+        joinedDate: "2024"
+      },
+      about: `Meet ${dog.name}, a wonderful ${dog.breed} looking for new friends!`,
+      medicalNotes: dog.medicalProfile?.conditions?.join(", ") || "",
+      playPreferences: ["Fetch", "Running", "Socializing"],
+      recentCheckins: [],
+      location: "Nearby",
+      distance: dog.distance || 1
+    };
+  };
+
   if (isLoading) {
     return (
       <div className="flex flex-col h-full">
@@ -169,6 +205,15 @@ export default function Spotlight() {
   }
 
   return (
+    <>
+      {/* Profile Modal */}
+      {showProfileModal && selectedDog && (
+        <MatchedDogProfileModal
+          isOpen={showProfileModal}
+          onClose={() => setShowProfileModal(false)}
+          dog={convertToMatchedDog(selectedDog)}
+        />
+      )}
     <div className="flex flex-col h-full">
       <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 p-4 sticky top-0 z-40 shadow-sm">
         <h1 className="text-2xl font-bold text-gray-900">Today's Spotlight</h1>
@@ -203,25 +248,29 @@ export default function Spotlight() {
               
               return (
                 <div key={dog.id} className="spotlight-card bg-white border border-gray-100 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-200">
-                  {/* Photo and Match Badge */}
-                  <div className="spotlight-media">
+                  {/* Clickable Photo */}
+                  <div 
+                    className="spotlight-media cursor-pointer transform transition-transform hover:scale-105"
+                    onClick={() => handlePhotoClick(dog)}
+                    data-testid={`photo-${dog.id}`}
+                  >
                     <img
                       src={(dog.photos && dog.photos[0]) || "/api/placeholder/112/112"} 
                       alt={dog.name}
                       className="w-full h-full object-cover"
                     />
-                    <div className="match-pill">
-                      <span className="font-bold">{dog.compatibilityScore}%</span> match
-                    </div>
                   </div>
 
                   {/* Content */}
                   <div className="spotlight-body">
-                    {/* Title Row */}
-                    <div className="title-row">
+                    {/* Title Row with Match Badge */}
+                    <div className="title-row flex items-center justify-between">
                       <h3 className="text-base font-bold text-gray-900 m-0">
                         {dog.name} • {dog.age} yrs
                       </h3>
+                      <div className="match-pill-inline bg-gradient-to-r from-rose-100 to-pink-100 text-rose-700 text-xs font-bold px-3 py-1 rounded-full border border-rose-200">
+                        <span>{dog.compatibilityScore}%</span> match
+                      </div>
                     </div>
 
                     {/* Sub Row */}
@@ -311,5 +360,6 @@ export default function Spotlight() {
       
       <BottomNav />
     </div>
+    </>
   );
 }
