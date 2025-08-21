@@ -1123,8 +1123,8 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
                   Photo
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
-                  <Paperclip className="w-4 h-4 mr-2" />
-                  File
+                  <Video className="w-4 h-4 mr-2" />
+                  Video
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
