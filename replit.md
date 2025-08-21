@@ -83,6 +83,12 @@ PupMatch is a mobile-first dog dating application that allows dog owners to conn
 - Added explicit event prevention to navigation buttons to prevent accidental form submission
 - Enhanced user experience: users can now navigate freely between all sections and complete medical profile editing properly
 
+**Checkup Navigation Enhancement (August 21, 2025)**:
+- Implemented pro-gated checkup button functionality in profile medical section
+- Added smart navigation: pro users go directly to /vet-connect, non-pro users redirected to /premium
+- Enhanced user experience by providing clear upgrade path for non-pro users wanting to schedule checkups
+- Maintained existing medical modal checkup functionality for comprehensive vet scheduling access
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.

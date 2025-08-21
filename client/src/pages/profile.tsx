@@ -546,6 +546,13 @@ export default function Profile() {
                         <Button
                           variant="outline"
                           size="sm"
+                          onClick={() => {
+                            if (user?.isPro) {
+                              setLocation('/vet-connect');
+                            } else {
+                              setLocation('/premium');
+                            }
+                          }}
                           className="h-auto p-3 flex flex-col items-center space-y-1 border-2 hover:bg-green-50"
                           data-testid="button-schedule-checkup"
                         >
