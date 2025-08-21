@@ -12,7 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { 
   MapPin, Phone, Star, Clock, Calendar, ExternalLink, ArrowLeft, Filter, 
   SlidersHorizontal, Navigation, Crown, Shield, Heart, ChevronDown, Info,
-  Stethoscope, Video, Home, Timer, User, MapPinIcon, Zap, Award
+  Stethoscope, Video, Home, Timer, User, MapPinIcon, Zap, Award, UserCircle
 } from "lucide-react";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import BottomNav from "@/components/bottom-nav";
@@ -464,23 +464,14 @@ export default function VetConnect() {
 
                         {/* Actions Row */}
                         <div className="flex items-center space-x-2">
-                          {vet.onlineBooking && vet.bookingUrl ? (
+                          <Link href={`/vet-profile/${vet.id}`}>
                             <Button 
                               className="bg-purple-600 hover:bg-purple-700 text-white h-8 px-3 text-sm font-semibold rounded-lg flex-1"
-                              onClick={() => window.open(vet.bookingUrl!, '_blank')}
                             >
-                              <Calendar className="w-3 h-3 mr-1" />
-                              Book
+                              <UserCircle className="w-3 h-3 mr-1" />
+                              Profile
                             </Button>
-                          ) : (
-                            <Button 
-                              className="bg-purple-600 hover:bg-purple-700 text-white h-8 px-3 text-sm font-semibold rounded-lg flex-1"
-                              onClick={() => window.open(`tel:${vet.phoneNumber}`, '_self')}
-                            >
-                              <Phone className="w-3 h-3 mr-1" />
-                              Call
-                            </Button>
-                          )}
+                          </Link>
                           
                           <Button
                             variant="outline"
@@ -491,15 +482,25 @@ export default function VetConnect() {
                             <Phone className="w-4 h-4 text-gray-600" />
                           </Button>
                           
-                          <Link href={`/vet-profile/${vet.id}`}>
+                          {vet.onlineBooking && vet.bookingUrl ? (
                             <Button
                               variant="outline"
                               size="sm"
                               className="min-w-[44px] min-h-[44px] p-0 rounded-lg"
+                              onClick={() => window.open(vet.bookingUrl!, '_blank')}
                             >
                               <ExternalLink className="w-4 h-4 text-gray-600" />
                             </Button>
-                          </Link>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="min-w-[44px] min-h-[44px] p-0 rounded-lg"
+                              onClick={() => window.open(`tel:${vet.phoneNumber}`, '_self')}
+                            >
+                              <ExternalLink className="w-4 h-4 text-gray-600" />
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </div>
