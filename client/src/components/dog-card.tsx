@@ -221,8 +221,8 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
               </div>
             )}
             
-            {/* Share Profile and Report Profile Buttons */}
-            <div className="flex gap-3 mb-4">
+            {/* Share Profile and Report Profile Icons */}
+            <div className="flex justify-center gap-6 mb-4">
               <Button
                 onClick={() => {
                   if (navigator.share) {
@@ -259,12 +259,13 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
                     });
                   }
                 }}
-                className="flex-1 flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 min-h-[48px] touch-manipulation"
+                variant="ghost"
+                size="lg"
+                className="w-14 h-14 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-700 shadow-md hover:shadow-lg transition-all duration-200 touch-manipulation p-0"
                 data-testid="button-share-profile"
                 aria-label={`Share ${dog.name}'s profile`}
               >
-                <Share2 className="w-4 h-4" />
-                <span className="text-sm">Share Profile</span>
+                <Share2 className="w-6 h-6" />
               </Button>
               
               <Button
@@ -277,13 +278,13 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
                   // Example API call:
                   // await reportProfile({ dogId: dog.id, reason: 'inappropriate_content' });
                 }}
-                variant="outline"
-                className="flex-1 flex items-center justify-center space-x-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 font-semibold py-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 min-h-[48px] touch-manipulation"
+                variant="ghost"
+                size="lg"
+                className="w-14 h-14 rounded-full bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 shadow-md hover:shadow-lg transition-all duration-200 touch-manipulation p-0"
                 data-testid="button-report-profile"
                 aria-label={`Report ${dog.name}'s profile`}
               >
-                <Flag className="w-4 h-4" />
-                <span className="text-sm">Report Profile</span>
+                <Flag className="w-6 h-6" />
               </Button>
             </div>
 
