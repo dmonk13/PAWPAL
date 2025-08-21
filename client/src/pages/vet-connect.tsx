@@ -391,8 +391,8 @@ export default function VetConnect() {
                       : 'linear-gradient(135deg, rgba(37, 99, 235, 0.02) 0%, transparent 100%)'
                   }}
                 >
-                  <CardContent className="p-3">
-                    <div className="flex items-center space-x-3">
+                  <CardContent className="p-4">
+                    <div className="flex items-start space-x-3">
                       {/* 56px Avatar */}
                       {vet.profilePhoto ? (
                         <img 
@@ -406,103 +406,86 @@ export default function VetConnect() {
                         </div>
                       )}
                       
-                      {/* Compact Content */}
-                      <div className="flex-1 min-w-0">
-                        {/* Row 1: Name + Rating + Availability */}
-                        <div className="flex items-center justify-between mb-1">
-                          <div className="flex items-center space-x-2 flex-1 min-w-0">
-                            <h3 className="text-base font-bold text-gray-900 truncate">
-                              {vet.name}
-                            </h3>
-                            {vet.emergencyServices ? (
-                              <Badge className="bg-amber-500 text-white px-1.5 py-0.5 text-xs font-bold rounded-full">24/7</Badge>
-                            ) : isOpenNow(vet.workingHours) ? (
-                              <Badge className="bg-green-500 text-white px-1.5 py-0.5 text-xs font-bold rounded-full">OPEN</Badge>
-                            ) : null}
-                          </div>
-                          <div className="flex items-center space-x-1 bg-amber-50 px-2 py-0.5 rounded-full">
+                      {/* Content */}
+                      <div className="flex-1 min-w-0 space-y-2">
+                        {/* Row 1: Name + Status Badge */}
+                        <div className="flex items-center space-x-2">
+                          <h3 className="text-lg font-bold text-gray-900 truncate">
+                            {vet.name}
+                          </h3>
+                          {vet.emergencyServices ? (
+                            <Badge className="bg-amber-500 text-white px-2 py-1 text-xs font-bold rounded-full">24/7</Badge>
+                          ) : isOpenNow(vet.workingHours) ? (
+                            <Badge className="bg-green-500 text-white px-2 py-1 text-xs font-bold rounded-full">OPEN</Badge>
+                          ) : null}
+                        </div>
+
+                        {/* Row 2: Clinic name + Rating */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600 truncate">{vet.clinicName}</span>
+                          <div className="flex items-center space-x-1 bg-amber-50 px-2 py-1 rounded-full ml-2">
                             <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
                             <span className="text-sm font-bold text-gray-900">{vet.rating}</span>
                           </div>
                         </div>
 
-                        {/* Row 2: Clinic + Distance + Price */}
-                        <div className="flex items-center justify-between text-sm mb-2">
-                          <div className="flex items-center space-x-1 flex-1 min-w-0">
-                            <span className="text-gray-600 truncate">{vet.clinicName}</span>
-                            <span className="text-gray-400">•</span>
-                            <span className="font-bold text-gray-900">{vet.distance}km</span>
-                          </div>
+                        {/* Row 3: Distance + Price */}
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-medium text-gray-900">{vet.distance}km from you</span>
                           {vet.consultationFee && (
-                            <span className="text-sm font-bold text-purple-600">from ${vet.consultationFee}</span>
+                            <span className="font-bold text-purple-600">from ${vet.consultationFee}</span>
                           )}
                         </div>
 
-                        {/* Short Bio/Description (1-2 lines) */}
-                        <div className="text-xs text-gray-600 mb-2 line-clamp-2">
-                          {vet.specialties.slice(0, 2).join(", ")} • {vet.yearsExperience || 5}+ years experience
-                          {vet.languages && vet.languages.length > 0 && ` • ${vet.languages.slice(0, 2).join(", ")}`}
-                        </div>
-
-                        {/* Micro-metadata Row */}
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center space-x-2">
-                            {vet.specialties.slice(0, 2).map((specialty, idx) => (
-                              <Badge key={idx} className="bg-blue-100 text-blue-800 px-1.5 py-0.5 text-xs rounded-full">
-                                <Stethoscope className="w-2.5 h-2.5 mr-0.5" />
-                                {specialty}
-                              </Badge>
-                            ))}
-                          </div>
-                          <div className="flex items-center space-x-2 text-xs text-gray-500">
-                            {vet.services && vet.services.includes('Telehealth') && <Video className="w-3 h-3" />}
-                            {vet.services && vet.services.includes('House Call') && <Home className="w-3 h-3" />}
+                        {/* Row 4: Specialties */}
+                        <div className="flex items-center space-x-1 overflow-x-auto pb-1">
+                          {vet.specialties.slice(0, 2).map((specialty, idx) => (
+                            <Badge key={idx} className="bg-blue-100 text-blue-800 px-2 py-1 text-xs rounded-full whitespace-nowrap flex-shrink-0">
+                              {specialty}
+                            </Badge>
+                          ))}
+                          <div className="flex items-center space-x-1 text-xs text-gray-500 ml-2">
                             <Timer className="w-3 h-3" />
                             <span>~15 min</span>
                           </div>
                         </div>
 
-                        {/* Actions Row */}
-                        <div className="flex items-center space-x-2">
-                          <Link href={`/vet-profile/${vet.id}`}>
-                            <Button 
-                              className="bg-purple-600 hover:bg-purple-700 text-white h-8 px-3 text-sm font-semibold rounded-lg flex-1"
-                            >
-                              <UserCircle className="w-3 h-3 mr-1" />
-                              Profile
-                            </Button>
-                          </Link>
-                          
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="min-w-[44px] min-h-[44px] p-0 rounded-lg"
-                            onClick={() => window.open(`tel:${vet.phoneNumber}`, '_self')}
-                          >
-                            <Phone className="w-4 h-4 text-gray-600" />
-                          </Button>
-                          
-                          {vet.onlineBooking && vet.bookingUrl ? (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="min-w-[44px] min-h-[44px] p-0 rounded-lg"
-                              onClick={() => window.open(vet.bookingUrl!, '_blank')}
-                            >
-                              <ExternalLink className="w-4 h-4 text-gray-600" />
-                            </Button>
-                          ) : (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="min-w-[44px] min-h-[44px] p-0 rounded-lg"
-                              onClick={() => window.open(`tel:${vet.phoneNumber}`, '_self')}
-                            >
-                              <ExternalLink className="w-4 h-4 text-gray-600" />
-                            </Button>
-                          )}
+                        {/* Row 5: Experience */}
+                        <div className="text-xs text-gray-600">
+                          {vet.yearsExperience || 5}+ years experience
+                          {vet.languages && vet.languages.length > 0 && ` • ${vet.languages.slice(0, 2).join(", ")}`}
                         </div>
                       </div>
+                    </div>
+
+                    {/* Actions Row - Separate Section */}
+                    <div className="flex items-center space-x-2 mt-4 pt-3 border-t border-gray-100">
+                      <Link href={`/vet-profile/${vet.id}`} className="flex-1">
+                        <Button 
+                          className="w-full bg-purple-600 hover:bg-purple-700 text-white h-10 px-4 text-sm font-semibold rounded-lg"
+                        >
+                          <UserCircle className="w-4 h-4 mr-2" />
+                          Profile
+                        </Button>
+                      </Link>
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="min-w-[44px] min-h-[44px] p-0 rounded-lg border-gray-300"
+                        onClick={() => window.open(`tel:${vet.phoneNumber}`, '_self')}
+                      >
+                        <Phone className="w-4 h-4 text-gray-600" />
+                      </Button>
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="min-w-[44px] min-h-[44px] p-0 rounded-lg border-gray-300"
+                        onClick={() => window.open(vet.onlineBooking && vet.bookingUrl ? vet.bookingUrl! : `tel:${vet.phoneNumber}`, vet.onlineBooking && vet.bookingUrl ? '_blank' : '_self')}
+                      >
+                        <ExternalLink className="w-4 h-4 text-gray-600" />
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
