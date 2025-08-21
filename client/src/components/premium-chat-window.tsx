@@ -15,7 +15,9 @@ import {
   Heart,
   ThumbsUp,
   CheckCircle2,
-  Check
+  Check,
+  Pin,
+  Paperclip
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -78,10 +80,33 @@ interface PremiumChatWindowProps {
   onVideoCall?: () => void;
 }
 
-const quickActions = [
-  { id: 'location', icon: MapPin, label: 'Share location' },
-  { id: 'schedule', icon: Calendar, label: 'Schedule' },
-  { id: 'vet', icon: UserPlus, label: 'Vet connect' },
+// Pin button options with expanded functionality
+const pinOptions = [
+  {
+    id: "location",
+    label: "Share location",
+    icon: MapPin
+  },
+  {
+    id: "schedule", 
+    label: "Schedule",
+    icon: Calendar
+  },
+  {
+    id: "vet",
+    label: "Vet connect",
+    icon: UserPlus
+  },
+  {
+    id: "profile",
+    label: "Share Dog Profile",
+    icon: Heart
+  },
+  {
+    id: "attachment",
+    label: "Attach File",
+    icon: Paperclip
+  }
 ];
 
 const reactionEmojis = ['❤️', '👍', '😂', '😮', '😢', '😡'];
@@ -134,7 +159,7 @@ export default function PremiumChatWindow({
     }
   };
 
-  const handleQuickAction = (actionId: string) => {
+  const handlePinAction = (actionId: string) => {
     switch (actionId) {
       case 'location':
         if (navigator.geolocation) {
@@ -161,6 +186,10 @@ export default function PremiumChatWindow({
       case 'profile':
         onSendMessage("📋 Shared profile", "profile");
         toast({ title: "Profile shared!" });
+        break;
+      case 'attachment':
+        // Open file picker
+        toast({ title: "Opening file picker..." });
         break;
     }
   };
@@ -483,23 +512,31 @@ export default function PremiumChatWindow({
 
       {/* Premium Composer */}
       <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 space-y-3">
-        {/* Quick Actions Row */}
-        <div className="flex space-x-2 overflow-x-auto scrollbar-hide">
-          {quickActions.map((action) => {
-            const Icon = action.icon;
-            return (
+        {/* Pin Actions */}
+        <div className="flex items-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <Button
-                key={action.id}
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                onClick={() => handleQuickAction(action.id)}
-                className="flex items-center space-x-2 whitespace-nowrap"
+                className="p-2"
+                data-testid="button-pin"
               >
-                <Icon className="w-4 h-4" />
-                <span className="text-sm">{action.label}</span>
+                <Pin className="w-5 h-5 text-gray-500" />
               </Button>
-            );
-          })}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              {pinOptions.map((option) => {
+                const Icon = option.icon;
+                return (
+                  <DropdownMenuItem key={option.id} onClick={() => handlePinAction(option.id)}>
+                    <Icon className="w-4 h-4 mr-2" />
+                    {option.label}
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Input Dock */}
