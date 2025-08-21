@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
+import ActionRow from "@/components/action-row";
 
 interface DogCardProps {
   dog: DogWithMedical;
@@ -220,73 +221,59 @@ export default function DogCard({ dog, onMedicalClick, onSwipe, className = "" }
                 </div>
               </div>
             )}
-            
-            {/* Share Profile and Report Profile Icons */}
-            <div className="flex justify-center gap-4 mb-4">
-              <Button
-                onClick={() => {
-                  if (navigator.share) {
-                    navigator.share({
-                      title: `Meet ${dog.name}!`,
-                      text: `Check out ${dog.name}, a ${dog.age} year old ${dog.breed} on PupMatch!`,
-                      url: window.location.href
-                    }).then(() => {
-                      toast({
-                        title: "Profile shared!",
-                        description: `${dog.name}'s profile has been shared successfully.`
-                      });
-                    }).catch(() => {
-                      // Fallback to clipboard
-                      navigator.clipboard.writeText(window.location.href);
-                      toast({
-                        title: "Link copied!",
-                        description: `${dog.name}'s profile link copied to clipboard.`
-                      });
+
+            {/* Thin Divider */}
+            <div className="h-px bg-gray-200 dark:bg-gray-700 my-3" />
+
+            {/* Action Row */}
+            <ActionRow
+              dogName={`${dog.name}'s profile`}
+              onShare={() => {
+                if (navigator.share) {
+                  navigator.share({
+                    title: `Meet ${dog.name}!`,
+                    text: `Check out ${dog.name}, a ${dog.age} year old ${dog.breed} on PupMatch!`,
+                    url: window.location.href
+                  }).then(() => {
+                    toast({
+                      title: "Profile shared!",
+                      description: `${dog.name}'s profile has been shared successfully.`
                     });
-                  } else {
-                    // Fallback to clipboard for browsers that don't support Web Share API
-                    navigator.clipboard.writeText(window.location.href).then(() => {
-                      toast({
-                        title: "Link copied!",
-                        description: `${dog.name}'s profile link copied to clipboard.`
-                      });
-                    }).catch(() => {
-                      toast({
-                        title: "Share failed",
-                        description: "Unable to share profile. Please try again.",
-                        variant: "destructive"
-                      });
+                  }).catch(() => {
+                    // Fallback to clipboard
+                    navigator.clipboard.writeText(window.location.href);
+                    toast({
+                      title: "Link copied!",
+                      description: `${dog.name}'s profile link copied to clipboard.`
                     });
-                  }
-                }}
-                variant="ghost"
-                size="sm"
-                className="w-10 h-10 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-700 shadow-sm hover:shadow-md transition-all duration-200 touch-manipulation p-0"
-                data-testid="button-share-profile"
-                aria-label={`Share ${dog.name}'s profile`}
-              >
-                <Share2 className="w-4 h-4" />
-              </Button>
-              
-              <Button
-                onClick={() => {
-                  toast({
-                    title: "Report submitted",
-                    description: `Thank you for reporting this profile. We'll review it within 24 hours.`,
                   });
-                  // In a real app, you would send this report to your moderation system
-                  // Example API call:
-                  // await reportProfile({ dogId: dog.id, reason: 'inappropriate_content' });
-                }}
-                variant="ghost"
-                size="sm"
-                className="w-10 h-10 rounded-full bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 shadow-sm hover:shadow-md transition-all duration-200 touch-manipulation p-0"
-                data-testid="button-report-profile"
-                aria-label={`Report ${dog.name}'s profile`}
-              >
-                <Flag className="w-4 h-4" />
-              </Button>
-            </div>
+                } else {
+                  // Fallback to clipboard for browsers that don't support Web Share API
+                  navigator.clipboard.writeText(window.location.href).then(() => {
+                    toast({
+                      title: "Link copied!",
+                      description: `${dog.name}'s profile link copied to clipboard.`
+                    });
+                  }).catch(() => {
+                    toast({
+                      title: "Share failed",
+                      description: "Unable to share profile. Please try again.",
+                      variant: "destructive"
+                    });
+                  });
+                }
+              }}
+              onReport={async (reason: string, description?: string) => {
+                // In a real app, you would send this report to your moderation system
+                // Example API call:
+                // await reportProfile({ dogId: dog.id, reason, description });
+                
+                // For now, we'll just simulate the API call
+                return new Promise((resolve) => {
+                  setTimeout(resolve, 1000);
+                });
+              }}
+            />
 
           </div>
         </div>
