@@ -1,0 +1,80 @@
+Goals
+
+Elevate look and usability while keeping existing features (messages, reactions, attachments, quick actions, proposals).
+
+Prioritize readability, thumb reach, and low visual noise.
+
+Layout
+
+App bar: large avatar + name, small “with Owner - Online”. Right actions: voice, video, overflow. Subtle gradient underline for online state.
+
+Conversation: soft, airy canvas; message groups with clear time separators; floating day chips.
+
+Message bubbles
+
+Sender (self): deep brand blue bubble, white text; 16px radius with 6px “tail”. Max width 78%.
+
+Receiver: white bubble, 1px #EAECF0 border, shadow xs; 14–16px font.
+
+Reactions: compact, stacked below bubble; long-press to add.
+
+Status ticks: tiny below-right of last message in a group.
+
+Composer
+
+Docked, rounded 20px field with placeholder “Type a message…”.
+
+Left: plus (expand sheet: photos, location, vet proposal, contact).
+
+Right: mic (press-and-hold), send (paper plane), quick emoji.
+
+Safe-area aware; grows to 4 lines; attachments preview above composer.
+
+Quick actions row (above composer)
+
+Chips: Share location, Schedule, Vet connect, Send profile. Horizontal scroll, haptics on tap.
+
+Meetup/Vet proposal card
+
+Premium “pass” card with soft container, icon, title (Playdate Proposal), details (title, date/time, location), note, CTA buttons: Accept (solid), Suggest change (outline).
+
+Colors and typography
+
+Text: #0F172A primary, #64748B secondary.
+
+Self bubble: #2962FF; outline focus: #8AD1FF.
+
+Accents: success #22A573, warning #F59E0B, danger #EF4444.
+
+Font: Inter/SF 16 base, 14 meta, 12 timestamps.
+
+Micro-interactions
+
+Smooth 120ms bubble fade/slide; spring for new reactions.
+
+Typing indicator: three-dot elastic in brand blue.
+
+Read receipt: avatar dot fade-in next to last seen bubble.
+
+Accessibility
+
+4.5:1 contrast; 44px tap targets; focus-visible rings; screen-reader labels for proposal details and actions.
+
+Dark mode
+
+Background #0B0F16; recv bubbles #121720; borders #202735; self bubble #1E40FF; maintain brand contrast.
+
+Performance
+
+Virtualized list; image lazy-load with blur-up; cached avatars.
+
+Example structure (HTML-ish)
+
+<header class="chat-appbar">…</header> <main class="thread"> <div class="day-chip">Yesterday</div> <div class="msg recv">…</div> <div class="msg self">…</div> <article class="proposal-card">…</article> </main> <footer class="composer"> <div class="quick-row">…chips…</div> <div class="input-dock">+ | [input] | 🙂 🎤 ✈️</div> </footer>
+Optional premium touches
+
+Gradient accent under app bar that animates subtly when online.
+
+Confetti burst when proposal is accepted.
+
+Inline safety reminder toast if location sharing is enabled without vet clearance.
