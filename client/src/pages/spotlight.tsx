@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import BottomNav from "@/components/bottom-nav";
 import MatchedDogProfileModal from "@/components/matched-dog-profile-modal";
+import PremiumSpotlightCard from "@/components/premium-spotlight-card";
 import { SpotlightCandidate, WoofStatus } from "@shared/schema";
 import "../styles/spotlight.css";
 
@@ -48,16 +49,15 @@ export default function Spotlight() {
     }
   };
 
-  const handleLike = async (dogId: string) => {
+  const handleLike = async (dogId: string, note?: string) => {
     setIsSubmittingLike(true);
     try {
-      const note = likeNotes[dogId] || "";
       const response = await fetch("/api/likes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           toDogId: dogId,
-          note: note.trim(),
+          note: (note || "").trim(),
           type: "like"
         }),
       });
@@ -68,9 +68,6 @@ export default function Spotlight() {
         title: "Like sent! 💕",
         description: note ? "Your message has been delivered!" : "You liked this profile!",
       });
-
-      // Clear the note after successful like
-      setLikeNotes(prev => ({ ...prev, [dogId]: "" }));
       
     } catch (error) {
       toast({
@@ -83,7 +80,7 @@ export default function Spotlight() {
     }
   };
 
-  const handleWoof = async (dogId: string) => {
+  const handleWoof = async (dogId: string, note?: string) => {
     if (!woofStatus?.woofRemaining) {
       toast({
         title: "No Woofs left!",
@@ -95,13 +92,12 @@ export default function Spotlight() {
 
     setIsSubmittingWoof(true);
     try {
-      const note = likeNotes[dogId] || "";
       const response = await fetch("/api/likes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           toDogId: dogId,
-          note: note.trim(),
+          note: (note || "").trim(),
           type: "woof"
         }),
       });
@@ -242,118 +238,21 @@ export default function Spotlight() {
           </div>
         ) : (
           <div className="space-y-6 p-4">
-            {candidates.map((dog) => {
-              const badges = getBadges(dog);
-              const note = likeNotes[dog.id] || "";
-              
-              return (
-                <div key={dog.id} className="spotlight-card bg-white border border-gray-100 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-200">
-                  {/* Clickable Photo */}
-                  <div 
-                    className="spotlight-media cursor-pointer transform transition-transform hover:scale-105"
-                    onClick={() => handlePhotoClick(dog)}
-                    data-testid={`photo-${dog.id}`}
-                  >
-                    <img
-                      src={(dog.photos && dog.photos[0]) || "/api/placeholder/112/112"} 
-                      alt={dog.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  {/* Content */}
-                  <div className="spotlight-body">
-                    {/* Title Row with Match Badge */}
-                    <div className="title-row flex items-center justify-between">
-                      <h3 className="text-base font-bold text-gray-900 m-0">
-                        {dog.name} • {dog.age} yrs
-                      </h3>
-                      <div className="match-pill-inline bg-gradient-to-r from-rose-100 to-pink-100 text-rose-700 text-xs font-bold px-3 py-1 rounded-full border border-rose-200">
-                        <span>{dog.compatibilityScore}%</span> match
-                      </div>
-                    </div>
-
-                    {/* Sub Row */}
-                    <div className="sub-row">
-                      <div className="breed text-sm text-gray-600">
-                        {dog.breed} • {dog.size}
-                      </div>
-                      {dog.distance && (
-                        <div className="distance text-xs text-gray-500 flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
-                          {formatDistance(dog.distance)}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Badges */}
-                    {badges.length > 0 && (
-                      <div className="badges flex flex-wrap gap-2 mt-1">
-                        {badges.map((badge) => (
-                          <span 
-                            key={badge}
-                            className="badge badge-success inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200"
-                          >
-                            <Shield className="w-3 h-3" />
-                            {badge}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Traits */}
-                    <div className="traits mt-1.5 text-sm text-gray-700">
-                      <div className="trait mb-1">
-                        <span className="font-semibold text-gray-900">Activity:</span> {dog.activityLevel}
-                      </div>
-                      <div className="trait">
-                        <span className="font-semibold text-gray-900">Temperament:</span> {dog.temperament ? dog.temperament.join(", ") : "Not specified"}
-                      </div>
-                    </div>
-
-                    {/* Note Input */}
-                    <label className="note block relative mt-3">
-                      <textarea
-                        value={note}
-                        onChange={(e) => handleNoteChange(dog.id, e.target.value)}
-                        maxLength={200}
-                        placeholder="Add a note (optional)"
-                        className="w-full min-h-[44px] max-h-24 p-3 pb-6 border border-gray-200 rounded-xl resize-none outline-none text-sm text-gray-900 transition-all duration-150 focus:border-blue-300 focus:shadow-[0_0_0_3px_rgba(138,209,255,0.35)]"
-                      />
-                      <span className="counter absolute right-2.5 bottom-1.5 text-xs text-gray-400">
-                        {note.length}/200
-                      </span>
-                    </label>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="spotlight-actions grid grid-cols-2 gap-2 pt-2 mt-2 border-t border-gray-100">
-                    <button
-                      onClick={() => handleLike(dog.id)}
-                      disabled={isSubmittingLike}
-                      className="btn like h-11 rounded-xl font-bold text-sm bg-rose-500 text-white flex items-center justify-center gap-2 border border-transparent transition-all duration-100 hover:shadow-[0_8px_20px_rgba(255,107,107,0.35)] active:scale-[0.98] disabled:opacity-50"
-                    >
-                      <Heart className="w-4 h-4" />
-                      Like
-                    </button>
-                    
-                    <button
-                      onClick={() => handleWoof(dog.id)}
-                      disabled={isSubmittingWoof || !woofStatus?.woofRemaining}
-                      className="btn woof h-11 rounded-xl font-bold text-sm bg-amber-50 text-amber-800 border border-amber-200 flex items-center justify-center gap-2 transition-all duration-100 hover:shadow-[0_8px_20px_rgba(245,192,78,0.35)] active:scale-[0.98] disabled:opacity-50"
-                    >
-                      <Zap className="w-4 h-4 fill-current" />
-                      Woof
-                      {woofStatus && (
-                        <span className="pill bg-amber-200 text-amber-900 rounded-full px-2 py-0.5 text-xs font-bold ml-1">
-                          {woofStatus.woofRemaining}
-                        </span>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+            {candidates.map((dog) => (
+              <PremiumSpotlightCard
+                key={dog.id}
+                dog={{
+                  ...dog,
+                  vetVerified: getBadges(dog).includes("Vet-verified"),
+                  vaccinationStatus: getBadges(dog).includes("Vaccinated") ? "Up to date" : "Unknown",
+                  isSpayedNeutered: getBadges(dog).includes("Spayed/Neutered"),
+                }}
+                woofCount={woofStatus?.woofRemaining || 0}
+                onLike={(dogId, note) => handleLike(dogId, note)}
+                onWoof={(dogId, note) => handleWoof(dogId, note)}
+                onPhotoClick={handlePhotoClick}
+              />
+            ))}
           </div>
         )}
       </div>
