@@ -18,7 +18,9 @@ import {
   CheckCircle2,
   Check,
   Pin,
-  Paperclip
+  Paperclip,
+  Eye,
+  ChevronDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -37,6 +39,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Switch } from "@/components/ui/switch";
 import MatchedDogProfileModal from "./matched-dog-profile-modal";
 
 interface Message {
@@ -127,8 +130,11 @@ export default function PremiumChatWindow({
   const [selectedMessage, setSelectedMessage] = useState<string | null>(null);
   const [showDogProfile, setShowDogProfile] = useState(false);
   const [shouldShowScroll, setShouldShowScroll] = useState(false);
+  const [readReceipts, setReadReceipts] = useState(true);
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   // Auto-scroll to bottom when new messages arrive
@@ -236,6 +242,17 @@ export default function PremiumChatWindow({
     });
     // Call onBack to return to matches list since profile is now removed
     onBack();
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setShowScrollToBottom(false);
+  };
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const container = e.currentTarget;
+    const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+    setShowScrollToBottom(!isNearBottom);
   };
 
   const addReaction = (messageId: string, emoji: string) => {
@@ -383,7 +400,18 @@ export default function PremiumChatWindow({
                   <MoreVertical className="w-5 h-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem className="justify-between">
+                  <div className="flex items-center">
+                    <Eye className="w-4 h-4 mr-2" />
+                    Read Receipts
+                  </div>
+                  <Switch 
+                    checked={readReceipts} 
+                    onCheckedChange={setReadReceipts}
+                    className="ml-auto" 
+                  />
+                </DropdownMenuItem>
                 <DropdownMenuItem 
                   className="text-red-600" 
                   onClick={handleUnmatch}
@@ -399,7 +427,11 @@ export default function PremiumChatWindow({
       </header>
 
       {/* Conversation Thread */}
-      <main className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
+      <main 
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto px-4 py-3 space-y-4 relative"
+        onScroll={handleScroll}
+      >
         <AnimatePresence>
           {groupedMessages.map((item, index) => {
             if (item.type === 'day') {
@@ -556,6 +588,20 @@ export default function PremiumChatWindow({
         )}
 
         <div ref={messagesEndRef} />
+        
+        {/* Scroll to Bottom Button */}
+        {showScrollToBottom && (
+          <div className="absolute bottom-4 right-4 z-10">
+            <Button
+              onClick={scrollToBottom}
+              size="sm"
+              className="rounded-full p-3 bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
+              data-testid="scroll-to-bottom"
+            >
+              <ChevronDown className="w-4 h-4" />
+            </Button>
+          </div>
+        )}
       </main>
 
       {/* Premium Composer - Fixed Footer */}
