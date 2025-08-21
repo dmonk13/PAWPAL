@@ -34,6 +34,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import MatchedDogProfileModal from "./matched-dog-profile-modal";
 
 interface Message {
   id: string;
@@ -99,6 +100,7 @@ export default function PremiumChatWindow({
   const [isRecording, setIsRecording] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<string | null>(null);
+  const [showDogProfile, setShowDogProfile] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
@@ -169,6 +171,51 @@ export default function PremiumChatWindow({
     toast({ title: `Added ${emoji} reaction` });
   };
 
+  // Mock dog data for profile modal (in real app, this would come from props or API)
+  const mockDogData = {
+    id: 'matched-dog-1',
+    name: conversation.participantName,
+    age: 3,
+    breed: 'Golden Retriever',
+    size: 'Large',
+    photos: [
+      conversation.participantAvatar,
+      "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=500",
+      "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=500"
+    ],
+    temperament: ['Friendly', 'Playful', 'Gentle', 'Energetic'],
+    vaccinations: {
+      rabies: { status: 'up-to-date' as const, date: '2024-03-15' },
+      dhpp: { status: 'due-soon' as const, date: '2024-01-20' }
+    },
+    allergies: ['chicken', 'wheat'],
+    owner: {
+      name: conversation.ownerName || 'Sarah',
+      verified: true,
+      joinedDate: 'March 2023'
+    },
+    about: `${conversation.participantName} is a loving and energetic dog who loves long walks, playing fetch, and meeting new friends at the dog park. Great with kids and other dogs!`,
+    medicalNotes: 'Healthy overall, just needs to watch diet due to food sensitivities.',
+    playPreferences: ['Fetch', 'Tug of war', 'Swimming', 'Dog park visits'],
+    recentCheckins: [
+      { park: 'Central Dog Park', date: '2 days ago' },
+      { park: 'Riverside Trail', date: '1 week ago' },
+      { park: 'Bark & Recreation', date: '2 weeks ago' }
+    ],
+    location: 'Brooklyn, NY',
+    distance: 2.4
+  };
+
+  const handleAvatarTap = () => {
+    if (typeof (window as any).gtag !== 'undefined') {
+      (window as any).gtag('event', 'avatar_tap_profile_open', {
+        dog_id: mockDogData.id,
+        source: 'chat_header'
+      });
+    }
+    setShowDogProfile(true);
+  };
+
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', { 
       hour: 'numeric', 
@@ -219,7 +266,7 @@ export default function PremiumChatWindow({
             </Button>
             
             <div className="flex items-center space-x-3">
-              <div className="relative">
+              <div className="relative cursor-pointer" onClick={handleAvatarTap}>
                 <Avatar className="w-11 h-11">
                   <AvatarImage src={conversation.participantAvatar} />
                   <AvatarFallback>{conversation.participantName[0]}</AvatarFallback>
@@ -529,6 +576,14 @@ export default function PremiumChatWindow({
           </div>
         </div>
       </footer>
+      
+      {/* Dog Profile Modal */}
+      <MatchedDogProfileModal
+        isOpen={showDogProfile}
+        onClose={() => setShowDogProfile(false)}
+        dog={mockDogData}
+        currentChatId={conversation.id}
+      />
     </div>
   );
 }
