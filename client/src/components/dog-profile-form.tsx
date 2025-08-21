@@ -236,11 +236,8 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
-      toast({
-        title: "Success",
-        description: dog?.id ? "Dog profile updated successfully!" : "Dog profile created successfully!",
-      });
-      onClose();
+      // Don't automatically close the form - let the onSubmit function handle closing
+      setHasUnsavedChanges(false);
     },
     onError: () => {
       toast({
@@ -311,6 +308,15 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
         }
         
         queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      }
+
+      // Only close the form if we're on the final medical step
+      if (currentStep === 'medical') {
+        toast({
+          title: "Success",
+          description: dog?.id ? "Dog profile updated successfully!" : "Dog profile created successfully!",
+        });
+        onClose();
       }
     } catch (error) {
       toast({
