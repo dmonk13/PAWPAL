@@ -243,9 +243,13 @@ export default function Spotlight() {
                 key={dog.id}
                 dog={{
                   ...dog,
+                  photos: dog.photos || [],
+                  temperament: dog.temperament || [],
+                  activityLevel: dog.activityLevel || undefined,
                   vetVerified: getBadges(dog).includes("Vet-verified"),
                   vaccinationStatus: getBadges(dog).includes("Vaccinated") ? "Up to date" : "Unknown",
                   isSpayedNeutered: getBadges(dog).includes("Spayed/Neutered"),
+                  medicalConditions: dog.medicalProfile?.conditions || [],
                 }}
                 woofCount={woofStatus?.woofRemaining || 0}
                 onLike={(dogId, note) => handleLike(dogId, note)}

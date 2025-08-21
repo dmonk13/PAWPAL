@@ -21,6 +21,7 @@ interface PremiumSpotlightCardProps {
     vetVerified?: boolean;
     vaccinationStatus?: string;
     isSpayedNeutered?: boolean;
+    medicalConditions?: string[];
   };
   woofCount: number;
   onLike: (dogId: string, note?: string) => void;
@@ -59,6 +60,7 @@ export default function PremiumSpotlightCard({
 }: PremiumSpotlightCardProps) {
   const [note, setNote] = useState("");
   const [showFullTraits, setShowFullTraits] = useState(false);
+  const [showFullConditions, setShowFullConditions] = useState(false);
   const [isShimmering, setIsShimmering] = useState(true);
   const { toast } = useToast();
 
@@ -234,6 +236,39 @@ export default function PremiumSpotlightCard({
                 className="p-0 h-auto ml-1 text-sm text-rose-600 hover:text-rose-700"
               >
                 {showFullTraits ? (
+                  <>
+                    Less <ChevronUp className="w-3 h-3 ml-1" />
+                  </>
+                ) : (
+                  <>
+                    More <ChevronDown className="w-3 h-3 ml-1" />
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Medical Conditions Section */}
+      {dog.medicalConditions && dog.medicalConditions.length > 0 && (
+        <div className="mb-4">
+          <div className="mb-2">
+            <span className="text-sm font-bold text-gray-900">Medical Conditions:</span>
+            <span className="text-sm text-gray-600 ml-2">
+              {showFullConditions || dog.medicalConditions.length <= 3 
+                ? dog.medicalConditions.join(', ')
+                : `${dog.medicalConditions.slice(0, 3).join(', ')}, ...`
+              }
+            </span>
+            {dog.medicalConditions.length > 3 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowFullConditions(!showFullConditions)}
+                className="p-0 h-auto ml-1 text-sm text-rose-600 hover:text-rose-700"
+              >
+                {showFullConditions ? (
                   <>
                     Less <ChevronUp className="w-3 h-3 ml-1" />
                   </>
