@@ -126,6 +126,7 @@ export default function PremiumChatWindow({
   const [showAttachments, setShowAttachments] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<string | null>(null);
   const [showDogProfile, setShowDogProfile] = useState(false);
+  const [shouldShowScroll, setShouldShowScroll] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
@@ -602,10 +603,19 @@ export default function PremiumChatWindow({
             <Textarea
               ref={textareaRef}
               value={messageText}
-              onChange={(e) => setMessageText(e.target.value)}
+              onChange={(e) => {
+                setMessageText(e.target.value);
+                // Check if scrolling is needed
+                setTimeout(() => {
+                  if (textareaRef.current) {
+                    const needsScroll = textareaRef.current.scrollHeight > textareaRef.current.clientHeight;
+                    setShouldShowScroll(needsScroll);
+                  }
+                }, 0);
+              }}
               onKeyPress={handleKeyPress}
               placeholder="Type a message..."
-              className="min-h-[44px] max-h-[96px] resize-none rounded-2xl border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-4 py-3 pr-20 focus:ring-2 focus:ring-blue-300 focus:border-transparent"
+              className={`min-h-[44px] max-h-[96px] resize-none rounded-2xl border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-4 py-3 pr-20 focus:ring-2 focus:ring-blue-300 focus:border-transparent ${shouldShowScroll ? 'overflow-y-auto' : 'overflow-hidden'} scrollbar-hide`}
               rows={1}
             />
             
