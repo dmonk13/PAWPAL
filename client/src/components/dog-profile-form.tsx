@@ -798,19 +798,7 @@ export default function DogProfileForm({ dog, onClose }: DogProfileFormProps) {
                 </div>
               </div>
 
-              {/* Floating Save Status */}
-              <div className="absolute top-20 left-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-sm border">
-                <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${
-                    autoSaveStatus === 'saved' ? 'bg-green-500' : 
-                    autoSaveStatus === 'saving' ? 'bg-yellow-500' : 'bg-red-500'
-                  }`} />
-                  <span className="text-xs text-gray-600">
-                    {autoSaveStatus === 'saved' ? 'Saved' : 
-                     autoSaveStatus === 'saving' ? 'Saving...' : 'Error'}
-                  </span>
-                </div>
-              </div>
+
             </div>
           ) : (
             /* Preview View */
