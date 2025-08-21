@@ -35,7 +35,11 @@ import {
   DollarSign,
   CheckSquare,
   AlertCircle,
-  Pin
+  Pin,
+  FileImage,
+  MicIcon,
+  Square,
+  Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -186,10 +190,16 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
   const [replyTo, setReplyTo] = useState<Message | null>(null);
   const [textareaRows, setTextareaRows] = useState(1);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [recordingTime, setRecordingTime] = useState(0);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
   const scrollToBottom = () => {
@@ -428,6 +438,90 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
     };
 
     setMessages(prev => [...prev, newMessage]);
+  };
+
+  const handleStartRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      
+      audioChunksRef.current = [];
+      
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+      
+      recorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        
+        const voiceMessage: Message = {
+          id: Date.now().toString(),
+          senderId: "me",
+          content: "Voice message",
+          timestamp: new Date(),
+          type: "audio",
+          mediaUrl: audioUrl,
+          isRead: false
+        };
+        
+        setMessages(prev => [...prev, voiceMessage]);
+        stream.getTracks().forEach(track => track.stop());
+      };
+      
+      setMediaRecorder(recorder);
+      recorder.start();
+      setIsRecording(true);
+      setRecordingTime(0);
+      
+      // Start recording timer
+      recordingIntervalRef.current = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
+      }, 1000);
+      
+      toast({
+        title: "Recording started",
+        description: "Tap the stop button when you're done"
+      });
+      
+    } catch (error) {
+      toast({
+        title: "Microphone access denied",
+        description: "Please allow microphone access to record voice messages",
+        variant: "destructive"
+      });
+    }
+  };
+  
+  const handleStopRecording = () => {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
+      setIsRecording(false);
+      setMediaRecorder(null);
+      
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+        recordingIntervalRef.current = null;
+      }
+      
+      toast({
+        title: "Voice message sent",
+        description: `Recorded ${recordingTime} seconds`
+      });
+    }
+  };
+  
+  const handleEmojiSelect = (emoji: string) => {
+    setMessage(prev => prev + emoji);
+    setShowEmojiPicker(false);
+  };
+  
+  const formatRecordingTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   const formatTime = (timestamp: Date) => {
@@ -1151,14 +1245,48 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
               />
               
               {/* Emoji button inside textarea */}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute right-2 top-1/2 -translate-y-1/2"
-                data-testid="button-emoji"
-              >
-                <Smile className="w-4 h-4 text-gray-500" />
-              </Button>
+              <DropdownMenu open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-1/2 -translate-y-1/2"
+                    data-testid="button-emoji"
+                  >
+                    <Smile className="w-4 h-4 text-gray-500" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-64 p-4">
+                  <div className="mb-3">
+                    <div className="flex space-x-2 mb-2">
+                      <Button variant="outline" size="sm" className="flex-1">
+                        <Smile className="w-4 h-4 mr-1" />
+                        Emoji
+                      </Button>
+                      <Button variant="outline" size="sm" className="flex-1">
+                        <FileImage className="w-4 h-4 mr-1" />
+                        GIF
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-8 gap-1 mb-2">
+                    {['😀', '😂', '🥰', '😍', '🤗', '😎', '🤔', '😴', '🐕', '🐶', '❤️', '👍', '👏', '🎉', '🔥', '💯'].map((emoji) => (
+                      <Button
+                        key={emoji}
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 hover:bg-gray-100"
+                        onClick={() => handleEmojiSelect(emoji)}
+                      >
+                        {emoji}
+                      </Button>
+                    ))}
+                  </div>
+                  <div className="text-xs text-gray-500 text-center">
+                    Tap an emoji to add it to your message
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             
             {message.trim() ? (
@@ -1170,14 +1298,31 @@ export default function ChatWindow({ matchId, dogName, dogPhoto, ownerName, onBa
                 <Send className="w-4 h-4" />
               </Button>
             ) : (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="rounded-full p-2 min-w-[40px] h-10"
-                data-testid="button-mic"
-              >
-                <Mic className="w-4 h-4 text-gray-500" />
-              </Button>
+              <div className="flex items-center space-x-2">
+                {isRecording && (
+                  <div className="flex items-center space-x-2 bg-red-100 px-3 py-1 rounded-full">
+                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                    <span className="text-sm text-red-600 font-medium">
+                      {formatRecordingTime(recordingTime)}
+                    </span>
+                  </div>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={`rounded-full p-2 min-w-[40px] h-10 ${
+                    isRecording ? 'bg-red-500 hover:bg-red-600 text-white' : ''
+                  }`}
+                  onClick={isRecording ? handleStopRecording : handleStartRecording}
+                  data-testid="button-mic"
+                >
+                  {isRecording ? (
+                    <Square className="w-4 h-4" />
+                  ) : (
+                    <Mic className="w-4 h-4 text-gray-500" />
+                  )}
+                </Button>
+              </div>
             )}
           </div>
         </div>
