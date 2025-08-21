@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import BottomNav from "@/components/bottom-nav";
-import PremiumChatWindow from "@/components/premium-chat-window";
+import SimpleChatWindow from "@/components/simple-chat-window";
 import MatchesStrip from "@/components/matches-strip";
 
 export default function Messages() {
@@ -154,18 +154,18 @@ export default function Messages() {
       participantName: selectedConversation.dogName,
       participantAvatar: selectedConversation.dogPhoto,
       ownerName: selectedConversation.ownerName,
-      isOnline: stripMatches.find(m => m.id === selectedChat)?.isOnline || false,
+      isOnline: stripMatches.find((m: any) => m.id === selectedChat)?.isOnline || false,
       isTyping: false,
     };
 
     return (
-      <PremiumChatWindow
+      <SimpleChatWindow
         conversation={conversation}
         messages={mockMessages}
         currentUserId={currentUser?.id || "current-user"}
         onBack={() => setSelectedChat(null)}
-        onSendMessage={(content, type, metadata) => {
-          console.log("Sending message:", { content, type, metadata });
+        onSendMessage={(content) => {
+          console.log("Sending message:", { content });
           // In real app, this would send to backend
         }}
         onCall={() => console.log("Starting voice call...")}
