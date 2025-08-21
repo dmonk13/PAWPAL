@@ -437,17 +437,19 @@ export default function VetConnect() {
                           )}
                         </div>
 
-                        {/* Row 4: Specialties */}
-                        <div className="flex items-center space-x-1 overflow-x-auto pb-1">
-                          {vet.specialties.slice(0, 2).map((specialty, idx) => (
-                            <Badge key={idx} className="bg-blue-100 text-blue-800 px-2 py-1 text-xs rounded-full whitespace-nowrap flex-shrink-0">
-                              {specialty}
-                            </Badge>
-                          ))}
-                          <div className="flex items-center space-x-1 text-xs text-gray-500 ml-2">
+                        {/* Row 4: Specialties + Time Estimate */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-1 overflow-x-auto">
+                            {vet.specialties.slice(0, 2).map((specialty, idx) => (
+                              <Badge key={idx} className="bg-blue-100 text-blue-800 px-2 py-1 text-xs rounded-full whitespace-nowrap flex-shrink-0">
+                                {specialty}
+                              </Badge>
+                            ))}
+                          </div>
+                          <Badge className="bg-gradient-to-r from-emerald-500 to-green-500 text-white px-3 py-1 text-xs font-bold rounded-full shadow-sm flex items-center space-x-1 ml-2 flex-shrink-0">
                             <Timer className="w-3 h-3" />
                             <span>~15 min</span>
-                          </div>
+                          </Badge>
                         </div>
 
                         {/* Row 5: Experience */}
