@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import BottomNav from "@/components/bottom-nav";
 import { SpotlightCandidate, WoofStatus } from "@shared/schema";
+import "../styles/spotlight.css";
 
 const CURRENT_USER_ID = "user-1"; // Sarah's user ID from sample data
 
@@ -195,110 +196,113 @@ export default function Spotlight() {
             </Button>
           </div>
         ) : (
-          <div className="space-y-4 p-4">
+          <div className="space-y-6 p-4">
             {candidates.map((dog) => {
               const badges = getBadges(dog);
               const note = likeNotes[dog.id] || "";
               
               return (
-                <Card key={dog.id} className="overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                  <CardContent className="p-0">
-                    {/* Dog Photo and Basic Info */}
-                    <div className="flex">
-                      <div className="w-24 h-24 flex-shrink-0">
-                        <img
-                          src={(dog.photos && dog.photos[0]) || "/api/placeholder/96/96"} 
-                          alt={dog.name}
-                          className="w-full h-full object-cover"
-                        />
+                <div key={dog.id} className="spotlight-card bg-white border border-gray-100 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-200">
+                  {/* Photo and Match Badge */}
+                  <div className="spotlight-media">
+                    <img
+                      src={(dog.photos && dog.photos[0]) || "/api/placeholder/112/112"} 
+                      alt={dog.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="match-pill">
+                      <span className="font-bold">{dog.compatibilityScore}%</span> match
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="spotlight-body">
+                    {/* Title Row */}
+                    <div className="title-row">
+                      <h3 className="text-base font-bold text-gray-900 m-0">
+                        {dog.name} • {dog.age} yrs
+                      </h3>
+                    </div>
+
+                    {/* Sub Row */}
+                    <div className="sub-row">
+                      <div className="breed text-sm text-gray-600">
+                        {dog.breed} • {dog.size}
                       </div>
-                      
-                      <div className="flex-1 p-4 space-y-3">
-                        {/* Name, age, compatibility */}
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <h3 className="font-bold text-lg text-gray-900">
-                              {dog.name} • {dog.age} yrs
-                            </h3>
-                            <p className="text-sm text-gray-600">
-                              {dog.breed} • {dog.size}
-                            </p>
-                            {dog.distance && (
-                              <div className="flex items-center mt-1 text-xs text-gray-500">
-                                <MapPin className="w-3 h-3 mr-1" />
-                                {formatDistance(dog.distance)}
-                              </div>
-                            )}
-                          </div>
-                          <Badge 
-                            variant="secondary" 
-                            className="bg-gradient-to-r from-rose-100 to-pink-100 text-rose-700 border-rose-200"
+                      {dog.distance && (
+                        <div className="distance text-xs text-gray-500 flex items-center gap-1">
+                          <MapPin className="w-3 h-3" />
+                          {formatDistance(dog.distance)}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Badges */}
+                    {badges.length > 0 && (
+                      <div className="badges flex flex-wrap gap-2 mt-1">
+                        {badges.map((badge) => (
+                          <span 
+                            key={badge}
+                            className="badge badge-success inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200"
                           >
-                            {dog.compatibilityScore}% match
-                          </Badge>
-                        </div>
+                            <Shield className="w-3 h-3" />
+                            {badge}
+                          </span>
+                        ))}
+                      </div>
+                    )}
 
-                        {/* Badges */}
-                        {badges.length > 0 && (
-                          <div className="flex flex-wrap gap-1">
-                            {badges.map((badge) => (
-                              <Badge 
-                                key={badge}
-                                variant="outline" 
-                                className="text-xs bg-green-50 text-green-700 border-green-200"
-                              >
-                                <Shield className="w-3 h-3 mr-1" />
-                                {badge}
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Activity level & temperament */}
-                        <div className="text-xs text-gray-600">
-                          <span className="font-medium">Activity:</span> {dog.activityLevel} • 
-                          <span className="ml-1 font-medium">Temperament:</span> {dog.temperament ? dog.temperament.join(", ") : "Not specified"}
-                        </div>
-
-                        {/* Add note input */}
-                        <div className="space-y-2">
-                          <Textarea
-                            placeholder="Add a note (optional)"
-                            value={note}
-                            onChange={(e) => handleNoteChange(dog.id, e.target.value)}
-                            className="min-h-[60px] text-sm resize-none"
-                            maxLength={200}
-                          />
-                          <div className="text-xs text-gray-400 text-right">
-                            {note.length}/200
-                          </div>
-                        </div>
-
-                        {/* Action buttons */}
-                        <div className="flex gap-2">
-                          <Button
-                            onClick={() => handleLike(dog.id)}
-                            disabled={isSubmittingLike}
-                            className="flex-1 bg-rose-500 hover:bg-rose-600 text-white"
-                          >
-                            <Heart className="w-4 h-4 mr-2" />
-                            Like
-                          </Button>
-                          
-                          <Button
-                            onClick={() => handleWoof(dog.id)}
-                            disabled={isSubmittingWoof || !woofStatus?.woofRemaining}
-                            variant="outline"
-                            className="flex-1 border-amber-300 text-amber-700 hover:bg-amber-50 disabled:opacity-50"
-                          >
-                            <Zap className="w-4 h-4 mr-2 fill-current" />
-                            Woof {woofStatus && `(${woofStatus.woofRemaining})`}
-                          </Button>
-                        </div>
+                    {/* Traits */}
+                    <div className="traits mt-1.5 text-sm text-gray-700 space-y-0.5">
+                      <div className="trait">
+                        <span className="font-semibold text-gray-900">Activity:</span> {dog.activityLevel}
+                      </div>
+                      <div className="trait">
+                        <span className="font-semibold text-gray-900">Temperament:</span> {dog.temperament ? dog.temperament.join(", ") : "Not specified"}
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+
+                    {/* Note Input */}
+                    <label className="note block relative mt-2">
+                      <textarea
+                        value={note}
+                        onChange={(e) => handleNoteChange(dog.id, e.target.value)}
+                        maxLength={200}
+                        placeholder="Add a note (optional)"
+                        className="w-full min-h-[44px] max-h-24 p-3 pb-6 border border-gray-200 rounded-xl resize-none outline-none text-sm text-gray-900 transition-all duration-150 focus:border-blue-300 focus:shadow-[0_0_0_3px_rgba(138,209,255,0.35)]"
+                      />
+                      <span className="counter absolute right-2.5 bottom-1.5 text-xs text-gray-400">
+                        {note.length}/200
+                      </span>
+                    </label>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="spotlight-actions grid grid-cols-2 gap-2 pt-2 mt-2 border-t border-gray-100">
+                    <button
+                      onClick={() => handleLike(dog.id)}
+                      disabled={isSubmittingLike}
+                      className="btn like h-11 rounded-xl font-bold text-sm bg-rose-500 text-white flex items-center justify-center gap-2 border border-transparent transition-all duration-100 hover:shadow-[0_8px_20px_rgba(255,107,107,0.35)] active:scale-[0.98] disabled:opacity-50"
+                    >
+                      <Heart className="w-4 h-4" />
+                      Like
+                    </button>
+                    
+                    <button
+                      onClick={() => handleWoof(dog.id)}
+                      disabled={isSubmittingWoof || !woofStatus?.woofRemaining}
+                      className="btn woof h-11 rounded-xl font-bold text-sm bg-amber-50 text-amber-800 border border-amber-200 flex items-center justify-center gap-2 transition-all duration-100 hover:shadow-[0_8px_20px_rgba(245,192,78,0.35)] active:scale-[0.98] disabled:opacity-50"
+                    >
+                      <Zap className="w-4 h-4 fill-current" />
+                      Woof
+                      {woofStatus && (
+                        <span className="pill bg-amber-200 text-amber-900 rounded-full px-2 py-0.5 text-xs font-bold ml-1">
+                          {woofStatus.woofRemaining}
+                        </span>
+                      )}
+                    </button>
+                  </div>
+                </div>
               );
             })}
           </div>

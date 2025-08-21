@@ -1,0 +1,257 @@
+Here’s a refined, more aesthetic version of your Spotlight tile that keeps all functionality intact (match badge, badges, note input, Like, Woof). It focuses on cleaner hierarchy, softer visuals, and better touch targets.
+
+Design goals
+
+Improve visual hierarchy: photo → name/age → breed/size → distance → health/safety → traits → actions.
+
+Softer, modern card: rounded corners, subtle shadow, airy spacing, consistent iconography.
+
+Accessible and mobile-friendly: larger tap targets, 44px buttons, clear contrast.
+
+Recommended visual changes
+
+Card
+
+Elevation: soft shadow (blur 16, y 6, 10% opacity), radius 16–20.
+
+Padding: 16 all sides; internal grid with 8/12 spacing rhythm.
+
+Divider: 1px subtle line between content and actions.
+
+Photo
+
+Make photo a 5:4 rounded thumbnail with radius 12; edge-to-edge on left, or use a top banner style with 8px inset.
+
+Add a light gradient overlay on the right edge to improve text legibility if text overlaps (if using banner layout).
+
+Header row
+
+Name - age: bold 16–18px.
+
+Match badge: pill with soft gradient, e.g., from #FFE8ED to #FFD1DB; text 12px medium, include a small heart or star icon.
+
+Keep breed/size stacked in 13–14px muted color.
+
+Meta row
+
+Distance: compact location pin icon + “700m away” in 12–13px secondary.
+
+Health badge: pill with soft green background (#E9F8F0) and green text/icon; use an inline shield/check icon.
+
+Traits
+
+Prefix labels in small caps or bold: “Activity:” and “Temperament:”.
+
+Truncate long trait lists after 1–2 lines with “more…” tooltip or expand-on-tap.
+
+Note input
+
+Rounded 12, soft border #E6E8EC, focus ring #8AD1FF.
+
+Placeholder: “Add a note (optional)”.
+
+Character counter subtle, right-aligned 12px secondary.
+
+Auto-grow to 3 lines max; otherwise scroll inside.
+
+Actions
+
+Two equal-width buttons in a safe bottom bar separated by 8px gap.
+
+Like: solid rose/coral; icon left; radius 12; height 44–48.
+
+Woof: outlined warm gold with subtle glow on hover/press; show remaining in a small badge.
+
+Add micro-interactions: tap ripple, 120–160ms scale/opacity.
+
+Micro-animations
+
+On Woof: 300ms pulse of the button outline and confetti shimmer on the card corner.
+
+On Like: small heart pop + haptic light.
+
+Color/typography
+
+Font: Inter/SF/Roboto; headings 600 weight; body 400/500.
+
+Use a cohesive palette:
+
+Primary rose/coral: #FF6B6B
+
+Gold accent (Woof): #F5C04E
+
+Success green: #2BB673 with background #E9F8F0
+
+Text primary: #23262F; secondary: #6B7280; borders: #E5E7EB
+
+Drop-in HTML/CSS (keeps structure and actions)
+
+HTML
+
+xml
+<div class="spotlight-card">
+  <div class="spotlight-media">
+    <img src="ruby.jpg" alt="Ruby the Labrador" />
+    <div class="match-pill">
+      <span>79%</span> match
+    </div>
+  </div>
+
+  <div class="spotlight-body">
+    <div class="title-row">
+      <h3>Ruby • 4 yrs</h3>
+    </div>
+
+    <div class="sub-row">
+      <div class="breed">Labrador Retriever • Large</div>
+      <div class="distance">
+        <i class="i-pin"></i> 700m away
+      </div>
+    </div>
+
+    <div class="badges">
+      <span class="badge badge-success">
+        <i class="i-shield"></i> Spayed/Neutered
+      </span>
+    </div>
+
+    <div class="traits">
+      <div class="trait"><strong>Activity:</strong></div>
+      <div class="trait">
+        <strong>Temperament:</strong> Loyal, Playful, Water-loving
+      </div>
+    </div>
+
+    <label class="note">
+      <textarea maxlength="200" placeholder="Add a note (optional)"></textarea>
+      <span class="counter">0/200</span>
+    </label>
+  </div>
+
+  <div class="spotlight-actions">
+    <button class="btn like">
+      <i class="i-heart"></i> Like
+    </button>
+    <button class="btn woof">
+      <i class="i-bolt"></i> Woof <span class="pill">1</span>
+    </button>
+  </div>
+</div>
+CSS
+
+css
+.spotlight-card {
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 6px 24px rgba(16, 24, 40, 0.06);
+  border: 1px solid #F1F2F4;
+}
+
+.spotlight-media {
+  position: relative;
+  width: 112px;
+  height: 112px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.spotlight-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.match-pill {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: linear-gradient(180deg, #FFE8ED 0%, #FFD7E0 100%);
+  color: #9B1C42;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(255, 105, 135, 0.25);
+}
+.match-pill span { font-weight: 700; }
+
+.spotlight-body { display: grid; gap: 8px; }
+.title-row h3 { margin: 0; font-size: 16px; font-weight: 700; color: #23262F; }
+.sub-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.breed { font-size: 13px; color: #4B5563; }
+.distance { font-size: 12px; color: #6B7280; display:flex; gap:6px; align-items:center; }
+
+.badges { margin-top: 4px; display: flex; gap: 8px; }
+.badge {
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  display: inline-flex; gap: 6px; align-items: center;
+}
+.badge-success { background: #E9F8F0; color: #1E7E5A; border: 1px solid #D3F2E5; }
+
+.traits { margin-top: 6px; font-size: 13px; color: #374151; display: grid; gap: 2px; }
+.traits strong { color:#111827; font-weight: 600; }
+
+.note { position: relative; margin-top: 8px; display:block; }
+.note textarea {
+  width: 100%; min-height: 44px; max-height: 96px;
+  padding: 10px 12px 20px 12px;
+  border: 1px solid #E5E7EB; border-radius: 12px; resize: vertical;
+  outline: none; font-size: 14px; color:#1F2937;
+  transition: border .15s, box-shadow .15s;
+}
+.note textarea:focus { border-color:#8AD1FF; box-shadow: 0 0 0 3px rgba(138,209,255,.35); }
+.note .counter {
+  position:absolute; right:10px; bottom:6px; font-size:12px; color:#9CA3AF;
+}
+
+.spotlight-actions {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #F1F2F4;
+  margin-top: 8px;
+}
+
+.btn {
+  height: 44px; border-radius: 12px; font-weight: 700; font-size: 15px;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  border: 1px solid transparent; transition: transform .08s ease, box-shadow .12s ease;
+}
+.btn:active { transform: scale(.98); }
+.btn.like { background:#FF6B6B; color:#fff; box-shadow: 0 6px 16px rgba(255,107,107,.25); }
+.btn.like:hover { box-shadow: 0 8px 20px rgba(255,107,107,.35); }
+
+.btn.woof { background:#FFF7E6; color:#7A5100; border-color:#F5C04E; }
+.btn.woof .pill {
+  background:#F5C04E; color:#3C2A00; border-radius:999px; padding: 2px 8px; font-size:12px; font-weight:700;
+}
+.btn.woof:hover { box-shadow: 0 8px 20px rgba(245,192,78,.35); }
+JS enhancements (non-breaking)
+
+js
+// Character counter
+const tiles = document.querySelectorAll('.spotlight-card .note textarea');
+tiles.forEach(t => {
+  const counter = t.parentElement.querySelector('.counter');
+  const max = parseInt(t.getAttribute('maxlength')||'200',10);
+  const update = () => counter.textContent = `${t.value.length}/${max}`;
+  t.addEventListener('input', update);
+  update();
+});
+Optional polish (no functionality change)
+
+Add skeleton shimmer for loading states.
+
+Use progressive image loading (blur-up).
+
+Support dark mode by inverting backgrounds and boosting contrast.
+
+Add subtle Lottie for “Woof” success.
+
+If you want, share your current CSS class na
