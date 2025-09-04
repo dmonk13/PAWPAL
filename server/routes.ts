@@ -112,7 +112,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication Routes
   app.post("/api/auth/login", async (req: Request, res: Response) => {
     try {
-      const { username, password } = req.body;
+      const { username, password, keepSignedIn } = req.body;
       
       if (!username || !password) {
         return res.status(400).json({ message: "Username and password are required" });
@@ -123,8 +123,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      // Set session
+      // Set session with appropriate duration
       req.session.userId = user.id;
+      
+      // Extend session if "Keep me signed in" is checked
+      if (keepSignedIn) {
+        req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
+      } else {
+        req.session.cookie.maxAge = 24 * 60 * 60 * 1000; // 24 hours
+      }
       
       // Don't send password back
       const { password: _, ...userWithoutPassword } = user;
