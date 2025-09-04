@@ -344,47 +344,6 @@ export default function MatchedDogProfileModal({
               </CardContent>
             </Card>
 
-            {/* Action buttons */}
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                className="h-12 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white font-medium"
-                onClick={handleStartChat}
-                data-testid="button-start-chat"
-              >
-                <MessageCircle className="w-4 h-4 mr-2" />
-                Start Chat
-              </Button>
-              <Button
-                variant="outline"
-                className="h-12"
-                onClick={handleSchedulePlaydate}
-                data-testid="button-schedule-playdate"
-              >
-                <Calendar className="w-4 h-4 mr-2" />
-                Schedule Playdate
-              </Button>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                variant="outline"
-                className="h-11"
-                onClick={handleShareProfile}
-                data-testid="button-share-profile"
-              >
-                <Share className="w-4 h-4 mr-2" />
-                Share Profile
-              </Button>
-              <Button
-                variant="outline"
-                className={`h-11 ${isFavorited ? 'bg-red-50 border-red-200 text-red-700' : ''}`}
-                onClick={handleToggleFavorite}
-                data-testid="button-toggle-favorite"
-              >
-                <Heart className={`w-4 h-4 mr-2 ${isFavorited ? 'fill-current' : ''}`} />
-                {isFavorited ? 'Favorited' : 'Add to Favorites'}
-              </Button>
-            </div>
 
             <Separator />
 
