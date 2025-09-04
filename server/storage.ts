@@ -18,6 +18,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   authenticateUser(username: string, password: string): Promise<User | null>;
+  changePassword(username: string, currentPassword: string, newPassword: string): Promise<boolean>;
 
   // Dog methods
   getDog(id: string): Promise<Dog | undefined>;
@@ -93,6 +94,22 @@ export class DatabaseStorage implements IStorage {
       return user;
     }
     return null;
+  }
+
+  async changePassword(username: string, currentPassword: string, newPassword: string): Promise<boolean> {
+    // First verify current password
+    const user = await this.authenticateUser(username, currentPassword);
+    if (!user) {
+      return false;
+    }
+
+    // Update password in database
+    await db
+      .update(users)
+      .set({ password: newPassword })
+      .where(eq(users.username, username));
+    
+    return true;
   }
 
   async getDog(id: string): Promise<Dog | undefined> {
@@ -1472,6 +1489,20 @@ export class MemStorage implements IStorage {
       return user;
     }
     return null;
+  }
+
+  async changePassword(username: string, currentPassword: string, newPassword: string): Promise<boolean> {
+    // First verify current password
+    const user = await this.authenticateUser(username, currentPassword);
+    if (!user) {
+      return false;
+    }
+
+    // Update password in memory storage
+    const updatedUser = { ...user, password: newPassword };
+    this.users.set(user.id, updatedUser);
+    
+    return true;
   }
 
   async getDog(id: string): Promise<Dog | undefined> {

@@ -227,6 +227,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/auth/change-password", async (req: Request, res: Response) => {
+    try {
+      const { username, currentPassword, newPassword } = req.body;
+      
+      if (!username || !currentPassword || !newPassword) {
+        return res.status(400).json({ message: "Username, current password, and new password are required" });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: "New password must be at least 6 characters long" });
+      }
+
+      const success = await storage.changePassword(username, currentPassword, newPassword);
+      
+      if (!success) {
+        return res.status(401).json({ message: "Invalid username or current password" });
+      }
+
+      res.json({ message: "Password changed successfully" });
+    } catch (error) {
+      console.error("Change password error:", error);
+      res.status(500).json({ message: "Failed to change password" });
+    }
+  });
+
   app.post("/api/auth/logout", async (req: Request, res: Response) => {
     try {
       if (req.session) {

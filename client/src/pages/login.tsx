@@ -9,6 +9,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { 
   PawPrint, 
   Eye, 
@@ -43,8 +50,19 @@ const magicLinkSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
 });
 
+const passwordResetSchema = z.object({
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  currentPassword: z.string().min(6, "Current password is required"),
+  newPassword: z.string().min(6, "New password must be at least 6 characters"),
+  confirmPassword: z.string()
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
 type LoginForm = z.infer<typeof loginSchema>;
 type MagicLinkForm = z.infer<typeof magicLinkSchema>;
+type PasswordResetForm = z.infer<typeof passwordResetSchema>;
 
 interface LoginProps {
   onLoginSuccess: () => void;
@@ -56,6 +74,9 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
   const [capsLockOn, setCapsLockOn] = useState(false);
   const [keepSignedIn, setKeepSignedIn] = useState(false);
   const [showMagicLink, setShowMagicLink] = useState(false);
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);
@@ -114,6 +135,16 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
     resolver: zodResolver(magicLinkSchema),
     defaultValues: {
       email: "",
+    },
+  });
+
+  const passwordResetForm = useForm<PasswordResetForm>({
+    resolver: zodResolver(passwordResetSchema),
+    defaultValues: {
+      username: "",
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
     },
   });
 
@@ -198,6 +229,28 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
     },
   });
 
+  const passwordResetMutation = useMutation({
+    mutationFn: async (data: PasswordResetForm) => {
+      return await apiRequest("POST", "/api/auth/change-password", data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Password changed successfully!",
+        description: "Your password has been updated. Please sign in with your new password.",
+        duration: 5000,
+      });
+      setShowPasswordReset(false);
+      passwordResetForm.reset();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to change password",
+        description: error.message || "Please check your current password and try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const onSubmit = (data: LoginForm) => {
     if (loginDelay > 0) return;
     loginMutation.mutate({ ...data, keepSignedIn });
@@ -205,6 +258,10 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
 
   const onMagicLinkSubmit = (data: MagicLinkForm) => {
     magicLinkMutation.mutate(data);
+  };
+
+  const onPasswordResetSubmit = (data: PasswordResetForm) => {
+    passwordResetMutation.mutate(data);
   };
 
   const isFormValid = form.watch("username") && form.watch("password") && 
@@ -321,7 +378,7 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
                     <button
                       type="button"
                       className="text-sm text-primary-600 hover:text-primary-700 transition-colors"
-                      onClick={() => toast({ title: "Password reset", description: "Check your email for reset instructions." })}
+                      onClick={() => setShowPasswordReset(true)}
                     >
                       Forgot password?
                     </button>
@@ -540,6 +597,156 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
           </div>
         </div>
       </div>
+
+      {/* Password Reset Modal */}
+      <Dialog open={showPasswordReset} onOpenChange={setShowPasswordReset}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Reset Password</DialogTitle>
+            <DialogDescription>
+              Enter your current credentials and choose a new password to reset your account password.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={passwordResetForm.handleSubmit(onPasswordResetSubmit)} className="space-y-4">
+            {/* Username Field */}
+            <div className="space-y-2">
+              <Label htmlFor="reset-username" className="text-sm font-medium">
+                Username
+              </Label>
+              <Input
+                id="reset-username"
+                type="text"
+                placeholder="Enter your username"
+                className="h-11 border-neutral-300 focus:border-primary-500"
+                {...passwordResetForm.register("username")}
+              />
+              {passwordResetForm.formState.errors.username && (
+                <p className="text-sm text-error-500 flex items-center gap-1">
+                  <AlertTriangle className="w-4 h-4" />
+                  {passwordResetForm.formState.errors.username.message}
+                </p>
+              )}
+            </div>
+
+            {/* Current Password Field */}
+            <div className="space-y-2">
+              <Label htmlFor="reset-current-password" className="text-sm font-medium">
+                Current Password
+              </Label>
+              <Input
+                id="reset-current-password"
+                type="password"
+                placeholder="Enter your current password"
+                className="h-11 border-neutral-300 focus:border-primary-500"
+                {...passwordResetForm.register("currentPassword")}
+              />
+              {passwordResetForm.formState.errors.currentPassword && (
+                <p className="text-sm text-error-500 flex items-center gap-1">
+                  <AlertTriangle className="w-4 h-4" />
+                  {passwordResetForm.formState.errors.currentPassword.message}
+                </p>
+              )}
+            </div>
+
+            {/* New Password Field */}
+            <div className="space-y-2">
+              <Label htmlFor="reset-new-password" className="text-sm font-medium">
+                New Password
+              </Label>
+              <div className="relative">
+                <Input
+                  id="reset-new-password"
+                  type={showNewPassword ? "text" : "password"}
+                  placeholder="Enter new password"
+                  className="h-11 border-neutral-300 focus:border-primary-500 pr-10"
+                  {...passwordResetForm.register("newPassword")}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-2 top-0 h-11 w-8 p-0"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                >
+                  {showNewPassword ? (
+                    <EyeOff className="h-4 w-4 text-neutral-500" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-neutral-500" />
+                  )}
+                </Button>
+              </div>
+              {passwordResetForm.formState.errors.newPassword && (
+                <p className="text-sm text-error-500 flex items-center gap-1">
+                  <AlertTriangle className="w-4 h-4" />
+                  {passwordResetForm.formState.errors.newPassword.message}
+                </p>
+              )}
+            </div>
+
+            {/* Confirm Password Field */}
+            <div className="space-y-2">
+              <Label htmlFor="reset-confirm-password" className="text-sm font-medium">
+                Confirm New Password
+              </Label>
+              <div className="relative">
+                <Input
+                  id="reset-confirm-password"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm new password"
+                  className="h-11 border-neutral-300 focus:border-primary-500 pr-10"
+                  {...passwordResetForm.register("confirmPassword")}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-2 top-0 h-11 w-8 p-0"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4 text-neutral-500" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-neutral-500" />
+                  )}
+                </Button>
+              </div>
+              {passwordResetForm.formState.errors.confirmPassword && (
+                <p className="text-sm text-error-500 flex items-center gap-1">
+                  <AlertTriangle className="w-4 h-4" />
+                  {passwordResetForm.formState.errors.confirmPassword.message}
+                </p>
+              )}
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowPasswordReset(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={passwordResetMutation.isPending}
+                className="flex-1"
+                style={{ background: 'var(--primary-gradient)' }}
+              >
+                {passwordResetMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Changing...
+                  </>
+                ) : (
+                  'Change Password'
+                )}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
