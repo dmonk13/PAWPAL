@@ -451,7 +451,7 @@ export default function Settings() {
               </Button>
               <Separator />
               <div className="text-xs text-gray-500 text-center">
-                PupMatch v1.0.0
+                PAWPAL v1.0.0
               </div>
             </CardContent>
           </Card>

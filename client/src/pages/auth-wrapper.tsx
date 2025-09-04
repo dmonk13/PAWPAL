@@ -21,7 +21,7 @@ export default function AuthWrapper({ children }: AuthWrapperProps) {
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-red-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin text-6xl mb-4">🐕</div>
-          <p className="text-gray-600 font-medium">Loading PupMatch...</p>
+          <p className="text-gray-600 font-medium">Loading PAWPAL...</p>
         </div>
       </div>
     );

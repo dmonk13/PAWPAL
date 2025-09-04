@@ -23,8 +23,8 @@ export default function Discover() {
             <PawPrint className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">PupMatch</h1>
-            <p className="text-gray-600 text-sm">Find your pup's perfect match</p>
+            <h1 className="text-xl font-bold text-gray-900">PAWPAL</h1>
+            <p className="text-gray-600 text-sm">Find a friend, start a wag</p>
           </div>
         </div>
         <div className="flex items-center space-x-3">

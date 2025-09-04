@@ -88,7 +88,7 @@ export default function Register({ onLoginSuccess, onSwitchToLogin }: RegisterPr
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
-        title: "Welcome to PupMatch!",
+        title: "Welcome to PAWPAL!",
         description: "Your account and pet profile have been created successfully.",
       });
       onLoginSuccess();
@@ -140,7 +140,7 @@ export default function Register({ onLoginSuccess, onSwitchToLogin }: RegisterPr
             {step === 1 ? "Create Account" : "Tell Us About Your Pup"}
           </h1>
           <p className="text-gray-600">
-            {step === 1 ? "Join PupMatch to find your pet's perfect companion" : "Help us create the perfect profile for your dog"}
+            {step === 1 ? "Join PAWPAL to find your pet's perfect companion" : "Help us create the perfect profile for your dog"}
           </p>
         </div>
 

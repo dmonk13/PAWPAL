@@ -59,7 +59,7 @@ export default function Checkout() {
       setPaymentComplete(true);
       toast({
         title: "Payment Successful!",
-        description: "Welcome to PupMatch Pro! Your premium features are now active.",
+        description: "Welcome to PAWPAL Pro! Your premium features are now active.",
       });
     }, 3000);
   };
@@ -74,14 +74,14 @@ export default function Checkout() {
             </div>
             <CardTitle className="text-green-600">Payment Successful!</CardTitle>
             <CardDescription>
-              Welcome to PupMatch Pro! Your premium features are now active.
+              Welcome to PAWPAL Pro! Your premium features are now active.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2 text-sm text-left">
               <div className="flex justify-between">
                 <span>Plan:</span>
-                <span className="font-semibold">PupMatch Pro</span>
+                <span className="font-semibold">PAWPAL Pro</span>
               </div>
               <div className="flex justify-between">
                 <span>Amount:</span>

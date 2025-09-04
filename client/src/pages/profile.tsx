@@ -608,7 +608,7 @@ export default function Profile() {
                         Are you sure you want to log out?
                       </AlertDialogTitle>
                       <AlertDialogDescription className="text-gray-600 dark:text-gray-300">
-                        You'll need to sign in again to access your account and continue using PupMatch.
+                        You'll need to sign in again to access your account and continue using PAWPAL.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="gap-2">
