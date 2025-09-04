@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -70,6 +71,7 @@ interface LoginProps {
 }
 
 export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps) {
+  const [, setLocation] = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [capsLockOn, setCapsLockOn] = useState(false);
   const [keepSignedIn, setKeepSignedIn] = useState(false);
@@ -531,10 +533,19 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
             <div className="text-center">
               <button
                 type="button"
-                onClick={() => setShowMagicLink(!showMagicLink)}
+                onClick={() => {
+                  // Fire analytics event if available
+                  if (typeof window !== 'undefined' && window.gtag) {
+                    window.gtag('event', 'auth_other_button_click', {
+                      event_category: 'authentication',
+                      event_label: 'other_signin_methods_redirect'
+                    });
+                  }
+                  setLocation('/auth/other');
+                }}
                 className="text-sm text-primary-600 hover:text-primary-700 transition-colors font-medium"
               >
-                {showMagicLink ? "Use password instead" : "Other sign-in methods"}
+                Other sign‑in methods
               </button>
             </div>
 

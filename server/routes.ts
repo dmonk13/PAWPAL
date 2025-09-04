@@ -259,6 +259,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Phone OTP authentication endpoint
+  app.post("/api/auth/phone-otp", async (req: Request, res: Response) => {
+    try {
+      const { phone } = req.body;
+      
+      if (!phone) {
+        return res.status(400).json({ message: "Phone number is required" });
+      }
+
+      // In a real app, you would:
+      // 1. Validate phone number format
+      // 2. Generate a secure OTP
+      // 3. Store OTP with expiration
+      // 4. Send SMS with verification code
+      
+      console.log(`OTP requested for phone: ${phone}`);
+      
+      // Simulate SMS sending delay
+      setTimeout(() => {
+        res.json({ 
+          success: true, 
+          message: "Verification code sent to phone number" 
+        });
+      }, 1000);
+    } catch (error) {
+      console.error("Phone OTP error:", error);
+      res.status(500).json({ message: "Failed to send verification code" });
+    }
+  });
+
+  // OAuth redirect endpoints
+  app.get("/api/auth/google", (req: Request, res: Response) => {
+    // In a real app, this would redirect to Google OAuth
+    console.log("Google OAuth requested");
+    res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5000'}/?auth=google&status=success`);
+  });
+
+  app.get("/api/auth/facebook", (req: Request, res: Response) => {
+    // In a real app, this would redirect to Facebook OAuth
+    console.log("Facebook OAuth requested");
+    res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5000'}/?auth=facebook&status=success`);
+  });
+
+  app.get("/api/auth/facebook/web", (req: Request, res: Response) => {
+    // In a real app, this would redirect to Facebook web OAuth
+    console.log("Facebook web OAuth requested");
+    res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5000'}/?auth=facebook_web&status=success`);
+  });
+
+  app.get("/api/auth/apple", (req: Request, res: Response) => {
+    // In a real app, this would redirect to Apple OAuth
+    console.log("Apple OAuth requested");
+    res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5000'}/?auth=apple&status=success`);
+  });
+
   app.post("/api/auth/logout", async (req: Request, res: Response) => {
     try {
       if (req.session) {

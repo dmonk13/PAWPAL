@@ -15,11 +15,11 @@ import VetConnect from "@/pages/vet-connect";
 import VetProfile from "@/pages/vet-profile";
 import Premium from "@/pages/premium";
 import Checkout from "@/pages/checkout";
+import OtherSignIn from "@/pages/other-signin";
 
 function Router() {
   return (
     <Switch>
-
       <Route path="/" component={Discover} />
       <Route path="/discover" component={Discover} />
       <Route path="/spotlight" component={Spotlight} />
@@ -38,18 +38,27 @@ function Router() {
 function App() {
   const [location] = useLocation();
   const isVetPage = location.startsWith('/vet-');
+  const isAuthPage = location.startsWith('/auth/');
   
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <AuthWrapper>
-          <div className={`${isVetPage ? 'max-w-full' : 'max-w-sm mx-auto'} bg-white min-h-screen relative flex flex-col`}>
-            <div className="flex-1 overflow-auto pb-20">
-              <Router />
-            </div>
-          </div>
-        </AuthWrapper>
+        <Switch>
+          {/* Auth routes - rendered outside AuthWrapper */}
+          <Route path="/auth/other" component={OtherSignIn} />
+          
+          {/* Main app routes - wrapped with AuthWrapper */}
+          <Route>
+            <AuthWrapper>
+              <div className={`${isVetPage ? 'max-w-full' : 'max-w-sm mx-auto'} bg-white min-h-screen relative flex flex-col`}>
+                <div className="flex-1 overflow-auto pb-20">
+                  <Router />
+                </div>
+              </div>
+            </AuthWrapper>
+          </Route>
+        </Switch>
       </TooltipProvider>
     </QueryClientProvider>
   );
