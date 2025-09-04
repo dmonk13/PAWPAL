@@ -317,6 +317,98 @@ export class DatabaseStorage implements IStorage {
       .where(eq(appointments.userId, userId))
       .orderBy(sql`${appointments.appointmentDate} DESC`);
   }
+
+  // Spotlight-specific methods
+  async getSpotlightCandidates(userId: string): Promise<SpotlightCandidate[]> {
+    // Simplified implementation for database storage
+    const user = await this.getUser(userId);
+    if (!user) return [];
+
+    const allDogs = await db.select({
+      dog: dogs,
+      medicalProfile: medicalProfiles
+    })
+    .from(dogs)
+    .leftJoin(medicalProfiles, eq(dogs.id, medicalProfiles.dogId))
+    .where(and(eq(dogs.isActive, true), sql`${dogs.ownerId} != ${userId}`))
+    .limit(5);
+
+    return allDogs.map((row: any) => ({
+      ...row.dog,
+      medicalProfile: row.medicalProfile || undefined,
+      compatibilityScore: 75,
+      badges: row.dog.vetVerified ? ["Vet Verified"] : []
+    }));
+  }
+
+  async getUserPreferences(userId: string): Promise<UserPreferences | undefined> {
+    const [prefs] = await db.select().from(userPreferences).where(eq(userPreferences.userId, userId));
+    return prefs || undefined;
+  }
+
+  async createUserPreferences(prefs: InsertUserPreferences): Promise<UserPreferences> {
+    const [userPrefs] = await db
+      .insert(userPreferences)
+      .values(prefs)
+      .returning();
+    return userPrefs;
+  }
+
+  async updateUserPreferences(userId: string, updates: Partial<UserPreferences>): Promise<UserPreferences | undefined> {
+    const [prefs] = await db
+      .update(userPreferences)
+      .set(updates)
+      .where(eq(userPreferences.userId, userId))
+      .returning();
+    return prefs || undefined;
+  }
+  
+  async getSpotlightState(userId: string, dayStamp: string): Promise<SpotlightState | undefined> {
+    const [state] = await db
+      .select()
+      .from(spotlightState)
+      .where(and(eq(spotlightState.userId, userId), eq(spotlightState.dayStamp, dayStamp)));
+    return state || undefined;
+  }
+
+  async createSpotlightState(state: InsertSpotlightState): Promise<SpotlightState> {
+    const [spotState] = await db
+      .insert(spotlightState)
+      .values(state)
+      .returning();
+    return spotState;
+  }
+
+  async updateSpotlightState(userId: string, dayStamp: string, updates: Partial<SpotlightState>): Promise<SpotlightState | undefined> {
+    const [state] = await db
+      .update(spotlightState)
+      .set(updates)
+      .where(and(eq(spotlightState.userId, userId), eq(spotlightState.dayStamp, dayStamp)))
+      .returning();
+    return state || undefined;
+  }
+  
+  async createLike(like: InsertLike): Promise<Like> {
+    const [likeRecord] = await db
+      .insert(likes)
+      .values(like)
+      .returning();
+    return likeRecord;
+  }
+
+  async getWoofStatus(userId: string): Promise<WoofStatus> {
+    const today = new Date().toISOString().split('T')[0];
+    const state = await this.getSpotlightState(userId, today);
+    
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    
+    return {
+      woofRemaining: state?.woofRemaining || 1,
+      resetTime: tomorrow.toISOString()
+    };
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -440,11 +532,15 @@ export class MemStorage implements IStorage {
           "https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"
         ],
         temperament: ["Playful", "Energetic", "Friendly"],
+        personalityPrompts: null,
         matingPreference: false,
         distanceRadius: 15,
         latitude: "12.9716",
         longitude: "77.5946",
         isActive: true,
+        activityLevel: "High",
+        vetVerified: true,
+        vaccinationStatus: "Up to date",
         createdAt: new Date(),
       },
       {
@@ -461,11 +557,15 @@ export class MemStorage implements IStorage {
           "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"
         ],
         temperament: ["Energetic", "Playful", "Curious"],
+        personalityPrompts: null,
         matingPreference: true,
         distanceRadius: 10,
         latitude: "12.9352",
         longitude: "77.6245",
         isActive: true,
+        activityLevel: "High",
+        vetVerified: false,
+        vaccinationStatus: "Up to date",
         createdAt: new Date(),
       },
       {
@@ -482,11 +582,15 @@ export class MemStorage implements IStorage {
           "https://images.unsplash.com/photo-1605568427561-40dd23c2acea?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"
         ],
         temperament: ["Athletic", "Independent", "Alert"],
+        personalityPrompts: null,
         matingPreference: false,
         distanceRadius: 25,
         latitude: "12.9279",
         longitude: "77.6271",
         isActive: true,
+        activityLevel: "High",
+        vetVerified: true,
+        vaccinationStatus: "Up to date",
         createdAt: new Date(),
       },
       {
@@ -503,11 +607,15 @@ export class MemStorage implements IStorage {
           "https://images.unsplash.com/photo-1551717743-49959800b1f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"
         ],
         temperament: ["Curious", "Gentle", "Food-motivated"],
+        personalityPrompts: null,
         matingPreference: false,
         distanceRadius: 8,
         latitude: "12.9698",
         longitude: "77.7500",
         isActive: true,
+        activityLevel: "Medium",
+        vetVerified: false,
+        vaccinationStatus: "Overdue",
         createdAt: new Date(),
       },
       {
@@ -524,11 +632,15 @@ export class MemStorage implements IStorage {
           "https://images.unsplash.com/photo-1594149831265-35c4c48ed8bf?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"
         ],
         temperament: ["Intelligent", "Social", "Obedient"],
+        personalityPrompts: null,
         matingPreference: true,
         distanceRadius: 12,
         latitude: "12.9141",
         longitude: "77.6101",
         isActive: true,
+        activityLevel: "Medium",
+        vetVerified: true,
+        vaccinationStatus: "Up to date",
         createdAt: new Date(),
       },
       {
@@ -545,11 +657,15 @@ export class MemStorage implements IStorage {
           "https://images.unsplash.com/photo-1591160690555-5debfba289f0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"
         ],
         temperament: ["Loyal", "Playful", "Water-loving"],
+        personalityPrompts: null,
         matingPreference: true,
         distanceRadius: 18,
         latitude: "12.9800",
         longitude: "77.6000",
         isActive: true,
+        activityLevel: "High",
+        vetVerified: false,
+        vaccinationStatus: "Up to date",
         createdAt: new Date(),
       },
       {
@@ -563,11 +679,15 @@ export class MemStorage implements IStorage {
         bio: "Highly intelligent and loves to learn new tricks. Perfect for active families!",
         photos: ["https://images.unsplash.com/photo-1551717743-49959800b1f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
         temperament: ["Intelligent", "Active", "Focused"],
+        personalityPrompts: null,
         matingPreference: false,
         distanceRadius: 20,
         latitude: "12.9500",
         longitude: "77.5800",
         isActive: true,
+        activityLevel: "High",
+        vetVerified: true,
+        vaccinationStatus: "Up to date",
         createdAt: new Date(),
       },
       {
@@ -581,11 +701,15 @@ export class MemStorage implements IStorage {
         bio: "Calm and cuddly companion. Loves lounging and short walks in the park.",
         photos: ["https://images.unsplash.com/photo-1583337130417-3346a1be7dee?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
         temperament: ["Calm", "Affectionate", "Easy-going"],
+        personalityPrompts: null,
         matingPreference: true,
         distanceRadius: 5,
         latitude: "12.9600",
         longitude: "77.6400",
         isActive: true,
+        activityLevel: "Low",
+        vetVerified: false,
+        vaccinationStatus: "Up to date",
         createdAt: new Date(),
       },
       {
@@ -599,11 +723,15 @@ export class MemStorage implements IStorage {
         bio: "Energetic herding dog who loves agility training and frisbee. Great with active families and enjoys learning new tricks!",
         photos: ["https://images.unsplash.com/photo-1551717743-49959800b1f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
         temperament: ["Energetic", "Intelligent", "Loyal", "Herding"],
+        personalityPrompts: null,
         matingPreference: false,
         distanceRadius: 30,
         latitude: "12.9700",
         longitude: "77.7500",
         isActive: true,
+        activityLevel: "High",
+        vetVerified: true,
+        vaccinationStatus: "Up to date",
         createdAt: new Date(),
       },
       {
@@ -617,11 +745,15 @@ export class MemStorage implements IStorage {
         bio: "Gentle giant with a sweet personality. Loves air conditioning, treats, and meeting new friends at a relaxed pace.",
         photos: ["https://images.unsplash.com/photo-1583337130417-3346a1be7dee?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
         temperament: ["Gentle", "Calm", "Friendly", "Laid-back"],
+        personalityPrompts: null,
         matingPreference: true,
         distanceRadius: 8,
         latitude: "12.9400",
         longitude: "77.6200",
         isActive: true,
+        activityLevel: "Low",
+        vetVerified: false,
+        vaccinationStatus: "Up to date",
         createdAt: new Date(),
       },
       {
@@ -635,11 +767,15 @@ export class MemStorage implements IStorage {
         bio: "Tiny but mighty! This little sausage dog loves burrowing under blankets and chasing squirrels in the park.",
         photos: ["https://images.unsplash.com/photo-1518717758536-85ae29035b6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
         temperament: ["Playful", "Curious", "Brave", "Snuggly"],
+        personalityPrompts: null,
         matingPreference: false,
         distanceRadius: 6,
         latitude: "12.9300",
         longitude: "77.5900",
         isActive: true,
+        activityLevel: "Medium",
+        vetVerified: false,
+        vaccinationStatus: "Overdue",
         createdAt: new Date(),
       },
       {
@@ -653,11 +789,15 @@ export class MemStorage implements IStorage {
         bio: "Loyal and protective companion. Well-trained, loves long hikes, and is great with children. Looking for a strong female partner.",
         photos: ["https://images.unsplash.com/photo-1551717743-49959800b1f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"],
         temperament: ["Loyal", "Protective", "Intelligent", "Active"],
+        personalityPrompts: null,
         matingPreference: true,
         distanceRadius: 25,
         latitude: "12.9900",
         longitude: "77.6100",
         isActive: true,
+        activityLevel: "High",
+        vetVerified: true,
+        vaccinationStatus: "Up to date",
         createdAt: new Date(),
       },
       {
@@ -674,11 +814,15 @@ export class MemStorage implements IStorage {
           "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600"
         ],
         temperament: ["Sweet", "Gentle", "Water-loving", "Social"],
+        personalityPrompts: null,
         matingPreference: true,
         distanceRadius: 15,
         latitude: "12.9100",
         longitude: "77.5700",
         isActive: true,
+        activityLevel: "Medium",
+        vetVerified: false,
+        vaccinationStatus: "Up to date",
         createdAt: new Date(),
       }
     ];
@@ -1520,8 +1664,8 @@ export class MemStorage implements IStorage {
       id, 
       createdAt: new Date(),
       bio: insertDog.bio ?? null,
-      photos: insertDog.photos ?? null,
-      temperament: insertDog.temperament ?? null,
+      photos: Array.isArray(insertDog.photos) ? insertDog.photos : null,
+      temperament: Array.isArray(insertDog.temperament) ? insertDog.temperament : null,
       matingPreference: insertDog.matingPreference ?? false,
       distanceRadius: insertDog.distanceRadius ?? 10,
       isActive: insertDog.isActive ?? true
@@ -1549,15 +1693,15 @@ export class MemStorage implements IStorage {
       ...insertProfile, 
       id, 
       createdAt: new Date(),
-      vaccinations: insertProfile.vaccinations ?? null,
-      medications: insertProfile.medications ?? null,
-      allergies: insertProfile.allergies ?? null,
-      conditions: insertProfile.conditions ?? null,
+      vaccinations: Array.isArray(insertProfile.vaccinations) ? insertProfile.vaccinations : null,
+      medications: Array.isArray(insertProfile.medications) ? insertProfile.medications : null,
+      allergies: Array.isArray(insertProfile.allergies) ? insertProfile.allergies : null,
+      conditions: Array.isArray(insertProfile.conditions) ? insertProfile.conditions : null,
       isSpayedNeutered: insertProfile.isSpayedNeutered ?? false,
       vetClearance: insertProfile.vetClearance ?? false,
       vetClearanceDate: insertProfile.vetClearanceDate ?? null,
       vetDocumentUrl: insertProfile.vetDocumentUrl ?? null,
-      insurance: insertProfile.insurance ?? null
+      insurance: insertProfile.insurance && typeof insertProfile.insurance === 'object' ? insertProfile.insurance as any : null
     };
     this.medicalProfiles.set(insertProfile.dogId, profile);
     return profile;
@@ -1809,10 +1953,17 @@ export class MemStorage implements IStorage {
   async createUserPreferences(prefs: InsertUserPreferences): Promise<UserPreferences> {
     const id = randomUUID();
     const userPrefs: UserPreferences = { 
-      ...prefs, 
+      ...prefs,
       id, 
       createdAt: new Date(), 
-      updatedAt: new Date() 
+      updatedAt: new Date(),
+      distanceKm: prefs.distanceKm ?? 25,
+      preferredBreeds: Array.isArray(prefs.preferredBreeds) ? prefs.preferredBreeds : [],
+      preferredSizes: Array.isArray(prefs.preferredSizes) ? prefs.preferredSizes : [],
+      ageRange: prefs.ageRange ?? { min: 0, max: 15 },
+      temperamentPrefs: Array.isArray(prefs.temperamentPrefs) ? prefs.temperamentPrefs : [],
+      activityLevelPrefs: Array.isArray(prefs.activityLevelPrefs) ? prefs.activityLevelPrefs : [],
+      medicalCompat: prefs.medicalCompat ?? { allowAllergies: true, allowChronic: true, notes: "" }
     };
     return userPrefs;
   }
@@ -1828,9 +1979,12 @@ export class MemStorage implements IStorage {
   async createSpotlightState(state: InsertSpotlightState): Promise<SpotlightState> {
     const id = randomUUID();
     const spotState: SpotlightState = { 
-      ...state, 
+      ...state,
       id, 
-      createdAt: new Date() 
+      createdAt: new Date(),
+      candidateIds: Array.isArray(state.candidateIds) ? state.candidateIds : [],
+      woofRemaining: state.woofRemaining ?? 1,
+      lastReset: state.lastReset ?? new Date()
     };
     return spotState;
   }
@@ -1841,7 +1995,13 @@ export class MemStorage implements IStorage {
   
   async createLike(like: InsertLike): Promise<Like> {
     const id = randomUUID();
-    const likeRecord: Like = { ...like, id, createdAt: new Date() };
+    const likeRecord: Like = { 
+      ...like, 
+      id, 
+      createdAt: new Date(),
+      type: like.type ?? "like",
+      note: like.note ?? null
+    };
     return likeRecord;
   }
 
