@@ -30,9 +30,12 @@ import {
   Smartphone,
   Settings,
   AlertTriangle,
-  ExternalLink
+  ExternalLink,
+  ArrowLeft,
+  Phone,
+  Zap
 } from "lucide-react";
-import { SiGoogle, SiApple } from "react-icons/si";
+import { SiGoogle, SiApple, SiFacebook } from "react-icons/si";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -61,9 +64,21 @@ const passwordResetSchema = z.object({
   path: ["confirmPassword"],
 });
 
+const emailSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+});
+
+const phoneSchema = z.object({
+  phone: z.string()
+    .min(10, "Phone number must be at least 10 digits")
+    .regex(/^[\+]?[1-9][\d]{0,15}$/, "Please enter a valid phone number"),
+});
+
 type LoginForm = z.infer<typeof loginSchema>;
 type MagicLinkForm = z.infer<typeof magicLinkSchema>;
 type PasswordResetForm = z.infer<typeof passwordResetSchema>;
+type EmailForm = z.infer<typeof emailSchema>;
+type PhoneForm = z.infer<typeof phoneSchema>;
 
 interface LoginProps {
   onLoginSuccess: () => void;
@@ -71,7 +86,6 @@ interface LoginProps {
 }
 
 export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps) {
-  const [, setLocation] = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [capsLockOn, setCapsLockOn] = useState(false);
   const [keepSignedIn, setKeepSignedIn] = useState(false);
@@ -79,6 +93,11 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
   const [showPasswordReset, setShowPasswordReset] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showOtherSignIn, setShowOtherSignIn] = useState(false);
+  const [activeMethod, setActiveMethod] = useState<string | null>(null);
+  const [lastUsedProvider, setLastUsedProvider] = useState<string | null>(null);
+  const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
+  const [otherSignInError, setOtherSignInError] = useState<string | null>(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);
@@ -150,11 +169,37 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
     },
   });
 
+  const emailForm = useForm<EmailForm>({
+    resolver: zodResolver(emailSchema),
+    defaultValues: { email: "" },
+  });
+
+  const phoneForm = useForm<PhoneForm>({
+    resolver: zodResolver(phoneSchema),
+    defaultValues: { phone: "" },
+  });
+
   // Check for maintenance mode (simplified for demo)
   useEffect(() => {
     // In a real app, this would check a system status endpoint
     setIsMaintenanceMode(false);
   }, []);
+
+  // Check for last used provider when other sign-in is shown
+  useEffect(() => {
+    if (showOtherSignIn) {
+      const lastProvider = localStorage.getItem('pawpal_last_provider');
+      setLastUsedProvider(lastProvider);
+      
+      // Fire analytics event
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'auth_other_screen_view', {
+          event_category: 'authentication',
+          event_label: 'other_signin_methods'
+        });
+      }
+    }
+  }, [showOtherSignIn]);
 
   const loginMutation = useMutation({
     mutationFn: async (data: LoginForm & { keepSignedIn?: boolean }) => {
@@ -253,6 +298,42 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
     },
   });
 
+  // Phone OTP mutation
+  const phoneOtpMutation = useMutation({
+    mutationFn: async (data: PhoneForm) => {
+      return await apiRequest("POST", "/api/auth/phone-otp", data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Verification code sent!",
+        description: "Check your phone for the verification code.",
+        duration: 5000,
+      });
+      setActiveMethod(null);
+    },
+    onError: (error: any) => {
+      setOtherSignInError(error.message || "Failed to send verification code");
+    },
+  });
+
+  // Enhanced magic link mutation for other sign-in
+  const otherMagicLinkMutation = useMutation({
+    mutationFn: async (data: EmailForm) => {
+      return await apiRequest("POST", "/api/auth/magic-link", data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Magic link sent!",
+        description: "Check your email for the sign-in link.",
+        duration: 5000,
+      });
+      setActiveMethod(null);
+    },
+    onError: (error: any) => {
+      setOtherSignInError(error.message || "Failed to send magic link");
+    },
+  });
+
   const onSubmit = (data: LoginForm) => {
     if (loginDelay > 0) return;
     loginMutation.mutate({ ...data, keepSignedIn });
@@ -264,6 +345,71 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
 
   const onPasswordResetSubmit = (data: PasswordResetForm) => {
     passwordResetMutation.mutate(data);
+  };
+
+  const onEmailSubmit = (data: EmailForm) => {
+    otherMagicLinkMutation.mutate(data);
+  };
+
+  const onPhoneSubmit = (data: PhoneForm) => {
+    phoneOtpMutation.mutate(data);
+  };
+
+  const handleProviderAuth = async (provider: string) => {
+    setLoadingProvider(provider);
+    setOtherSignInError(null);
+    
+    // Fire analytics event
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'auth_other_method_select', {
+        event_category: 'authentication',
+        event_label: provider,
+        method: provider
+      });
+    }
+
+    try {
+      if (provider === 'quick') {
+        if (lastUsedProvider) {
+          await handleProviderAuth(lastUsedProvider);
+          return;
+        } else {
+          setOtherSignInError("No previous sign-in method found. Please choose a method below.");
+          setLoadingProvider(null);
+          return;
+        }
+      }
+
+      if (provider === 'facebook') {
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile && !(window as any).FB) {
+          window.location.href = `/api/auth/facebook/web`;
+        } else {
+          window.location.href = `/api/auth/facebook`;
+        }
+      } else if (provider === 'google') {
+        window.location.href = `/api/auth/google`;
+      } else if (provider === 'apple') {
+        window.location.href = `/api/auth/apple`;
+      }
+
+      localStorage.setItem('pawpal_last_provider', provider);
+      
+    } catch (error: any) {
+      setOtherSignInError(error.message || `Failed to sign in with ${provider}`);
+      setLoadingProvider(null);
+    }
+  };
+
+  const isProviderAvailable = (provider: string) => {
+    return true; // For now, all are available
+  };
+
+  const handleBackFromOtherSignIn = () => {
+    setShowOtherSignIn(false);
+    setActiveMethod(null);
+    setOtherSignInError(null);
+    setLoadingProvider(null);
   };
 
   const isFormValid = form.watch("username") && form.watch("password") && 
@@ -535,13 +681,13 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
                 type="button"
                 onClick={() => {
                   // Fire analytics event if available
-                  if (typeof window !== 'undefined' && window.gtag) {
-                    window.gtag('event', 'auth_other_button_click', {
+                  if (typeof window !== 'undefined' && (window as any).gtag) {
+                    (window as any).gtag('event', 'auth_other_button_click', {
                       event_category: 'authentication',
-                      event_label: 'other_signin_methods_redirect'
+                      event_label: 'other_signin_methods_show'
                     });
                   }
-                  setLocation('/auth/other');
+                  setShowOtherSignIn(true);
                 }}
                 className="text-sm text-primary-600 hover:text-primary-700 transition-colors font-medium"
               >
@@ -576,6 +722,260 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
             </div>
           </CardContent>
         </Card>
+
+        {/* Other Sign-In Full Screen */}
+        {showOtherSignIn && (
+          <div className="fixed inset-0 z-50 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-700 text-white overflow-hidden">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 left-0 w-72 h-72 bg-white rounded-full -translate-x-36 -translate-y-36"></div>
+              <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-48 translate-y-48"></div>
+            </div>
+            
+            {/* Header */}
+            <div className="relative z-10 flex items-center justify-between p-4 pt-12">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleBackFromOtherSignIn}
+                className="text-white hover:bg-white/10 rounded-full p-2"
+                aria-label="Go back"
+              >
+                <ArrowLeft className="w-6 h-6" />
+              </Button>
+            </div>
+
+            {/* Hero Content */}
+            <div className="relative z-10 px-6 pt-8 pb-12 h-full overflow-y-auto">
+              <div className="text-center mb-12">
+                <div className="inline-flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-yellow-400 rounded-2xl flex items-center justify-center">
+                    <PawPrint className="w-8 h-8 text-primary-900" />
+                  </div>
+                  <h1 className="text-3xl font-bold text-yellow-400">PAWPAL</h1>
+                </div>
+                <h2 className="text-4xl font-bold mb-4 leading-tight">
+                  For the Love of<br />Love
+                </h2>
+                <p className="text-white/80 text-lg">
+                  {lastUsedProvider ? `You last signed in with ${lastUsedProvider}` : 'Choose your preferred sign-in method'}
+                </p>
+              </div>
+
+              {/* Error Alert */}
+              {otherSignInError && (
+                <Alert className="mb-6 bg-red-500/10 border-red-400 text-red-100" role="alert" aria-live="assertive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>{otherSignInError}</AlertDescription>
+                </Alert>
+              )}
+
+              {/* Auth Methods */}
+              <div className="space-y-4">
+                {/* Quick Sign-in (if available) */}
+                {lastUsedProvider && isProviderAvailable('quick') && (
+                  <Button
+                    onClick={() => handleProviderAuth('quick')}
+                    disabled={loadingProvider === 'quick'}
+                    className="w-full h-14 bg-yellow-400 hover:bg-yellow-300 text-primary-900 font-semibold rounded-2xl text-lg"
+                    aria-busy={loadingProvider === 'quick'}
+                  >
+                    {loadingProvider === 'quick' ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                        Signing in...
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="w-5 h-5 mr-3" />
+                        Quick sign in
+                      </>
+                    )}
+                  </Button>
+                )}
+
+                {/* Facebook */}
+                {isProviderAvailable('facebook') && (
+                  <Button
+                    onClick={() => handleProviderAuth('facebook')}
+                    disabled={loadingProvider === 'facebook'}
+                    className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl text-lg"
+                    aria-busy={loadingProvider === 'facebook'}
+                  >
+                    {loadingProvider === 'facebook' ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                        Connecting...
+                      </>
+                    ) : (
+                      <>
+                        <SiFacebook className="w-5 h-5 mr-3" />
+                        Continue with Facebook
+                      </>
+                    )}
+                  </Button>
+                )}
+
+                {/* Google */}
+                {isProviderAvailable('google') && (
+                  <Button
+                    onClick={() => handleProviderAuth('google')}
+                    disabled={loadingProvider === 'google'}
+                    className="w-full h-14 bg-white hover:bg-gray-50 text-gray-900 font-semibold rounded-2xl text-lg"
+                    aria-busy={loadingProvider === 'google'}
+                  >
+                    {loadingProvider === 'google' ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                        Connecting...
+                      </>
+                    ) : (
+                      <>
+                        <SiGoogle className="w-5 h-5 mr-3" />
+                        Continue with Google
+                      </>
+                    )}
+                  </Button>
+                )}
+
+                {/* Phone Number */}
+                {isProviderAvailable('phone') && (
+                  <Button
+                    onClick={() => setActiveMethod(activeMethod === 'phone' ? null : 'phone')}
+                    disabled={!!loadingProvider}
+                    className="w-full h-14 bg-white hover:bg-gray-50 text-gray-900 font-semibold rounded-2xl text-lg"
+                  >
+                    <Phone className="w-5 h-5 mr-3" />
+                    Use cell phone number
+                  </Button>
+                )}
+
+                {/* Phone Number Form */}
+                {activeMethod === 'phone' && (
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 space-y-4">
+                    <form onSubmit={phoneForm.handleSubmit(onPhoneSubmit)} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="phone" className="text-white font-medium">
+                          Phone Number
+                        </Label>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          placeholder="+1 (555) 123-4567"
+                          className="h-12 bg-white text-gray-900 border-0 rounded-xl"
+                          {...phoneForm.register("phone")}
+                        />
+                        {phoneForm.formState.errors.phone && (
+                          <p className="text-red-300 text-sm flex items-center gap-1">
+                            <AlertTriangle className="w-4 h-4" />
+                            {phoneForm.formState.errors.phone.message}
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        type="submit"
+                        disabled={phoneOtpMutation.isPending}
+                        className="w-full h-12 bg-yellow-400 hover:bg-yellow-300 text-primary-900 font-semibold rounded-xl"
+                      >
+                        {phoneOtpMutation.isPending ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Sending...
+                          </>
+                        ) : (
+                          <>
+                            <Smartphone className="w-4 h-4 mr-2" />
+                            Send verification code
+                          </>
+                        )}
+                      </Button>
+                    </form>
+                  </div>
+                )}
+
+                {/* Email */}
+                {isProviderAvailable('email') && (
+                  <Button
+                    onClick={() => setActiveMethod(activeMethod === 'email' ? null : 'email')}
+                    disabled={!!loadingProvider}
+                    className="w-full h-14 bg-white hover:bg-gray-50 text-gray-900 font-semibold rounded-2xl text-lg"
+                  >
+                    <Mail className="w-5 h-5 mr-3" />
+                    Use email
+                  </Button>
+                )}
+
+                {/* Email Form */}
+                {activeMethod === 'email' && (
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 space-y-4">
+                    <form onSubmit={emailForm.handleSubmit(onEmailSubmit)} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="other-email" className="text-white font-medium">
+                          Email Address
+                        </Label>
+                        <Input
+                          id="other-email"
+                          type="email"
+                          placeholder="your@email.com"
+                          className="h-12 bg-white text-gray-900 border-0 rounded-xl"
+                          {...emailForm.register("email")}
+                        />
+                        {emailForm.formState.errors.email && (
+                          <p className="text-red-300 text-sm flex items-center gap-1">
+                            <AlertTriangle className="w-4 h-4" />
+                            {emailForm.formState.errors.email.message}
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        type="submit"
+                        disabled={otherMagicLinkMutation.isPending}
+                        className="w-full h-12 bg-yellow-400 hover:bg-yellow-300 text-primary-900 font-semibold rounded-xl"
+                      >
+                        {otherMagicLinkMutation.isPending ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Sending...
+                          </>
+                        ) : (
+                          <>
+                            <Mail className="w-4 h-4 mr-2" />
+                            Send magic link
+                          </>
+                        )}
+                      </Button>
+                    </form>
+                  </div>
+                )}
+              </div>
+
+              {/* Legal Footer */}
+              <div className="mt-16 text-center">
+                <p className="text-white/60 text-sm leading-relaxed">
+                  By signing up, you agree to our{' '}
+                  <button 
+                    className="text-white underline hover:no-underline"
+                    onClick={() => {
+                      toast({ title: "Terms", description: "Terms of Service would open here" });
+                    }}
+                  >
+                    Terms
+                  </button>
+                  . See how we use your data in our{' '}
+                  <button 
+                    className="text-white underline hover:no-underline"
+                    onClick={() => {
+                      toast({ title: "Privacy", description: "Privacy Policy would open here" });
+                    }}
+                  >
+                    Privacy Policy
+                  </button>
+                  .
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Demo Credentials */}
         <Card className="bg-info-50 border-info-200 rounded-xl">
