@@ -186,7 +186,7 @@ export default function VetConnect() {
           />
           
           <div className="relative px-4 py-4">
-            {/* Top Row: Back + Title + Premium Badge */}
+            {/* Top Row: Back + Title + Crown Badge */}
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-3">
                 <Link href="/discover">
@@ -199,22 +199,15 @@ export default function VetConnect() {
                     <ArrowLeft className="w-5 h-5 text-gray-700" />
                   </Button>
                 </Link>
-                <div className="flex items-center space-x-2">
-                  <Crown className="w-6 h-6 text-amber-500" />
-                  <h1 className="text-2xl font-bold text-gray-900">Vet Connect</h1>
-                </div>
+                <h1 className="text-2xl font-bold text-gray-900">Vet Connect</h1>
               </div>
               
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Badge 
-                      className="bg-gradient-to-r from-purple-600 to-amber-500 text-white px-3 py-1 font-semibold"
-                      data-tone="info"
-                    >
-                      <Crown className="w-3 h-3 mr-1" />
-                      Premium Feature
-                    </Badge>
+                    <div className="bg-gradient-to-r from-purple-600 to-amber-500 text-white rounded-lg p-3 flex items-center justify-center min-w-[48px] min-h-[48px]">
+                      <Crown className="w-6 h-6" />
+                    </div>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Access to verified veterinarians with advanced booking</p>
