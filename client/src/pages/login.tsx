@@ -552,7 +552,7 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
                     />
                     <div className="absolute right-2 top-0 h-full flex items-center gap-1">
                       {capsLockOn && (
-                        <Lock className="w-4 h-4 text-warning-500" title="Caps Lock is on" />
+                        <Lock className="w-4 h-4 text-warning-500" />
                       )}
                       <Button
                         type="button"
