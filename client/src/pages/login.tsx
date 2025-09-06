@@ -94,6 +94,7 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showOtherSignIn, setShowOtherSignIn] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
   const [activeMethod, setActiveMethod] = useState<string | null>(null);
   const [lastUsedProvider, setLastUsedProvider] = useState<string | null>(null);
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
@@ -412,6 +413,13 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
     setLoadingProvider(null);
   };
 
+  const handleBackFromRegister = () => {
+    setShowRegister(false);
+    setActiveMethod(null);
+    setOtherSignInError(null);
+    setLoadingProvider(null);
+  };
+
   const isFormValid = form.watch("username") && form.watch("password") && 
                      !form.formState.errors.username && !form.formState.errors.password;
 
@@ -700,7 +708,7 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
               <p className="text-sm text-neutral-600">
                 Don't have an account?{" "}
                 <button
-                  onClick={onSwitchToRegister}
+                  onClick={() => setShowRegister(true)}
                   className="font-medium text-primary-600 hover:text-primary-700 transition-colors"
                 >
                   Create account
@@ -964,6 +972,227 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
                   . See how we use your data in our{' '}
                   <button 
                     className="text-white underline hover:no-underline"
+                    onClick={() => {
+                      toast({ title: "Privacy", description: "Privacy Policy would open here" });
+                    }}
+                  >
+                    Privacy Policy
+                  </button>
+                  .
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Registration Dialog */}
+        {showRegister && (
+          <div className="fixed inset-0 z-50 bg-gradient-to-br from-yellow-400 via-yellow-300 to-orange-400 text-neutral-800 overflow-hidden">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 left-0 w-72 h-72 bg-white rounded-full -translate-x-36 -translate-y-36"></div>
+              <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-48 translate-y-48"></div>
+            </div>
+            
+            {/* Header */}
+            <div className="relative z-10 flex items-center justify-between p-4 pt-12">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleBackFromRegister}
+                className="text-neutral-800 hover:bg-white/10 rounded-full p-2"
+                aria-label="Go back to login"
+              >
+                <ArrowLeft className="w-6 h-6" />
+              </Button>
+            </div>
+
+            {/* Hero Content */}
+            <div className="relative z-10 px-6 pt-8 pb-12 h-full overflow-y-auto">
+              <div className="text-center mb-12">
+                <div className="inline-flex items-center gap-3 mb-6">
+                  <div className="w-16 h-16 bg-neutral-800 rounded-3xl flex items-center justify-center shadow-lg">
+                    <PawPrint className="w-10 h-10 text-yellow-400" />
+                  </div>
+                  <h1 className="text-4xl font-bold text-neutral-800">PAWPAL</h1>
+                </div>
+                <p className="text-neutral-700 text-lg font-medium">
+                  Join the community for dog lovers
+                </p>
+              </div>
+
+              {/* Error Alert */}
+              {otherSignInError && (
+                <Alert className="mb-6 bg-red-500/10 border-red-400 text-red-800" role="alert" aria-live="assertive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>{otherSignInError}</AlertDescription>
+                </Alert>
+              )}
+
+              {/* Registration Methods */}
+              <div className="space-y-4">
+                {/* Facebook */}
+                <Button
+                  onClick={() => handleProviderAuth('facebook')}
+                  disabled={loadingProvider === 'facebook'}
+                  className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl text-lg"
+                  aria-busy={loadingProvider === 'facebook'}
+                >
+                  {loadingProvider === 'facebook' ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                      Connecting...
+                    </>
+                  ) : (
+                    <>
+                      <SiFacebook className="w-5 h-5 mr-3" />
+                      Continue with Facebook
+                    </>
+                  )}
+                </Button>
+
+                {/* Google */}
+                <Button
+                  onClick={() => handleProviderAuth('google')}
+                  disabled={loadingProvider === 'google'}
+                  className="w-full h-14 bg-white hover:bg-gray-50 text-gray-900 font-semibold rounded-2xl text-lg shadow-md border border-gray-200"
+                  aria-busy={loadingProvider === 'google'}
+                >
+                  {loadingProvider === 'google' ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                      Connecting...
+                    </>
+                  ) : (
+                    <>
+                      <SiGoogle className="w-5 h-5 mr-3" />
+                      Continue with Google
+                    </>
+                  )}
+                </Button>
+
+                {/* Phone Number */}
+                <Button
+                  onClick={() => setActiveMethod(activeMethod === 'phone' ? null : 'phone')}
+                  disabled={!!loadingProvider}
+                  className="w-full h-14 bg-neutral-800 hover:bg-neutral-700 text-white font-semibold rounded-2xl text-lg"
+                >
+                  <Phone className="w-5 h-5 mr-3" />
+                  Use cell phone number
+                </Button>
+
+                {/* Phone Number Form */}
+                {activeMethod === 'phone' && (
+                  <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 space-y-4">
+                    <form onSubmit={phoneForm.handleSubmit(onPhoneSubmit)} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="register-phone" className="text-neutral-800 font-medium">
+                          Phone Number
+                        </Label>
+                        <Input
+                          id="register-phone"
+                          type="tel"
+                          placeholder="+1 (555) 123-4567"
+                          className="h-12 bg-white text-gray-900 border-0 rounded-xl"
+                          {...phoneForm.register("phone")}
+                        />
+                        {phoneForm.formState.errors.phone && (
+                          <p className="text-red-700 text-sm flex items-center gap-1">
+                            <AlertTriangle className="w-4 h-4" />
+                            {phoneForm.formState.errors.phone.message}
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        type="submit"
+                        disabled={phoneOtpMutation.isPending}
+                        className="w-full h-12 bg-neutral-800 hover:bg-neutral-700 text-white font-semibold rounded-xl"
+                      >
+                        {phoneOtpMutation.isPending ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Sending...
+                          </>
+                        ) : (
+                          <>
+                            <Smartphone className="w-4 h-4 mr-2" />
+                            Send verification code
+                          </>
+                        )}
+                      </Button>
+                    </form>
+                  </div>
+                )}
+
+                {/* Email */}
+                <Button
+                  onClick={() => setActiveMethod(activeMethod === 'email' ? null : 'email')}
+                  disabled={!!loadingProvider}
+                  className="w-full h-14 bg-neutral-800 hover:bg-neutral-700 text-white font-semibold rounded-2xl text-lg"
+                >
+                  <Mail className="w-5 h-5 mr-3" />
+                  Use email
+                </Button>
+
+                {/* Email Form */}
+                {activeMethod === 'email' && (
+                  <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 space-y-4">
+                    <form onSubmit={emailForm.handleSubmit(onEmailSubmit)} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="register-email" className="text-neutral-800 font-medium">
+                          Email Address
+                        </Label>
+                        <Input
+                          id="register-email"
+                          type="email"
+                          placeholder="your@email.com"
+                          className="h-12 bg-white text-gray-900 border-0 rounded-xl"
+                          {...emailForm.register("email")}
+                        />
+                        {emailForm.formState.errors.email && (
+                          <p className="text-red-700 text-sm flex items-center gap-1">
+                            <AlertTriangle className="w-4 h-4" />
+                            {emailForm.formState.errors.email.message}
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        type="submit"
+                        disabled={otherMagicLinkMutation.isPending}
+                        className="w-full h-12 bg-neutral-800 hover:bg-neutral-700 text-white font-semibold rounded-xl"
+                      >
+                        {otherMagicLinkMutation.isPending ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Sending...
+                          </>
+                        ) : (
+                          <>
+                            <Mail className="w-4 h-4 mr-2" />
+                            Send sign-up link
+                          </>
+                        )}
+                      </Button>
+                    </form>
+                  </div>
+                )}
+              </div>
+
+              {/* Legal Footer */}
+              <div className="mt-16 text-center">
+                <p className="text-neutral-700 text-sm leading-relaxed">
+                  By signing up, you agree to our{' '}
+                  <button 
+                    className="text-neutral-800 underline hover:no-underline font-medium"
+                    onClick={() => {
+                      toast({ title: "Terms", description: "Terms of Service would open here" });
+                    }}
+                  >
+                    Terms
+                  </button>
+                  . See how we use your data in our{' '}
+                  <button 
+                    className="text-neutral-800 underline hover:no-underline font-medium"
                     onClick={() => {
                       toast({ title: "Privacy", description: "Privacy Policy would open here" });
                     }}
