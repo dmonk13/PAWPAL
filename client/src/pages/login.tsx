@@ -93,12 +93,9 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
   const [showPasswordReset, setShowPasswordReset] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [showOtherSignIn, setShowOtherSignIn] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [activeMethod, setActiveMethod] = useState<string | null>(null);
-  const [lastUsedProvider, setLastUsedProvider] = useState<string | null>(null);
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
-  const [otherSignInError, setOtherSignInError] = useState<string | null>(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);
@@ -186,21 +183,6 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
     setIsMaintenanceMode(false);
   }, []);
 
-  // Check for last used provider when other sign-in is shown
-  useEffect(() => {
-    if (showOtherSignIn) {
-      const lastProvider = localStorage.getItem('pawpal_last_provider');
-      setLastUsedProvider(lastProvider);
-      
-      // Fire analytics event
-      if (typeof window !== 'undefined' && (window as any).gtag) {
-        (window as any).gtag('event', 'auth_other_screen_view', {
-          event_category: 'authentication',
-          event_label: 'other_signin_methods'
-        });
-      }
-    }
-  }, [showOtherSignIn]);
 
   const loginMutation = useMutation({
     mutationFn: async (data: LoginForm & { keepSignedIn?: boolean }) => {
@@ -313,7 +295,11 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
       setActiveMethod(null);
     },
     onError: (error: any) => {
-      setOtherSignInError(error.message || "Failed to send verification code");
+      toast({
+        title: "Failed to send verification code",
+        description: error.message || "Please try again later.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -406,17 +392,9 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
     return true; // For now, all are available
   };
 
-  const handleBackFromOtherSignIn = () => {
-    setShowOtherSignIn(false);
-    setActiveMethod(null);
-    setOtherSignInError(null);
-    setLoadingProvider(null);
-  };
-
   const handleBackFromRegister = () => {
     setShowRegister(false);
     setActiveMethod(null);
-    setOtherSignInError(null);
     setLoadingProvider(null);
   };
 
@@ -478,6 +456,7 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
                 variant="outline" 
                 className="w-full h-11 border-neutral-300 hover:border-neutral-400 text-neutral-700"
                 style={{ minHeight: '44px' }}
+                onClick={() => handleProviderAuth('apple')}
               >
                 <SiApple className="w-5 h-5 mr-3" />
                 Continue with Apple
@@ -488,11 +467,70 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
                 variant="outline" 
                 className="w-full h-11 border-neutral-300 hover:border-neutral-400 text-neutral-700"
                 style={{ minHeight: '44px' }}
+                onClick={() => setActiveMethod(activeMethod === 'phone' ? null : 'phone')}
+              >
+                <Phone className="w-5 h-5 mr-3" />
+                Continue with phone number
+              </Button>
+              
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="w-full h-11 border-neutral-300 hover:border-neutral-400 text-neutral-700"
+                style={{ minHeight: '44px' }}
+                onClick={() => handleProviderAuth('google')}
               >
                 <SiGoogle className="w-5 h-5 mr-3" />
                 Continue with Google
               </Button>
             </div>
+
+            {/* Phone Number Form */}
+            {activeMethod === 'phone' && (
+              <div className="bg-neutral-50 rounded-2xl p-4 border border-neutral-200">
+                <form onSubmit={phoneForm.handleSubmit(onPhoneSubmit)} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="text-sm font-medium text-neutral-700">
+                      Phone Number
+                    </Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="+1 (555) 123-4567"
+                      className="h-11 border-neutral-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                      {...phoneForm.register("phone")}
+                    />
+                    {phoneForm.formState.errors.phone && (
+                      <p className="text-sm text-error-500 flex items-center gap-1">
+                        <AlertTriangle className="w-4 h-4" />
+                        {phoneForm.formState.errors.phone.message}
+                      </p>
+                    )}
+                  </div>
+                  <Button
+                    type="submit"
+                    disabled={phoneOtpMutation.isPending}
+                    className="w-full h-11 font-medium text-white shadow-lg transition-all duration-300 hover:shadow-xl"
+                    style={{ 
+                      background: 'var(--primary-gradient)',
+                      minHeight: '44px'
+                    }}
+                  >
+                    {phoneOtpMutation.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Smartphone className="w-4 h-4 mr-2" />
+                        Send verification code
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </div>
+            )}
 
             <div className="relative">
               <Separator />
@@ -683,25 +721,6 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
               </form>
             )}
 
-            {/* Other Sign-in Methods */}
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={() => {
-                  // Fire analytics event if available
-                  if (typeof window !== 'undefined' && (window as any).gtag) {
-                    (window as any).gtag('event', 'auth_other_button_click', {
-                      event_category: 'authentication',
-                      event_label: 'other_signin_methods_show'
-                    });
-                  }
-                  setShowOtherSignIn(true);
-                }}
-                className="text-sm text-primary-600 hover:text-primary-700 transition-colors font-medium"
-              >
-                Other sign‑in methods
-              </button>
-            </div>
 
             {/* Create Account Link */}
             <div className="text-center pt-4 border-t border-neutral-200">
@@ -731,259 +750,6 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
           </CardContent>
         </Card>
 
-        {/* Other Sign-In Full Screen */}
-        {showOtherSignIn && (
-          <div className="fixed inset-0 z-50 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-700 text-white overflow-hidden">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 left-0 w-72 h-72 bg-white rounded-full -translate-x-36 -translate-y-36"></div>
-              <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-48 translate-y-48"></div>
-            </div>
-            
-            {/* Header */}
-            <div className="relative z-10 flex items-center justify-between p-4 pt-12">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleBackFromOtherSignIn}
-                className="text-white hover:bg-white/10 rounded-full p-2"
-                aria-label="Go back"
-              >
-                <ArrowLeft className="w-6 h-6" />
-              </Button>
-            </div>
-
-            {/* Hero Content */}
-            <div className="relative z-10 px-6 pt-8 pb-12 h-full overflow-y-auto">
-              <div className="text-center mb-12">
-                <div className="inline-flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-yellow-400 rounded-2xl flex items-center justify-center">
-                    <PawPrint className="w-8 h-8 text-primary-900" />
-                  </div>
-                  <h1 className="text-3xl font-bold text-yellow-400">PAWPAL</h1>
-                </div>
-                <h2 className="text-4xl font-bold mb-4 leading-tight">
-                  For the Love of<br />Love
-                </h2>
-                <p className="text-white/80 text-lg">
-                  {lastUsedProvider ? `You last signed in with ${lastUsedProvider}` : 'Choose your preferred sign-in method'}
-                </p>
-              </div>
-
-              {/* Error Alert */}
-              {otherSignInError && (
-                <Alert className="mb-6 bg-red-500/10 border-red-400 text-red-100" role="alert" aria-live="assertive">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription>{otherSignInError}</AlertDescription>
-                </Alert>
-              )}
-
-              {/* Auth Methods */}
-              <div className="space-y-4">
-                {/* Quick Sign-in (if available) */}
-                {lastUsedProvider && isProviderAvailable('quick') && (
-                  <Button
-                    onClick={() => handleProviderAuth('quick')}
-                    disabled={loadingProvider === 'quick'}
-                    className="w-full h-14 bg-yellow-400 hover:bg-yellow-300 text-primary-900 font-semibold rounded-2xl text-lg"
-                    aria-busy={loadingProvider === 'quick'}
-                  >
-                    {loadingProvider === 'quick' ? (
-                      <>
-                        <Loader2 className="w-5 h-5 mr-3 animate-spin" />
-                        Signing in...
-                      </>
-                    ) : (
-                      <>
-                        <Zap className="w-5 h-5 mr-3" />
-                        Quick sign in
-                      </>
-                    )}
-                  </Button>
-                )}
-
-                {/* Facebook */}
-                {isProviderAvailable('facebook') && (
-                  <Button
-                    onClick={() => handleProviderAuth('facebook')}
-                    disabled={loadingProvider === 'facebook'}
-                    className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl text-lg"
-                    aria-busy={loadingProvider === 'facebook'}
-                  >
-                    {loadingProvider === 'facebook' ? (
-                      <>
-                        <Loader2 className="w-5 h-5 mr-3 animate-spin" />
-                        Connecting...
-                      </>
-                    ) : (
-                      <>
-                        <SiFacebook className="w-5 h-5 mr-3" />
-                        Continue with Facebook
-                      </>
-                    )}
-                  </Button>
-                )}
-
-                {/* Google */}
-                {isProviderAvailable('google') && (
-                  <Button
-                    onClick={() => handleProviderAuth('google')}
-                    disabled={loadingProvider === 'google'}
-                    className="w-full h-14 bg-white hover:bg-gray-50 text-gray-900 font-semibold rounded-2xl text-lg"
-                    aria-busy={loadingProvider === 'google'}
-                  >
-                    {loadingProvider === 'google' ? (
-                      <>
-                        <Loader2 className="w-5 h-5 mr-3 animate-spin" />
-                        Connecting...
-                      </>
-                    ) : (
-                      <>
-                        <SiGoogle className="w-5 h-5 mr-3" />
-                        Continue with Google
-                      </>
-                    )}
-                  </Button>
-                )}
-
-                {/* Phone Number */}
-                {isProviderAvailable('phone') && (
-                  <Button
-                    onClick={() => setActiveMethod(activeMethod === 'phone' ? null : 'phone')}
-                    disabled={!!loadingProvider}
-                    className="w-full h-14 bg-white hover:bg-gray-50 text-gray-900 font-semibold rounded-2xl text-lg"
-                  >
-                    <Phone className="w-5 h-5 mr-3" />
-                    Use cell phone number
-                  </Button>
-                )}
-
-                {/* Phone Number Form */}
-                {activeMethod === 'phone' && (
-                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 space-y-4">
-                    <form onSubmit={phoneForm.handleSubmit(onPhoneSubmit)} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="phone" className="text-white font-medium">
-                          Phone Number
-                        </Label>
-                        <Input
-                          id="phone"
-                          type="tel"
-                          placeholder="+1 (555) 123-4567"
-                          className="h-12 bg-white text-gray-900 border-0 rounded-xl"
-                          {...phoneForm.register("phone")}
-                        />
-                        {phoneForm.formState.errors.phone && (
-                          <p className="text-red-300 text-sm flex items-center gap-1">
-                            <AlertTriangle className="w-4 h-4" />
-                            {phoneForm.formState.errors.phone.message}
-                          </p>
-                        )}
-                      </div>
-                      <Button
-                        type="submit"
-                        disabled={phoneOtpMutation.isPending}
-                        className="w-full h-12 bg-yellow-400 hover:bg-yellow-300 text-primary-900 font-semibold rounded-xl"
-                      >
-                        {phoneOtpMutation.isPending ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Sending...
-                          </>
-                        ) : (
-                          <>
-                            <Smartphone className="w-4 h-4 mr-2" />
-                            Send verification code
-                          </>
-                        )}
-                      </Button>
-                    </form>
-                  </div>
-                )}
-
-                {/* Email */}
-                {isProviderAvailable('email') && (
-                  <Button
-                    onClick={() => setActiveMethod(activeMethod === 'email' ? null : 'email')}
-                    disabled={!!loadingProvider}
-                    className="w-full h-14 bg-white hover:bg-gray-50 text-gray-900 font-semibold rounded-2xl text-lg"
-                  >
-                    <Mail className="w-5 h-5 mr-3" />
-                    Use email
-                  </Button>
-                )}
-
-                {/* Email Form */}
-                {activeMethod === 'email' && (
-                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 space-y-4">
-                    <form onSubmit={emailForm.handleSubmit(onEmailSubmit)} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="other-email" className="text-white font-medium">
-                          Email Address
-                        </Label>
-                        <Input
-                          id="other-email"
-                          type="email"
-                          placeholder="your@email.com"
-                          className="h-12 bg-white text-gray-900 border-0 rounded-xl"
-                          {...emailForm.register("email")}
-                        />
-                        {emailForm.formState.errors.email && (
-                          <p className="text-red-300 text-sm flex items-center gap-1">
-                            <AlertTriangle className="w-4 h-4" />
-                            {emailForm.formState.errors.email.message}
-                          </p>
-                        )}
-                      </div>
-                      <Button
-                        type="submit"
-                        disabled={otherMagicLinkMutation.isPending}
-                        className="w-full h-12 bg-yellow-400 hover:bg-yellow-300 text-primary-900 font-semibold rounded-xl"
-                      >
-                        {otherMagicLinkMutation.isPending ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Sending...
-                          </>
-                        ) : (
-                          <>
-                            <Mail className="w-4 h-4 mr-2" />
-                            Send magic link
-                          </>
-                        )}
-                      </Button>
-                    </form>
-                  </div>
-                )}
-              </div>
-
-              {/* Legal Footer */}
-              <div className="mt-16 text-center">
-                <p className="text-white/60 text-sm leading-relaxed">
-                  By signing up, you agree to our{' '}
-                  <button 
-                    className="text-white underline hover:no-underline"
-                    onClick={() => {
-                      toast({ title: "Terms", description: "Terms of Service would open here" });
-                    }}
-                  >
-                    Terms
-                  </button>
-                  . See how we use your data in our{' '}
-                  <button 
-                    className="text-white underline hover:no-underline"
-                    onClick={() => {
-                      toast({ title: "Privacy", description: "Privacy Policy would open here" });
-                    }}
-                  >
-                    Privacy Policy
-                  </button>
-                  .
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Registration Dialog - Mobile Optimized */}
         {showRegister && (
