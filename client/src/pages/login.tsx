@@ -995,16 +995,14 @@ export default function Login({ onLoginSuccess, onSwitchToRegister }: LoginProps
             </div>
             
             {/* Header with prominent back button */}
-            <div className="relative z-10 flex items-center justify-start p-4 pt-12">
-              <Button
-                variant="ghost"
-                size="lg"
+            <div className="absolute top-0 left-0 z-50 p-4 pt-12">
+              <button
                 onClick={handleBackFromRegister}
-                className="text-neutral-800 hover:bg-white/20 bg-white/10 rounded-full p-3 shadow-lg backdrop-blur-sm border border-white/20"
+                className="flex items-center justify-center w-12 h-12 bg-black/20 hover:bg-black/30 text-white rounded-full shadow-xl backdrop-blur-sm border-2 border-white/30 transition-all duration-200 hover:scale-110"
                 aria-label="Go back to login"
               >
-                <ArrowLeft className="w-8 h-8" />
-              </Button>
+                <ArrowLeft className="w-6 h-6 text-white" />
+              </button>
             </div>
 
             {/* Hero Content */}
