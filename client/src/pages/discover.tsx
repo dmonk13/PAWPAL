@@ -27,16 +27,16 @@ export default function Discover() {
             <p className="text-gray-600 text-sm">Find a friend, start a wag</p>
           </div>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center">
           <Button
-            variant="ghost"
-            size="sm"
-            className="text-gray-600 hover:text-rose-500 hover:bg-gray-100 rounded-full p-2"
+            variant="default"
+            size="default"
+            className="bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-4 py-2 rounded-xl font-medium"
             onClick={() => setShowFilters(true)}
           >
-            <Sliders className="w-5 h-5" />
+            <Sliders className="w-5 h-5 mr-2" />
+            Filters
           </Button>
-          <DiscoverUserNav />
         </div>
       </header>
 
